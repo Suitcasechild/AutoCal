@@ -1,0 +1,34 @@
+TASMOTA PRECISION CALIBRATION REPORT
+Methode:          HOME
+Datenquelle (CSV): 20260216_200247
+Report erstellt:  20260216_200247
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  226.70V | DUT  226.40V | Err:  -0.30V ( -0.13%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.246A | DUT   0.272A | Err: +0.025A (+10.27%) -> Cal-Vorschlag: 2948
+  Leistung: Ref   62.16W | DUT   61.45W | Err:  -0.71W ( -1.14%) -> Cal-Vorschlag: 9582
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 1.011549 | Bestimmtheitsmaß R2 = 0.759216
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1538                     VoltageCal 1540
+    CurrentCal 3251                     CurrentCal 2948
+      PowerCal 9473                       PowerCal 9582
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+[20:03:29] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+[20:03:29] As Found (Vorher):  VCal 1538 | ACal 3251 | WCal 9473
+[20:03:29] As Left  (Nachher): VCal 1540 | ACal 2948 | WCal 9582
+[20:03:29] Status der Übertragung: ERFOLGREICH
+=====================================================================================

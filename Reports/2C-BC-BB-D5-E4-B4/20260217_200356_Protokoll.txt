@@ -1,0 +1,55 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D5E4B4-1204
+  MAC Address: 2C:BC:BB:D5:E4:B4
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260217_200356
+  Report erstellt:    20260217_200356
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  227.40V | DUT  227.10V | Err:  -0.30V ( -0.13%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.269A | DUT   0.272A | Err: +0.003A ( +1.00%) -> Cal-Vorschlag: 3202
+  Leistung: Ref   62.79W | DUT   62.95W | Err:  +0.16W ( +0.26%) -> Cal-Vorschlag: 9591
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.997372 | Bestimmtheitsmaß R2 = 0.090909
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1538                     VoltageCal 1540 (Mittelwert der Stufen)
+    CurrentCal 3235                     CurrentCal 3202 (Mittelwert der Stufen)
+      PowerCal 9617                       PowerCal 9591 (aus Regression, empfohlen)
+                                          └─ Alternative: 9591 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+
+[20:04:41] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+
+[20:04:41] Gesendete Werte:    VCal 1540 | ACal 3202 | WCal 9591
+
+[20:04:41] As Found (Vorher):  VCal 1538 | ACal 3235 | WCal 9617
+
+[20:04:41] As Left  (Nachher): VCal 1540 | ACal 3202 | WCal 9591
+
+[20:04:41] Status der Übertragung: ERFOLGREICH
+
+=====================================================================================

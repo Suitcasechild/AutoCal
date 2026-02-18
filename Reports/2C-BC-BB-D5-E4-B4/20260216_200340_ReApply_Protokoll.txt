@@ -1,0 +1,27 @@
+TASMOTA PRECISION CALIBRATION RE-APPLY REPORT
+Methode:          HOME
+Ursprünglicher Report: 20260216_200247_Protokoll.txt
+Re-Apply Report erstellt:  20260216_200340
+=====================================================================================
+
+[1] BEREITS ERMITTELTE KALIBRIERWERTE WERDEN ERNEUT ANGEWENDET
+  Vorgeschlagene VoltageCal: 1540
+  Vorgeschlagene CurrentCal: 2948
+  Vorgeschlagene PowerCal:   9582
+
+=====================================================================================
+[2] AS FOUND / AS LEFT (Wird nach Übertragung ergänzt)
+
+    VoltageCal: ???? -> ????
+    CurrentCal: ???? -> ????
+    PowerCal:   ???? -> ????
+
+=====================================================================================
+ENDE DES RE-APPLY PROTOKOLLS
+
+=====================================================================================
+[20:04:02] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+[20:04:02] As Found (Vorher):  VCal 1540 | ACal 2948 | WCal 9582
+[20:04:02] As Left  (Nachher): VCal 1540 | ACal 2948 | WCal 9582
+[20:04:02] Status der Übertragung: ERFOLGREICH
+=====================================================================================

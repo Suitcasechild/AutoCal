@@ -1,0 +1,27 @@
+TASMOTA PRECISION CALIBRATION REPORT
+Methode:          HOME
+Datenquelle (CSV): 20260215_194706
+Report erstellt:  20260215_194706
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  231.12V | DUT  231.20V | Err:  +0.07V ( +0.03%) -> Cal-Vorschlag: 1525
+  Strom:    Ref   0.273A | DUT   0.290A | Err: +0.018A ( +6.55%) -> Cal-Vorschlag: 3250
+  Leistung: Ref   63.98W | DUT   67.20W | Err:  +3.22W ( +5.03%) -> Cal-Vorschlag: 9593
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.952080 | Bestimmtheitsmaß R2 = 0.266667
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1526                     VoltageCal 1525
+    CurrentCal 3463                     CurrentCal 3250
+      PowerCal 10076                      PowerCal 9593
+
+=====================================================================================
+ENDE DES PROTOKOLLS
