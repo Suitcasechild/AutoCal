@@ -2,6 +2,9 @@
 
 ## v5.1.0 (2026-02-18)
 
+### 📚 Dokumentation
+*   **Projektdokumentation:** Eine detaillierte `README.md` wurde erstellt, die das Projekt, dessen Features und den technischen Stack in Deutsch und Englisch beschreibt.
+
 ### ⚙️ Konfiguration
 *   **Git-Konfiguration:** `.gitignore` Datei hinzugefügt, um Python-Caches, virtuelle Umgebungen, Build-Artefakte und Windows-Systemdateien aus dem Repository auszuschließen.
 
