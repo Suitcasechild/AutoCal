@@ -1,5 +1,10 @@
 # Changelog
 
+## v5.1.0 (2026-02-18)
+
+### ⚙️ Konfiguration
+*   **Git-Konfiguration:** `.gitignore` Datei hinzugefügt, um Python-Caches, virtuelle Umgebungen, Build-Artefakte und Windows-Systemdateien aus dem Repository auszuschließen.
+
 ## v5.0.0 (2026-02-17)
 
 ### ✨ Features

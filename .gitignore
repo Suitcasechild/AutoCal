@@ -1,0 +1,30 @@
+# Python
+# English: Exclude Python compiled files and caches
+# Deutsch: Schließe Python-Kompilate und Caches aus
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+# English: Exclude virtual environment folders
+# Deutsch: Schließe Ordner für virtuelle Umgebungen aus
+venv/
+.venv/
+env/
+ENV/
+
+# Build & Distribution
+# English: Exclude PyInstaller build and distribution folders
+# Deutsch: Schließe PyInstaller Build- und Dist-Ordner aus
+build/
+dist/
+*.spec
+
+# Windows
+# English: Exclude Windows system files
+# Deutsch: Schließe Windows-Systemdateien aus
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
