@@ -438,7 +438,7 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(0, 0, 0, 0)
                 plot_widget = pg.PlotWidget()
                 plot_widget.setLabel('left', title, units=unit)
-                plot_widget.setLabel('bottom', 'Zeit', units='s')
+                plot_widget.setLabel('bottom', 'Messung', units='#')
                 plot_widget.showGrid(x=True, y=True)
                 plot_widget.addLegend(offset=(30, 10))
                 
@@ -487,8 +487,9 @@ class MainWindow(QMainWindow):
         for data_key, curve_key in mapping.items():
             if curve_key in self.curves:
                 plot_data = self.graph_data[data_key][-100:]
-                if plot_data: 
-                    self.curves[curve_key].setData(plot_data)
+                if plot_data:
+                    x_values = list(range(len(plot_data)))
+                    self.curves[curve_key].setData(x=x_values, y=plot_data)
 
     def setup_ui_logic(self):
         self.ui.btn_start.clicked.connect(self.toggle_measurement)
@@ -520,7 +521,7 @@ class MainWindow(QMainWindow):
         try:
             if hasattr(self.ui, 'edit_dut_ip'): self.ui.edit_dut_ip.setText(self.cm.config.get('TARGET', 'ip_address', fallback='0.0.0.0'))
             if hasattr(self.ui, 'spin_steps'): self.ui.spin_steps.setValue(self.cm.config.getint('TARGET', 'measurement_steps', fallback=3))
-            if hasattr(self.ui, 'spin_duration'): self.ui.spin_duration.setValue(self.cm.config.getint('TARGET', 'duration_per_step', fallback=15))
+            if hasattr(self.ui, 'spin_measurements'): self.ui.spin_measurements.setValue(self.cm.config.getint('TARGET', 'measurements_per_step', fallback=15))
         except Exception as e:
             self.ui.log_output.appendPlainText(f"❌ Fehler beim Laden der INI: {e}")
 
@@ -686,7 +687,7 @@ class MainWindow(QMainWindow):
         if not dut_info: return self.ui.log_output.appendPlainText("❌ ABBRUCH: Ziel-Dose nicht erreichbar!")
 
         steps = self.ui.spin_steps.value()
-        duration = self.ui.spin_duration.value()
+        measurements = self.ui.spin_measurements.value()
 
         com_port = self.cm.config.get('REFERENCE_PRO', 'com_port', fallback='')
         ref_ip = self.cm.config.get('REFERENCE_HOME', 'ip_address', fallback='')
@@ -717,7 +718,7 @@ class MainWindow(QMainWindow):
 
         try:
             self.cm.config['TARGET']['measurement_steps'] = str(steps)
-            self.cm.config['TARGET']['duration_per_step'] = str(duration)
+            self.cm.config['TARGET']['measurements_per_step'] = str(measurements)
             with open('config.ini', 'w') as configfile: self.cm.config.write(configfile)
         except: return
 
@@ -762,7 +763,7 @@ class MainWindow(QMainWindow):
                     self.ui.log_output.appendPlainText("ℹ️ Alte Daten werden ignoriert. Starte neuen Testlauf.")
 
         params = {
-            'mode': "PRO" if is_pro else "HOME", 'steps': steps, 'duration': duration,
+            'mode': "PRO" if is_pro else "HOME", 'steps': steps, 'measurements': measurements,
             'ref_ip': ref_ip, 'com_port': com_port, 'dut_ip': dut_ip,
             'device_path': device_path, 'session_ts': session_ts,
             'use_existing': use_existing,
