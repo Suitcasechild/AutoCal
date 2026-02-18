@@ -146,11 +146,10 @@ class MeasurementWorker(QThread):
 
                 if not self.is_running: break
 
-                self.log_signal.emit(f"\n▶️ Zeichne Messdaten auf (Stufe {stufe}/{self.params['steps']} | {self.params['duration']}s)...")
+                self.log_signal.emit(f"\n▶️ Zeichne Messdaten auf (Stufe {stufe}/{self.params['steps']} | {self.params['measurements']} Messungen)...")
                 step_data_list = []
-                start_time = time.time()
-
-                while (time.time() - start_time) < self.params['duration']:
+                
+                for i in range(self.params['measurements']):
                     if not self.is_running: break
                     
                     try:
