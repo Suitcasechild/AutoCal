@@ -866,7 +866,7 @@ class MainWindow(QMainWindow):
 
     def show_license_info(self):
         license_text = (
-            "Tasmota Precision Calibrator v5.1\n"
+            "Tasmota Precision Calibrator v5.2.0\n"
             "Erstellt von: Arnulf Greilberger\n\n"
             "----------------------------------------------------------\n"
             "LIZENZ:\n"
