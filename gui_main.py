@@ -109,7 +109,6 @@ class MeasurementWorker(QThread):
                     return
                 
                 self.apply_request_signal.emit(old_report_path, dut_ip, [], dut_info_str, ref_info_str)
-                self.finished_signal.emit("") # Worker ist hier fertig
                 return
 
             # =========================================================
