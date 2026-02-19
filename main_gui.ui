@@ -208,7 +208,7 @@
       <item row="1" column="1">
        <widget class="QSpinBox" name="spin_measurements">
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Messdauer pro Stufe&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Zeitfenster für die Datenaufnahme nach der Stabilisierung. &lt;br/&gt;Hinweis: &lt;br/&gt;Längere Zeiten (z.B. 15-30s) filtern Schwankungen und Rauschen&lt;br/&gt;besser heraus, was zu einer präziseren Korrektur führt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Anzahl der Messwerte pro Stufe&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Ermittlung der Messwerte für die Datenaufnahme nach der Stabilisierung. &lt;br/&gt;Hinweis: &lt;br/&gt;Mehr Messwerte (z.B. 15-30) filtern Schwankungen und Rauschen&lt;br/&gt;besser, was zu einer präziseren Korrektur führt.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
