@@ -1,28 +1,71 @@
+# -*- coding: utf-8 -*-
+"""
+# English: This module contains the core logic for calculating calibration values and generating reports.
+# Deutsch: Dieses Modul enthält die Kernlogik für die Berechnung von Kalibrierwerten und die Erstellung von Protokollen.
+"""
 import os
 import pandas as pd
 from data_analyzer import DataAnalyzer
 
 class CalibrationEngine:
+    """
+    # English:
+    # Handles the calculation of new calibration values based on measurement data
+    # and generates summary reports.
+    # Deutsch:
+    # Übernimmt die Berechnung neuer Kalibrierwerte basierend auf Messdaten
+    # und erstellt zusammenfassende Protokolle.
+    """
     def __init__(self, device_path):
+        """
+        # English: Initializes the CalibrationEngine.
+        # Deutsch: Initialisiert die CalibrationEngine.
+
+        :param device_path: (str) The path to the directory where device-specific files are stored.
+                            (str) Der Pfad zum Verzeichnis, in dem gerätespezifische Dateien gespeichert werden.
+        """
         self.device_path = device_path
 
     def calculate_new_calibration(self, csv_file, old_cal):
+        """
+        # English:
+        # Calculates new calibration factor suggestions for a single measurement step (one CSV file).
+        # It compares the mean values of the reference (Soll) and the device-under-test (Ist).
+        # Deutsch:
+        # Berechnet neue Kalibrierfaktor-Vorschläge für eine einzelne Messstufe (eine CSV-Datei).
+        # Vergleicht die Mittelwerte der Referenz (Soll) und des Prüflings (Ist).
+
+        :param csv_file: (str) Path to the CSV file containing measurement data for one step.
+                         (str) Pfad zur CSV-Datei mit den Messdaten einer Stufe.
+        :param old_cal: (dict) The existing calibration factors of the device.
+                        (dict) Die bestehenden Kalibrierfaktoren des Geräts.
+        :return: (dict) A dictionary containing all calculated results for this step.
+                 (dict) Ein Dictionary mit allen berechneten Ergebnissen für diese Stufe.
+        """
+        # English: Read the measurement data from the CSV file.
+        # Deutsch: Lese die Messdaten aus der CSV-Datei.
         df = pd.read_csv(csv_file)
         
+        # English: Calculate the mean values for reference (Soll) and DUT (Ist).
+        # Deutsch: Berechne die Mittelwerte für Referenz (Soll) und Prüfling (Ist).
         soll = {"V": df['Ref_Volt'].mean(), "A": df['Ref_Amp'].mean(), "W": df['Ref_Watt'].mean()}
         ist = {"V": df['Target_Volt'].mean(), "A": df['Target_Amp'].mean(), "W": df['Target_Watt'].mean()}
 
-        # Berechnung der Abweichungen (DEIN ORIGINAL CODE)
+        # English: Calculate absolute and relative differences.
+        # Deutsch: Berechne die absoluten und relativen Abweichungen.
         diff_abs = {k: ist[k] - soll[k] for k in soll}
         diff_rel = {k: (diff_abs[k] / soll[k] * 100) if soll[k] > 0 else 0 for k in soll}
 
-        # Stufenspezifische Faktoren
+        # English: Calculate the suggested calibration factors for this specific step.
+        # Deutsch: Berechne die vorgeschlagenen Kalibrierfaktoren für diese spezifische Stufe.
         stufen_cal = {
             "VCal": int(old_cal['VCal'] * (soll['V'] / ist['V'])) if ist['V'] > 0 else old_cal['VCal'],
             "ACal": int(old_cal['ACal'] * (soll['A'] / ist['A'])) if ist['A'] > 0 else old_cal['ACal'],
             "WCal": int(old_cal['WCal'] * (soll['W'] / ist['W'])) if ist['W'] > 0 else old_cal['WCal']
         }
 
+        # English: Return a structured dictionary with all results for this step.
+        # Deutsch: Gib ein strukturiertes Dictionary mit allen Ergebnissen dieser Stufe zurück.
         return {
             "Stufe": None,
             "Soll": soll,
@@ -34,24 +77,56 @@ class CalibrationEngine:
         }
 
     def write_summary(self, all_results, data_ts, report_ts=None, cal_mode="Unbekannt", old_cal=None, dut_info=None, ref_info=None):
-        # Zeitstempel-Logik
+        """
+        # English:
+        # Writes a detailed summary report (.txt) based on the results of all measurement steps.
+        # It calculates final suggestions for calibration values (averaged and from regression).
+        # Deutsch:
+        # Schreibt ein detailliertes Zusammenfassungsprotokoll (.txt) basierend auf den Ergebnissen aller Messstufen.
+        # Es berechnet endgültige Vorschläge für Kalibrierwerte (gemittelt und aus der Regression).
+
+        :param all_results: (list) A list of result dictionaries from `calculate_new_calibration`.
+                            (list) Eine Liste von Ergebnis-Dictionaries aus `calculate_new_calibration`.
+        :param data_ts: (str) The timestamp of the source CSV data.
+                        (str) Der Zeitstempel der zugrundeliegenden CSV-Daten.
+        :param report_ts: (str, optional) The timestamp for the report file itself. Defaults to data_ts.
+                          (str, optional) Der Zeitstempel für die Protokolldatei selbst. Standard ist data_ts.
+        :param cal_mode: (str, optional) The calibration mode used ("PRO" or "HOME").
+                         (str, optional) Der verwendete Kalibriermodus ("PRO" oder "HOME").
+        :param old_cal: (dict, optional) The existing calibration factors.
+                        (dict, optional) Die bestehenden Kalibrierfaktoren.
+        :param dut_info: (dict, optional) Information about the device under test.
+                         (dict, optional) Informationen über den Prüfling.
+        :param ref_info: (dict, optional) Information about the reference device.
+                         (dict, optional) Informationen über das Referenzgerät.
+        :return: (str) The path to the generated report file.
+                 (str) Der Pfad zur erstellten Protokolldatei.
+        """
+        # English: Use the report timestamp if provided, otherwise fall back to the data timestamp.
+        # Deutsch: Verwende den Protokoll-Zeitstempel, falls vorhanden, ansonsten den Daten-Zeitstempel.
         actual_report_ts = report_ts if report_ts else data_ts
 
+        # English: Get regression analysis data for power values.
+        # Deutsch: Hole die Regressionsanalyse-Daten für die Leistungswerte.
         reg_data = DataAnalyzer.calculate_regression(self.device_path, data_ts)
         
+        # --- FINAL SUGGESTION CALCULATION ---
         # --- BERECHNUNG DER FINALEN VORSCHLÄGE ---
         
-        # VCal und ACal werden immer über die Stufen gemittelt
+        # English: VCal and ACal are always averaged across all steps.
+        # Deutsch: VCal und ACal werden immer über alle Stufen gemittelt.
         avg_v = int(sum(r['Stufen_Cal']['VCal'] for r in all_results) / len(all_results))
         avg_a = int(sum(r['Stufen_Cal']['ACal'] for r in all_results) / len(all_results))
         
-        # Für PowerCal beide Methoden berechnen
+        # English: Calculate PowerCal using both methods (average and regression).
+        # Deutsch: Berechne PowerCal über beide Methoden (Mittelwert und Regression).
         pcal_from_regression = 0
         pcal_from_avg = int(sum(r['Stufen_Cal']['WCal'] for r in all_results) / len(all_results))
 
         if reg_data and old_cal:
             p_reg = reg_data['Power']
-            # Die eigentliche Formel: Alter Wert * Steigung der Korrektur
+            # English: The formula: Old value * slope of the correction.
+            # Deutsch: Die eigentliche Formel: Alter Wert * Steigung der Korrektur.
             pcal_from_regression = int(old_cal.get('WCal', 12500) * p_reg['slope'])
                 
         path = os.path.join(self.device_path, f"{actual_report_ts}_Protokoll.txt")
@@ -60,7 +135,8 @@ class CalibrationEngine:
             f.write(f"TASMOTA PRECISION CALIBRATION REPORT\n")
             f.write("="*85 + "\n")
             
-            # --- NEUER GERÄTE-HEADER ---
+            # --- DEVICE HEADER ---
+            # --- GERÄTE-HEADER ---
             if dut_info:
                 f.write("[PRÜFLING (DUT)]\n")
                 f.write(f"  Device Name: {dut_info.get('name', 'k.A.')}\n")
@@ -77,7 +153,7 @@ class CalibrationEngine:
                     f.write(f"  Hostname:    {ref_info.get('host', 'k.A.')}\n")
                     f.write(f"  MAC Address: {ref_info.get('mac', 'k.A.')}\n")
             f.write("="*85 + "\n\n")
-            # --- ENDE NEUER HEADER ---
+            # --- END HEADER ---
 
             f.write(f"MESSUNGSDETAILS\n")
             f.write(f"  Kalibrier-Modus:  {cal_mode}\n")
@@ -121,6 +197,25 @@ class CalibrationEngine:
         return path
 
     def write_reapply_summary(self, new_report_path, original_report_path, dut_info, ref_info):
+        """
+        # English:
+        # Writes a short summary report for a "Re-Apply" action.
+        # This report only documents that values from a previous report were applied.
+        # Deutsch:
+        # Schreibt ein kurzes Protokoll für eine "Re-Apply"-Aktion.
+        # Dieses Protokoll dokumentiert nur, dass Werte aus einem früheren Protokoll angewendet wurden.
+
+        :param new_report_path: (str) Path for the new, short report.
+                                (str) Pfad für das neue, kurze Protokoll.
+        :param original_report_path: (str) Path to the original report that was used.
+                                     (str) Pfad zum ursprünglichen Protokoll, das verwendet wurde.
+        :param dut_info: (dict) Information about the device under test.
+                         (dict) Informationen über den Prüfling.
+        :param ref_info: (dict) Information about the reference device (can be None).
+                         (dict) Informationen über das Referenzgerät (kann None sein).
+        :return: (str) The path to the generated report file.
+                 (str) Der Pfad zur erstellten Protokolldatei.
+        """
         with open(new_report_path, "w", encoding="utf-8") as f:
             f.write(f"TASMOTA RE-APPLY CALIBRATION REPORT\n")
             f.write("="*85 + "\n")

@@ -43,9 +43,9 @@
      <property name="geometry">
       <rect>
        <x>380</x>
-       <y>140</y>
+       <y>130</y>
        <width>241</width>
-       <height>41</height>
+       <height>50</height>
       </rect>
      </property>
      <property name="text">
@@ -58,7 +58,7 @@
        <x>20</x>
        <y>20</y>
        <width>351</width>
-       <height>46</height>
+       <height>91</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -67,41 +67,67 @@
      <property name="frameShadow">
       <enum>QFrame::Shadow::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Referenzen:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="check_ref_pro">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Referenz: Fluke 45 (Labor-Modus)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nutzt das Fluke 45 Dual-Display Multimeter als hochpräzise Referenz. &lt;/p&gt;&lt;p&gt;Voraussetzungen:&lt;br/&gt;• Verbindung via &lt;span style=&quot; font-weight:700;&quot;&gt;RS232-Schnittstelle&lt;/span&gt; (seriell). &lt;br/&gt;• Das Gerät wird im &lt;span style=&quot; font-weight:700;&quot;&gt;Dual-Modus&lt;/span&gt; betrieben, um Spannung und Strom gleichzeitig zu erfassen. &lt;br/&gt;• Ein spezieller &lt;span style=&quot; font-weight:700;&quot;&gt;Messadapter&lt;/span&gt; zum Abgriff von Strom und Spannung wird benötigt.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Die Leistung (Watt) wird softwareseitig aus den Präzisionswerten berechnet.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>FLUKE 45 Referenz</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="check_ref_home">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Referenz: Tasmota-Dose&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nutzt eine kalibrierte Steckdose als Vergleichsnormal.&lt;br/&gt;&lt;br/&gt;Messaufbau:&lt;br/&gt;Prüfling in die Referenz-Dose stecken. &lt;/p&gt;&lt;p&gt;Hinweis:&lt;br/&gt;Das Programm ermittelt vorab automatisch den Eigenverbrauch &lt;br/&gt;des Prüflings und zieht diesen während der Kalibrierung von den&lt;br/&gt;Referenzwerten ab, um höchste Präzision zu gewährleisten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Tasmota Referenz</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>62</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Referenzen:</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>0</y>
+        <width>241</width>
+        <height>86</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="check_ref_home">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Referenz: Tasmota-Dose&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nutzt eine kalibrierte Steckdose als Vergleichsnormal.&lt;br/&gt;&lt;br/&gt;Messaufbau:&lt;br/&gt;Prüfling in die Referenz-Dose stecken. &lt;/p&gt;&lt;p&gt;Hinweis:&lt;br/&gt;Das Programm ermittelt vorab automatisch den Eigenverbrauch &lt;br/&gt;des Prüflings und zieht diesen während der Kalibrierung von den&lt;br/&gt;Referenzwerten ab, um höchste Präzision zu gewährleisten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Tasmota</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="check_ref_manual">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Referenz: Tasmota-Dose&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nutzt eine kalibrierte Steckdose als Vergleichsnormal.&lt;br/&gt;&lt;br/&gt;Messaufbau:&lt;br/&gt;Prüfling in die Referenz-Dose stecken. &lt;/p&gt;&lt;p&gt;Hinweis:&lt;br/&gt;Das Programm ermittelt vorab automatisch den Eigenverbrauch &lt;br/&gt;des Prüflings und zieht diesen während der Kalibrierung von den&lt;br/&gt;Referenzwerten ab, um höchste Präzision zu gewährleisten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Manuell</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="check_ref_pro">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Referenz: Fluke 45 (Labor-Modus)&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Nutzt das Fluke 45 Dual-Display Multimeter als hochpräzise Referenz. &lt;/p&gt;&lt;p&gt;Voraussetzungen:&lt;br/&gt;• Verbindung via &lt;span style=&quot; font-weight:700;&quot;&gt;RS232-Schnittstelle&lt;/span&gt; (seriell). &lt;br/&gt;• Das Gerät wird im &lt;span style=&quot; font-weight:700;&quot;&gt;Dual-Modus&lt;/span&gt; betrieben, um Spannung und Strom gleichzeitig zu erfassen. &lt;br/&gt;• Ein spezieller &lt;span style=&quot; font-weight:700;&quot;&gt;Messadapter&lt;/span&gt; zum Abgriff von Strom und Spannung wird benötigt.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Die Leistung (Watt) wird softwareseitig aus den Präzisionswerten berechnet.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>FLUKE 45</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QFrame" name="frame_3">
      <property name="geometry">
       <rect>
        <x>20</x>
-       <y>82</y>
+       <y>130</y>
        <width>351</width>
        <height>48</height>
       </rect>
@@ -142,7 +168,7 @@
        <x>380</x>
        <y>20</y>
        <width>241</width>
-       <height>111</height>
+       <height>91</height>
       </rect>
      </property>
      <property name="sizePolicy">
