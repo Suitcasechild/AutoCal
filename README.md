@@ -56,6 +56,12 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
 ## Bedienungsanleitung
 
 ### 1. Vorbereitung & Installation
+**Option A: Vorkompilierte Version (Empfohlen für Anwender)**
+
+Für Benutzer, die Python nicht installieren möchten, steht im [Releases-Tab](https://github.com/Suitcasechild/AutoCal/releases) eine vorkompilierte Version (`.exe` für Windows) zur Verfügung. Laden Sie einfach die neueste `TasmotaCalibrator.exe` herunter und führen Sie sie aus.
+
+**Option B: Aus dem Quellcode (Für Entwickler)**
+
 1.  **Repository klonen:** Laden Sie das Projekt auf Ihren Computer herunter, z.B. mit `git clone https://github.com/Suitcasechild/AutoCal.git`.
 2.  **Abhängigkeiten installieren:** Das Projekt enthält eine `requirements.txt`-Datei. Installieren Sie alle benötigten Bibliotheken mit dem Befehl:  
     `pip install -r requirements.txt`
@@ -100,6 +106,12 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
 ## User Guide
 
 ### 1. Preparation & Installation
+**Option A: Pre-compiled Version (Recommended for Users)**
+
+For users who do not want to install Python, a pre-compiled version (`.exe` for Windows) is available in the [Releases tab](https://github.com/Suitcasechild/AutoCal/releases). Simply download the latest `TasmotaCalibrator.exe` and run it.
+
+**Option B: From Source Code (For Developers)**
+
 1.  **Clone Repository:** Download the project to your computer, e.g., with `git clone https://github.com/Suitcasechild/AutoCal.git`.
 2.  **Install Dependencies:** The project includes a `requirements.txt` file. Install all required libraries using the command:  
     `pip install -r requirements.txt`
