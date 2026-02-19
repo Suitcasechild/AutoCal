@@ -68,10 +68,10 @@ class ReferenceManager:
             print(f"[FEHLER] Fluke 45 Initialisierung fehlgeschlagen: {e}")
             return False
 
-    def get_reference_data(self):
+    def get_reference_data(self, auth=None):
         if self.mode == 'PRO':
             return self._get_fluke_data()
-        return self._get_tasmota_ref_data()
+        return self._get_tasmota_ref_data(auth)
 
     def _get_fluke_data(self):
         """Abfrage mit VAL? wie im Testskript"""
@@ -90,10 +90,10 @@ class ReferenceManager:
         except:
             return None, None, None
 
-    def _get_tasmota_ref_data(self):
+    def _get_tasmota_ref_data(self, auth=None):
         ip = self.config['REFERENCE_HOME']['ip_address']
         try:
-            r = httpx.get(f"http://{ip}/cm?cmnd=Status%208", timeout=2)
+            r = httpx.get(f"http://{ip}/cm?cmnd=Status%208", timeout=2, auth=auth)
             d = r.json()['StatusSNS']['ENERGY']
             
             # 1. Rohwerte von der Referenzdose lesen
@@ -112,12 +112,12 @@ class ReferenceManager:
             # Falls ein Fehler auftritt (z.B. Timeout), geben wir None zurück
             return None, None, None
 
-    def get_current_cal_factors(self, target_ip):
+    def get_current_cal_factors(self, target_ip, auth=None):
         factors = {"VCal": 20230, "ACal": 2500, "WCal": 12500}
         cmds = {"VoltageCal": "VCal", "CurrentCal": "ACal", "PowerCal": "WCal"}
         for cmd, key in cmds.items():
             try:
-                r = httpx.get(f"http://{target_ip}/cm?cmnd={cmd}", timeout=2)
+                r = httpx.get(f"http://{target_ip}/cm?cmnd={cmd}", timeout=2, auth=auth)
                 val = r.json().get(cmd)
                 if val is not None:
                     factors[key] = int(val)

@@ -10,7 +10,8 @@ import pandas as pd
 from datetime import datetime
 import pyqtgraph as pg
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QMessageBox, 
-                               QDialog, QTextEdit, QHBoxLayout, QPushButton, QFileDialog)
+                               QDialog, QTextEdit, QHBoxLayout, QPushButton, QFileDialog,
+                               QLabel, QLineEdit)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QThread, Signal, QObject, Qt
 
@@ -18,6 +19,7 @@ from PySide6.QtCore import QFile, QThread, Signal, QObject, Qt
 from config_manager import ConfigManager
 from reference_manager import ReferenceManager
 from data_analyzer import DataAnalyzer
+from credential_manager import CredentialsManager
 
 # ---------------------------------------------------------
 # 1. DER LOG-SPION
@@ -42,11 +44,18 @@ class MeasurementWorker(QThread):
     show_popup_signal = Signal(str)
     hide_popup_signal = Signal()
 
-    def __init__(self, config, params):
+    def __init__(self, config, params, credentials_manager):
         super().__init__()
         self.config = config
         self.params = params
+        self.credentials_manager = credentials_manager
         self.is_running = True
+
+    def _get_auth(self, ip):
+        creds = self.credentials_manager.get_credentials(ip)
+        if creds:
+            return (creds['user'], creds['password'])
+        return None
 
     def wait_for_power(self, ip, stufe):
         msg = f"STUFE {stufe}:\nWarte auf Leistung...\n\nBitte Ziel-Dose jetzt EINSCHALTEN!"
@@ -54,15 +63,19 @@ class MeasurementWorker(QThread):
         
         self.show_popup_signal.emit(msg)
         
+        auth = self._get_auth(ip)
         while self.is_running:
             try:
-                r = httpx.get(f"http://{ip}/cm?cmnd=Status%2011", timeout=2.0)
+                r = httpx.get(f"http://{ip}/cm?cmnd=Status%2011", timeout=2.0, auth=auth)
+                r.raise_for_status()
                 if r.json()['StatusSTS']['POWER'] == 'ON':
                     self.log_signal.emit(f"✅ Power ON erkannt! Starte Inrush-Filter (7s)...")
                     self.hide_popup_signal.emit()
                     return True
-            except:
-                pass
+            except Exception as e:
+                self.log_signal.emit(f"Fehler in wait_for_power: {e}")
+                # Kein Abbruch hier, da es nur ein Lese-Fehler sein könnte.
+                # Die Haupt-Schleife wird es erneut versuchen.
             time.sleep(1)
             
         self.hide_popup_signal.emit()
@@ -70,7 +83,7 @@ class MeasurementWorker(QThread):
 
     def run(self):
         try:
-            from main import check_device_availability
+            # from main import check_device_availability # wird bereits in der mainwindow gemacht
             from calibration_engine import CalibrationEngine
 
             dut_ip = self.params['dut_ip']
@@ -81,6 +94,9 @@ class MeasurementWorker(QThread):
             dut_info_str = json.dumps(self.params.get('dut_info'))
             ref_info_str = json.dumps(self.params.get('ref_info'))
             
+            dut_auth = self._get_auth(dut_ip)
+            ref_auth = self._get_auth(ref_ip)
+
             # =========================================================
             # ABLAUF WENN "VORHANDENE DATEN NUTZEN" GEWÄHLT WURDE
             # =========================================================
@@ -92,7 +108,6 @@ class MeasurementWorker(QThread):
                     self.finished_signal.emit(f"❌ Fehler: Der ursprüngliche Report '{old_report_path}' wurde nicht gefunden.")
                     return
                 
-                # Signal mit leerem all_results signalisiert einen Re-Apply-Vorgang
                 self.apply_request_signal.emit(old_report_path, dut_ip, [], dut_info_str, ref_info_str)
                 self.finished_signal.emit("") # Worker ist hier fertig
                 return
@@ -100,17 +115,10 @@ class MeasurementWorker(QThread):
             # =========================================================
             # NORMALER ABLAUF (Neue Messung mit Hardware)
             # =========================================================
-            self.log_signal.emit("🔄 Prüfe Erreichbarkeit der Ziel-Dose...")
-            if not check_device_availability(dut_ip, "Ziel-Dose"):
-                self.finished_signal.emit("❌ ABBRUCH: Ziel-Dose nicht erreichbar!")
-                return
-
-            if mode == "HOME" and not check_device_availability(ref_ip, "Tasmota-Referenz"):
-                self.finished_signal.emit("❌ ABBRUCH: Referenz-Dose nicht erreichbar!")
-                return
+            # Die Erreichbarkeitsprüfung ist bereits in start_measurement() erfolgt
 
             ref_manager = ReferenceManager(self.config)
-            old_cal = ref_manager.get_current_cal_factors(dut_ip)
+            old_cal = ref_manager.get_current_cal_factors(dut_ip, dut_auth)
             engine = CalibrationEngine(self.params['device_path'])
             all_results = []
 
@@ -123,19 +131,19 @@ class MeasurementWorker(QThread):
                 ref_manager.set_mode('HOME')
 
             from main import prepare_dut
-            prepare_dut(dut_ip)
+            prepare_dut(dut_ip, dut_auth)
 
             if mode == "HOME":
                 self.log_signal.emit("🔌 Schalte Ziel-Dose für Offset-Messung AUS...")
                 try:
-                    httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2)
+                    httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2, auth=dut_auth)
                     time.sleep(2) 
                 except Exception as e:
                     self.log_signal.emit(f"⚠️ Warnung: Automatisches Ausschalten fehlgeschlagen: {e}")
 
                 if not self.is_running: return
                 from refhome_offset import ermittle_offset
-                offset_a, offset_w = ermittle_offset(ref_ip)
+                offset_a, offset_w = ermittle_offset(ref_ip, ref_auth)
                 ref_manager.set_home_offset(offset_a, offset_w)
 
             for stufe in range(1, self.params['steps'] + 1):
@@ -153,17 +161,20 @@ class MeasurementWorker(QThread):
                     if not self.is_running: break
                     
                     try:
-                        ref_v, ref_a, ref_w = ref_manager.get_reference_data()
+                        ref_v, ref_a, ref_w = ref_manager.get_reference_data(ref_auth)
                         if ref_v is None: ref_v, ref_a, ref_w = 0.0, 0.0, 0.0
                     except Exception as e:
                         self.log_signal.emit(f"⚠️ REFERENZ LESE-FEHLER: {e}")
                         ref_v, ref_a, ref_w = 0.0, 0.0, 0.0
                     
                     try:
-                        r = httpx.get(f"http://{dut_ip}/cm?cmnd=Status%208", timeout=2)
+                        r = httpx.get(f"http://{dut_ip}/cm?cmnd=Status%208", timeout=2, auth=dut_auth)
+                        r.raise_for_status()
                         d = r.json()['StatusSNS']['ENERGY']
                         dut_v, dut_a, dut_w = float(d['Voltage']), float(d['Current']), float(d['Power'])
-                    except: dut_v, dut_a, dut_w = 0.0, 0.0, 0.0
+                    except Exception as e: 
+                        self.log_signal.emit(f"❌ Fehler beim Lesen der Zieldose: {e}")
+                        dut_v, dut_a, dut_w = 0.0, 0.0, 0.0
 
                     self.data_signal.emit({'volt_ref': ref_v, 'volt_dut': dut_v, 'amp_ref': ref_a, 'amp_dut': dut_a, 'watt_ref': ref_w, 'watt_dut': dut_w, 'dut_off': (dut_w <= 0) })
                     step_data_list.append({'Ref_Volt': ref_v, 'Ref_Amp': ref_a, 'Ref_Watt': ref_w, 'Target_Volt': dut_v, 'Target_Amp': dut_a, 'Target_Watt': dut_w})
@@ -183,7 +194,7 @@ class MeasurementWorker(QThread):
                     try:
                         self.log_signal.emit(f"🔌 Schalte Ziel-Dose nach Stufe {stufe} AUS...")
                         self.data_signal.emit({'volt_ref': None, 'volt_dut': 0.0, 'amp_ref': None, 'amp_dut': 0.0, 'watt_ref': None, 'watt_dut': 0.0, 'dut_off': True})
-                        httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2)
+                        httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2, auth=dut_auth)
                         time.sleep(3.0)
                     except Exception as e:
                         self.log_signal.emit(f"⚠️ Warnung: Konnte Ziel-Dose nicht ausschalten: {e}")
@@ -214,12 +225,13 @@ class MeasurementWorker(QThread):
 # 3. DAS PROTOKOLL-POPUP (Custom Dialog)
 # ---------------------------------------------------------
 class CalibrationReportDialog(QDialog):
-    def __init__(self, parent, target_ip, final_values, is_reapply, report_info):
+    def __init__(self, parent, target_ip, final_values, is_reapply, report_info, credentials_manager):
         super().__init__(parent)
         self.target_ip = target_ip
         self.final_values = final_values
         self.is_reapply = is_reapply
         self.report_info = report_info # Enthält device_path, session_ts, dut_info, ref_info
+        self.credentials_manager = credentials_manager
         self.log_callback = parent.ui.log_output.appendPlainText
         self.chosen_pcal = 0
         # Wichtig: Der Pfad zum aktuell angezeigten Report
@@ -341,7 +353,15 @@ class CalibrationReportDialog(QDialog):
         from calibration_engine import CalibrationEngine
 
         self.log_callback("\n🚀 Starte Übertragung an die Dose...")
-        as_found_left_string = apply_calibration(self.target_ip, self.final_values['vcal'], self.final_values['acal'], self.chosen_pcal)
+        
+        # English: Get auth tuple from manager
+        # Deutsch: Hole Auth-Tupel aus dem Manager
+        auth = None
+        creds = self.credentials_manager.get_credentials(self.target_ip)
+        if creds:
+            auth = (creds['user'], creds['password'])
+            
+        as_found_left_string = apply_calibration(self.target_ip, self.final_values['vcal'], self.final_values['acal'], self.chosen_pcal, auth=auth)
 
         if as_found_left_string:
             self.log_callback("✅ Übertragung abgeschlossen.")
@@ -374,12 +394,75 @@ class CalibrationReportDialog(QDialog):
 
 
 # ---------------------------------------------------------
-# 4. DAS HAUPTFENSTER (GUI)
+# 4. DAS CREDENTIAL-POPUP (Custom Dialog)
+# ---------------------------------------------------------
+class CredentialDialog(QDialog):
+    """
+    # English: A dialog to ask the user for username and password.
+    # Deutsch: Ein Dialog, um den Benutzer nach Benutzername und Passwort zu fragen.
+    """
+    def __init__(self, device_name, attempt=1, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(f"Zugangsdaten für {device_name}")
+        self.setModal(True)
+
+        self.layout = QVBoxLayout(self)
+
+        # English: Add a descriptive label
+        # Deutsch: Füge ein beschreibendes Label hinzu
+        self.info_label = QLabel(f"Zugangsdaten für '{device_name}' erforderlich (Versuch {attempt}/3).")
+        self.layout.addWidget(self.info_label)
+
+        # English: Username field
+        # Deutsch: Benutzername-Feld
+        self.user_label = QLabel("Benutzername:")
+        self.user_input = QLineEdit(self)
+        self.layout.addWidget(self.user_label)
+        self.layout.addWidget(self.user_input)
+
+        # English: Password field
+        # Deutsch: Passwort-Feld
+        self.pass_label = QLabel("Passwort:")
+        self.pass_input = QLineEdit(self)
+        self.pass_input.setEchoMode(QLineEdit.Password)
+        self.layout.addWidget(self.pass_label)
+        self.layout.addWidget(self.pass_input)
+        
+        # English: Add a disclaimer that the credentials are not stored permanently.
+        # Deutsch: Füge einen Hinweis hinzu, dass die Zugangsdaten nicht dauerhaft gespeichert werden.
+        self.disclaimer_label = QLabel(
+            "<i>Die Zugangsdaten werden nicht dauerhaft gespeichert und nur für diesen Kalibrierprozess verwendet.</i>"
+        )
+        self.disclaimer_label.setWordWrap(True)
+        self.layout.addWidget(self.disclaimer_label)
+
+        # English: OK and Cancel buttons
+        # Deutsch: OK- und Abbrechen-Buttons
+        self.btn_layout = QHBoxLayout()
+        self.ok_button = QPushButton("OK", self)
+        self.ok_button.clicked.connect(self.accept)
+        self.cancel_button = QPushButton("Abbrechen", self)
+        self.cancel_button.clicked.connect(self.reject)
+        self.btn_layout.addWidget(self.ok_button)
+        self.btn_layout.addWidget(self.cancel_button)
+        self.layout.addLayout(self.btn_layout)
+
+    def get_credentials(self):
+        """
+        # English: Returns the entered username and password.
+        # Deutsch: Gibt den eingegebenen Benutzernamen und das Passwort zurück.
+        """
+        return self.user_input.text().strip(), self.pass_input.text()
+
+
+# ---------------------------------------------------------
+# 5. DAS HAUPTFENSTER (GUI)
 # ---------------------------------------------------------
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.cm = ConfigManager()
+        self.credentials_manager = CredentialsManager()
         self.wait_msgbox = None   
         ui_path = os.path.join(os.path.dirname(__file__), "main_gui.ui")
         ui_file = QFile(ui_path)
@@ -674,6 +757,7 @@ class MainWindow(QMainWindow):
             self.start_measurement()
 
     def start_measurement(self):
+        self.credentials_manager.clear_all_credentials()
         is_pro = self.ui.check_ref_pro.isChecked()
         is_home = self.ui.check_ref_home.isChecked()
         if not is_pro and not is_home:
@@ -772,7 +856,7 @@ class MainWindow(QMainWindow):
 
         for key in self.graph_data: self.graph_data[key] = []
         
-        self.worker = MeasurementWorker(self.cm.config, params)
+        self.worker = MeasurementWorker(self.cm.config, params, self.credentials_manager)
         
         self.worker.log_signal.connect(self.ui.log_output.appendPlainText)
         self.worker.data_signal.connect(self.update_live_data)
@@ -787,6 +871,7 @@ class MainWindow(QMainWindow):
         self.worker.start()
 
     def measurement_finished(self, message):
+        self.credentials_manager.clear_all_credentials()
         if message: 
             self.ui.log_output.appendPlainText(message)
         self.ui.btn_start.setText("Kalibrierung Starten")
@@ -859,7 +944,7 @@ class MainWindow(QMainWindow):
             'ref_info': ref_info
         }
 
-        dialog = CalibrationReportDialog(self, target_ip, final_values, is_reapply, report_info)
+        dialog = CalibrationReportDialog(self, target_ip, final_values, is_reapply, report_info, self.credentials_manager)
         dialog.exec()
         
         self.measurement_finished("🏁 Der gesamte Kalibrierprozess ist beendet.")
@@ -897,13 +982,41 @@ class MainWindow(QMainWindow):
             if hasattr(self.ui, 'split_info'):
                 self.ui.split_info.setVisible(False)
 
+    def _handle_auth_error(self, ip, attempt):
+        # English: Shows a dialog to get credentials from the user.
+        # Deutsch: Zeigt einen Dialog an, um Zugangsdaten vom Benutzer zu erhalten.
+        device_name = f"Gerät bei IP {ip}"
+        dialog = CredentialDialog(device_name, attempt, self)
+        
+        if dialog.exec() == QDialog.Accepted:
+            user, password = dialog.get_credentials()
+            if user: # Password can be empty
+                self.credentials_manager.set_credentials(ip, user, password)
+                self.ui.log_output.appendPlainText(f"ℹ️ Zugangsdaten für {ip} erhalten. Versuche erneut...")
+                return True # continue loop
+        
+        # English: User cancelled the dialog
+        # Deutsch: Benutzer hat den Dialog abgebrochen
+        return False # break loop
+
     def fetch_tasmota_info(self, ip, is_dut=True):
-        try:
-            r = httpx.get(f"http://{ip}/cm?cmnd=Status%200", timeout=2.0)
-            
-            if r.status_code == 200:
+        auth = None
+        for attempt in range(1, 4):
+            try:
+                # English: Get credentials from manager if they exist
+                # Deutsch: Hole Zugangsdaten aus dem Manager, falls vorhanden
+                creds = self.credentials_manager.get_credentials(ip)
+                if creds:
+                    auth = (creds['user'], creds['password'])
+
+                # English: Make the request
+                # Deutsch: Führe die Anfrage durch
+                r = httpx.get(f"http://{ip}/cm?cmnd=Status%200", timeout=2.0, auth=auth)
+                r.raise_for_status() # Raise exception for 4xx/5xx errors
+
+                # English: Success! Process data.
+                # Deutsch: Erfolg! Verarbeite die Daten.
                 data = r.json()
-                
                 device_name = data.get('Status', {}).get('DeviceName', 'Tasmota')
                 hostname = data.get('StatusNET', {}).get('Hostname', 'Unbekannt')
                 mac_addr = data.get('StatusNET', {}).get('Mac', 'Unbekannt')
@@ -924,16 +1037,28 @@ class MainWindow(QMainWindow):
                 
                 self.ui.log_output.appendPlainText(f"✅ Dose '{device_name}' ({ip}) erfolgreich gefunden.")
                 return info
-            else:
-                self.ui.log_output.appendPlainText(f"❌ Fehler: Dose ({ip}) antwortet mit Status {r.status_code}")
-                if is_dut and hasattr(self.ui, 'split_info'): self.ui.split_info.setVisible(False)
-                return None
-                
-        except Exception as e:
-            self.ui.log_output.appendPlainText(f"❌ Dose ({ip}) nicht erreichbar: {str(e)}")
-            if is_dut and hasattr(self.ui, 'split_info'):
-                self.ui.split_info.setVisible(False)
-            return None
+
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 401:
+                    self.ui.log_output.appendPlainText(f"🔑 Authentifizierung für {ip} erforderlich.")
+                    if not self._handle_auth_error(ip, attempt):
+                        # User cancelled
+                        break 
+                else:
+                    self.ui.log_output.appendPlainText(f"❌ Fehler: Dose ({ip}) antwortet mit Status {e.response.status_code}")
+                    break # Break on other HTTP errors
+            
+            except Exception as e:
+                self.ui.log_output.appendPlainText(f"❌ Dose ({ip}) nicht erreichbar: {str(e)}")
+                break # Break on connection errors etc.
+
+        # English: If the loop finishes without success
+        # Deutsch: Wenn die Schleife ohne Erfolg endet
+        self.ui.log_output.appendPlainText(f"❌ Verbindung zu {ip} endgültig fehlgeschlagen.")
+        if is_dut and hasattr(self.ui, 'split_info'):
+            self.ui.split_info.setVisible(False)
+        return None
+
 
     def reset_lcd_displays(self):
         """Setzt alle LCD-Anzeigen auf das 'Keine Daten' Format."""

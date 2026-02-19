@@ -2,12 +2,13 @@ import httpx
 import time
 import os
 
-def get_current_factors(ip):
+def get_current_factors(ip, auth=None):
     factors = {}
     commands = ["VoltageCal", "CurrentCal", "PowerCal"]
     try:
         for cmd in commands:
-            r = httpx.get(f"http://{ip}/cm?cmnd={cmd}", timeout=3)
+            r = httpx.get(f"http://{ip}/cm?cmnd={cmd}", timeout=3, auth=auth)
+            r.raise_for_status()
             val = list(r.json().values())[0]
             factors[cmd] = val
         return factors
@@ -15,10 +16,10 @@ def get_current_factors(ip):
         print(f"Fehler beim Lesen der Faktoren: {e}")
         return None
 
-def apply_calibration(ip, new_v, new_a, new_w):
+def apply_calibration(ip, new_v, new_a, new_w, auth=None):
     """Sendet die finalen Kalibrierdaten und gibt einen 'As Found'/'As Left' String zurück."""
     print("\n--- STATUS VOR DER ÜBERTRAGUNG ---")
-    as_found = get_current_factors(ip)
+    as_found = get_current_factors(ip, auth=auth)
     if not as_found:
         print("Fehler: Konnte bestehende Faktoren nicht lesen.")
         return None 
@@ -27,11 +28,11 @@ def apply_calibration(ip, new_v, new_a, new_w):
     print(f"Sende neue Werte an {ip}...")
     try:
         cmd_chain = f"VoltageCal {new_v}; CurrentCal {new_a}; PowerCal {new_w}"
-        httpx.get(f"http://{ip}/cm?cmnd=Backlog%20{cmd_chain}", timeout=5)
+        httpx.get(f"http://{ip}/cm?cmnd=Backlog%20{cmd_chain}", timeout=5, auth=auth)
         time.sleep(2)
 
         print("\n--- VERIFIZIERUNG ---")
-        as_left = get_current_factors(ip)
+        as_left = get_current_factors(ip, auth=auth)
         
         if not as_left:
             print("Fehler: Konnte neue Faktoren nach dem Senden nicht verifizieren.")

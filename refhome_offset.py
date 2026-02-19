@@ -1,7 +1,7 @@
 import time
 import httpx
 
-def ermittle_offset(ref_ip):
+def ermittle_offset(ref_ip, auth=None):
     """
     Ermittelt den Eigenverbrauch der DUT-Dose an der Referenz-Dose.
     Wird aufgerufen, während die DUT-Dose noch ausgeschaltet ist.
@@ -12,7 +12,7 @@ def ermittle_offset(ref_ip):
     
     for i in range(1, 6):
         try:
-            r = httpx.get(f"http://{ref_ip}/cm?cmnd=Status%208", timeout=2)
+            r = httpx.get(f"http://{ref_ip}/cm?cmnd=Status%208", timeout=2, auth=auth)
             d = r.json()['StatusSNS']['ENERGY']
             a = float(d['Current'])
             w = float(d['Power'])

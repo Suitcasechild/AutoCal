@@ -9,11 +9,11 @@ from reference_manager import ReferenceManager
 from calibration_engine import CalibrationEngine
 
 # Hilfsfunktionen (identisch mit Backup)
-def prepare_dut(target_ip):
+def prepare_dut(target_ip, auth=None):
     print(f"Bereite Ziel-Dose vor (Auflösung & Optionen)...")
     cmds = "VoltRes 2;WattRes 2;AmpRes 3;SetOption21 1"
     try:
-        httpx.get(f"http://{target_ip}/cm?cmnd=Backlog%20{cmds}", timeout=5)
+        httpx.get(f"http://{target_ip}/cm?cmnd=Backlog%20{cmds}", timeout=5, auth=auth)
         return True
     except: return False
 
