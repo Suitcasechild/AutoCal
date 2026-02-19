@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.2.0 (2026-02-19)
+
+### 📝 Planung & Spezifikation
+*   **Neues Feature 'Manuelle Kalibrierung':** Ein neues, umfangreiches Feature für eine manuelle Kalibrierungsmethode wurde spezifiziert. Die Anforderungen und der Implementierungsplan wurden in der Datei `TODO.md` festgehalten.
+*   **Neues Feature 'Dynamisches Credential-Management':** Die Anforderungen für die dynamische Abfrage von Zugangsdaten für passwortgeschützte Tasmota-Geräte wurden definiert und in `TODO.md` ergänzt.
+
 ## v5.1.0 (2026-02-18)
 
 ### 📚 Dokumentation
