@@ -208,11 +208,12 @@ class MeasurementWorker(QThread):
                 )
                 self.log_signal.emit("\n" + "="*40 + "\nERMITTLUNG DER KALIBRIERWERTE ABGESCHLOSSEN\n" + "="*40)
                 self.apply_request_signal.emit(report_file, dut_ip, all_results, dut_info_str, ref_info_str)
-            
+                return # Job is done, main thread takes over via dialog.
+
             if not self.is_running:
                 self.finished_signal.emit("⚠️ Messung wurde vom Benutzer abgebrochen.")
             else:
-                self.finished_signal.emit("")
+                self.finished_signal.emit("ℹ️ Messung beendet, aber es wurden keine Ergebnisse zum Anwenden generiert.")
 
         except Exception as e:
             self.finished_signal.emit(f"❌ Schwerer Fehler im Worker: {str(e)}")
