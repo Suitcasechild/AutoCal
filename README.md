@@ -51,6 +51,42 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
 *   **Nicht-blockierende GUI:** Live-Daten werden mit `pyqtgraph` angezeigt, und die gesamte Kommunikation (HTTP und Seriell) läuft in einem Hintergrund-Thread (`QThread`), um die Oberfläche reaktionsfähig zu halten.
 *   **Prüfung vor der Messung:** Überprüft automatisch Geräteeinstellungen (`SetOption21`, Auflösung) und ermöglicht das erneute Anwenden einer Kalibrierung aus alten Protokollen, ohne eine neue Messung durchführen zu müssen.
 
+---
+
+## Bedienungsanleitung
+
+### 1. Vorbereitung & Installation
+1.  **Repository klonen:** Laden Sie das Projekt auf Ihren Computer herunter, z.B. mit `git clone https://github.com/Suitcasechild/AutoCal.git`.
+2.  **Abhängigkeiten installieren:** Das Projekt enthält eine `requirements.txt`-Datei. Installieren Sie alle benötigten Bibliotheken mit dem Befehl:  
+    `pip install -r requirements.txt`
+3.  **Konfiguration (`config.ini`):** Passen Sie bei Bedarf die `config.ini`-Datei an. Hier können Sie Standard-IP-Adressen und den Speicherort für die Reports (`root_report_dir`) festlegen.
+
+### 2. Das Hauptfenster
+*   **IP-Adresse des Prüflings (DUT):** Geben Sie hier die IP-Adresse der Tasmota-Dose ein, die Sie kalibrieren möchten.
+*   **Kalibrier-Parameter:**
+    *   **Stufen:** Anzahl der verschiedenen Lastpunkte, die Sie messen möchten (z.B. 3 für 60W, 100W, 200W).
+    *   **Messungen pro Stufe:** Anzahl der Einzelmessungen pro Laststufe. Mehr Messungen (z.B. 15-30) führen zu stabileren Mittelwerten.
+*   **Referenz-Auswahl:** Wählen Sie Ihre Referenzquelle aus.
+    *   **PRO (Fluke 45):** Für die Messung mit dem Multimeter.
+    *   **HOME (Tasmota):** Für die Messung mit einer anderen Tasmota-Dose als Referenz.
+*   **Graphen & Log:** Die Graphen zeigen Live-Messdaten an. Das Log-Fenster darunter dokumentiert den gesamten Prozessablauf und zeigt Fehler an.
+
+### 3. Durchführung einer Kalibrierung
+1.  **Vorbereitung:** Geben Sie die IP des Prüflings ein und wählen Sie Ihre Referenz.
+2.  **Online Check (Optional):** Klicken Sie auf den `🌐`-Button, um zu prüfen, ob das Gerät erreichbar ist und um dessen Gerätedaten (Name, Version, MAC) anzuzeigen.
+3.  **Messung starten:** Klicken Sie auf **"Kalibrierung Starten"**.
+4.  **Umgang mit Passwortschutz:** Falls eines Ihrer Tasmota-Geräte (Prüfling oder Referenz) passwortgeschützt ist, erscheint automatisch ein Dialog. Geben Sie Benutzername und Passwort ein. Diese Daten werden nur für die aktuelle Sitzung im Speicher gehalten und **niemals** gespeichert. Bei Fehleingabe haben Sie bis zu drei Versuche.
+5.  **Anweisungen folgen:** Die Software wird Sie nun auffordern, die Last für die erste Stufe einzuschalten. Tun Sie dies und warten Sie, bis die Messung für die Stufe abgeschlossen ist.
+6.  **Weitere Stufen:** Die Software schaltet die Last automatisch ab und fordert Sie auf, die nächste Laststufe vorzubereiten und einzuschalten. Wiederholen Sie dies für alle konfigurierten Stufen.
+7.  **Abschluss & Auswertung:** Nach der letzten Stufe erscheint der **Report-Dialog**. Hier sehen Sie die vollständige Auswertung.
+8.  **Kalibrierung anwenden:** Im Report-Dialog haben Sie die Wahl:
+    *   **KALIBRIEREN:** Klicken Sie hier, um die neuen Werte zu senden. Sie werden gefragt, ob der `PowerCal`-Wert aus der Regression (empfohlen) oder dem Mittelwert verwendet werden soll.
+    *   **NICHT KALIBRIEREN:** Schließt den Dialog, ohne die neuen Werte zu senden. Die Protokolle werden trotzdem gespeichert.
+
+### 4. Verwendung bestehender Daten (Re-Apply)
+*   Wenn Sie eine Kalibrierung für ein Gerät starten, für das bereits Daten existieren, fragt die Software, ob Sie eine **"Neue Messung"** oder den **"Alten Report nutzen"** möchten.
+*   Wenn Sie "Alten Report nutzen" wählen, wird die Messung übersprungen und direkt der Report-Dialog mit den Werten der letzten Kalibrierung angezeigt. Dies ist nützlich, wenn Sie die Werte lediglich erneut anwenden möchten.
+
 ## Technischer Überblick
 
 *   **Sprache:** Python 3.12+
@@ -58,3 +94,40 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
 *   **Echtzeit-Graphen:** pyqtgraph
 *   **Kommunikation:** `pyserial` (für Fluke 45) & `httpx` (für Tasmota)
 *   **Datenverarbeitung:** `pandas` & `numpy`
+
+---
+
+## User Guide
+
+### 1. Preparation & Installation
+1.  **Clone Repository:** Download the project to your computer, e.g., with `git clone https://github.com/Suitcasechild/AutoCal.git`.
+2.  **Install Dependencies:** The project includes a `requirements.txt` file. Install all required libraries using the command:  
+    `pip install -r requirements.txt`
+3.  **Configuration (`config.ini`):** If necessary, adjust the `config.ini` file. Here you can set default IP addresses and the storage location for reports (`root_report_dir`).
+
+### 2. The Main Window
+*   **IP Address of DUT:** Enter the IP address of the Tasmota device you want to calibrate.
+*   **Calibration Parameters:**
+    *   **Steps:** The number of different load points you want to measure (e.g., 3 for 60W, 100W, 200W).
+    *   **Measurements per Step:** The number of individual measurements per load step. More measurements (e.g., 15-30) lead to more stable average values.
+*   **Reference Selection:** Choose your reference source.
+    *   **PRO (Fluke 45):** For measurement with the multimeter.
+    *   **HOME (Tasmota):** For measurement using another Tasmota device as a reference.
+*   **Graphs & Log:** The graphs display live measurement data. The log window below documents the entire process flow and shows errors.
+
+### 3. Performing a Calibration
+1.  **Preparation:** Enter the DUT's IP and select your reference.
+2.  **Online Check (Optional):** Click the `🌐` button to check if the device is reachable and to display its device data (Name, Version, MAC).
+3.  **Start Measurement:** Click **"Start Calibration"**.
+4.  **Handling Password Protection:** If one of your Tasmota devices (DUT or reference) is password-protected, a dialog will automatically appear. Enter the username and password. This data is only held in memory for the current session and is **never** saved. You have up to three attempts in case of a typo.
+5.  **Follow Instructions:** The software will now prompt you to turn on the load for the first step. Do this and wait for the measurement for the step to complete.
+6.  **Further Steps:** The software automatically turns off the load and prompts you to prepare and turn on the next load step. Repeat this for all configured steps.
+7.  **Completion & Analysis:** After the last step, the **Report Dialog** will appear. Here you will see the complete analysis.
+8.  **Apply Calibration:** In the report dialog, you have the choice:
+    *   **CALIBRATE:** Click here to send the new values. You will be asked whether to use the `PowerCal` value from the regression (recommended) or the average value.
+    *   **DO NOT CALIBRATE:** Closes the dialog without sending the new values. The reports are still saved.
+
+### 4. Using Existing Data (Re-Apply)
+*   If you start a calibration for a device for which data already exists, the software will ask if you want to perform a **"New Measurement"** or **"Use Old Report"**.
+*   If you choose "Use Old Report," the measurement is skipped, and the report dialog is displayed directly with the values from the last calibration. This is useful if you just want to re-apply the values.
+
