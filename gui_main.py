@@ -22,20 +22,50 @@ from data_analyzer import DataAnalyzer
 from credential_manager import CredentialsManager
 
 # ---------------------------------------------------------
-# 1. DER LOG-SPION
+# 1. DER LOG-SPION (Log Spy)
 # ---------------------------------------------------------
 class OutputStreamProxy(QObject):
+    """
+    # English:
+    # A proxy object that captures stdout/stderr and emits it as a Qt signal.
+    # This allows redirecting console output (like print statements) to a GUI widget.
+    # Deutsch:
+    # Ein Proxy-Objekt, das stdout/stderr abfängt und als Qt-Signal aussendet.
+    # Dies ermöglicht die Umleitung von Konsolenausgaben (wie print-Anweisungen) in ein GUI-Widget.
+    """
     message_signal = Signal(str)
+
     def write(self, text):
+        """
+        # English:
+        # This method is called whenever something is written to the proxied stream.
+        # It emits the text via the message_signal.
+        # Deutsch:
+        # Diese Methode wird aufgerufen, wann immer etwas in den umgeleiteten Stream geschrieben wird.
+        # Sie sendet den Text über das message_signal aus.
+        """
         if text and text.strip():
             self.message_signal.emit(text.strip())
+
     def flush(self):
+        """
+        # English: A required method for a stream-like object, does nothing here.
+        # Deutsch: Eine erforderliche Methode für ein stream-artiges Objekt, macht hier nichts.
+        """
         pass
 
 # ---------------------------------------------------------
 # 2. DER MESS-ARBEITER (Hintergrund-Thread)
 # ---------------------------------------------------------
 class MeasurementWorker(QThread):
+    """
+    # English:
+    # A QThread worker that performs the entire measurement and calibration process in the background,
+    # preventing the GUI from freezing. It communicates with the main window via signals.
+    # Deutsch:
+    # Ein QThread-Worker, der den gesamten Mess- und Kalibrierprozess im Hintergrund ausführt,
+    # um ein Einfrieren der GUI zu verhindern. Er kommuniziert über Signale mit dem Hauptfenster.
+    """
     log_signal = Signal(str)
     data_signal = Signal(dict)
     finished_signal = Signal(str)
@@ -45,6 +75,14 @@ class MeasurementWorker(QThread):
     hide_popup_signal = Signal()
 
     def __init__(self, config, params, credentials_manager):
+        """
+        # English: Initializes the worker.
+        # Deutsch: Initialisiert den Worker.
+
+        :param config: The application's configuration object.
+        :param params: A dictionary of parameters for the measurement run.
+        :param credentials_manager: The manager for handling device credentials.
+        """
         super().__init__()
         self.config = config
         self.params = params
@@ -52,12 +90,24 @@ class MeasurementWorker(QThread):
         self.is_running = True
 
     def _get_auth(self, ip):
+        """
+        # English: Gets the authentication tuple for a given IP from the credentials manager.
+        # Deutsch: Holt das Authentifizierungs-Tupel für eine gegebene IP aus dem Credential-Manager.
+        """
         creds = self.credentials_manager.get_credentials(ip)
         if creds:
             return (creds['user'], creds['password'])
         return None
 
     def wait_for_power(self, ip, stufe):
+        """
+        # English:
+        # Waits for the target device to be powered on by polling its status.
+        # Shows a popup to the user to prompt them to turn the device on.
+        # Deutsch:
+        # Wartet darauf, dass das Zielgerät eingeschaltet wird, indem es dessen Status abfragt.
+        # Zeigt dem Benutzer ein Popup an, um ihn zum Einschalten des Geräts aufzufordern.
+        """
         msg = f"STUFE {stufe}:\nWarte auf Leistung...\n\nBitte Ziel-Dose jetzt EINSCHALTEN!"
         self.log_signal.emit(f"⏳ STUFE {stufe}: Warte auf Leistung...")
         
@@ -74,16 +124,19 @@ class MeasurementWorker(QThread):
                     return True
             except Exception as e:
                 self.log_signal.emit(f"Fehler in wait_for_power: {e}")
-                # Kein Abbruch hier, da es nur ein Lese-Fehler sein könnte.
-                # Die Haupt-Schleife wird es erneut versuchen.
+                # English: No break here, as it might just be a temporary read error. The loop will retry.
+                # Deutsch: Kein Abbruch hier, da es nur ein temporärer Lesefehler sein könnte. Die Schleife versucht es erneut.
             time.sleep(1)
             
         self.hide_popup_signal.emit()
         return False 
 
     def run(self):
+        """
+        # English: The main execution method of the thread. Contains the entire measurement logic.
+        # Deutsch: Die Haupt-Ausführungsmethode des Threads. Enthält die gesamte Messlogik.
+        """
         try:
-            # from main import check_device_availability # wird bereits in der mainwindow gemacht
             from calibration_engine import CalibrationEngine
 
             dut_ip = self.params['dut_ip']
@@ -97,9 +150,8 @@ class MeasurementWorker(QThread):
             dut_auth = self._get_auth(dut_ip)
             ref_auth = self._get_auth(ref_ip)
 
-            # =========================================================
-            # ABLAUF WENN "VORHANDENE DATEN NUTZEN" GEWÄHLT WURDE
-            # =========================================================
+            # English: Handle the "Re-Apply" case where existing data is used.
+            # Deutsch: Behandle den "Re-Apply"-Fall, bei dem bestehende Daten verwendet werden.
             if use_existing:
                 self.log_signal.emit(f"🔄 Lese alten Report ({data_ts})...")
                 old_report_path = os.path.join(self.params['device_path'], f"{data_ts}_Protokoll.txt")
@@ -108,14 +160,13 @@ class MeasurementWorker(QThread):
                     self.finished_signal.emit(f"❌ Fehler: Der ursprüngliche Report '{old_report_path}' wurde nicht gefunden.")
                     return
                 
+                # English: Signal the main thread to show the apply-dialog. Then the worker's job is done.
+                # Deutsch: Signalisiere dem Haupt-Thread, den Anwenden-Dialog zu zeigen. Dann ist die Arbeit des Workers erledigt.
                 self.apply_request_signal.emit(old_report_path, dut_ip, [], dut_info_str, ref_info_str)
                 return
 
-            # =========================================================
-            # NORMALER ABLAUF (Neue Messung mit Hardware)
-            # =========================================================
-            # Die Erreichbarkeitsprüfung ist bereits in start_measurement() erfolgt
-
+            # English: Normal workflow with new hardware measurements.
+            # Deutsch: Normaler Ablauf mit neuen Hardware-Messungen.
             ref_manager = ReferenceManager(self.config)
             old_cal = ref_manager.get_current_cal_factors(dut_ip, dut_auth)
             engine = CalibrationEngine(self.params['device_path'])
@@ -132,6 +183,8 @@ class MeasurementWorker(QThread):
             from main import prepare_dut
             prepare_dut(dut_ip, dut_auth)
 
+            # English: For HOME mode, determine the DUT's idle consumption offset.
+            # Deutsch: Im HOME-Modus, bestimme den Offset durch den Eigenverbrauch des DUT.
             if mode == "HOME":
                 self.log_signal.emit("🔌 Schalte Ziel-Dose für Offset-Messung AUS...")
                 try:
@@ -145,17 +198,23 @@ class MeasurementWorker(QThread):
                 offset_a, offset_w = ermittle_offset(ref_ip, ref_auth)
                 ref_manager.set_home_offset(offset_a, offset_w)
 
+            # English: Loop through all measurement steps.
+            # Deutsch: Schleife durch alle Messstufen.
             for stufe in range(1, self.params['steps'] + 1):
                 if not self.is_running: break
                 if not self.wait_for_power(dut_ip, stufe): break 
                 
-                time.sleep(7) # Inrush-Filter
+                # English: Wait for the inrush current to stabilize.
+                # Deutsch: Warte, bis sich der Einschaltstrom stabilisiert hat.
+                time.sleep(7) 
 
                 if not self.is_running: break
 
                 self.log_signal.emit(f"\n▶️ Zeichne Messdaten auf (Stufe {stufe}/{self.params['steps']} | {self.params['measurements']} Messungen)...")
                 step_data_list = []
                 
+                # English: Inner loop for taking multiple measurements per step.
+                # Deutsch: Innere Schleife für mehrere Messungen pro Stufe.
                 for i in range(self.params['measurements']):
                     if not self.is_running: break
                     
@@ -218,6 +277,10 @@ class MeasurementWorker(QThread):
             self.finished_signal.emit(f"❌ Schwerer Fehler im Worker: {str(e)}")
 
     def stop(self):
+        """
+        # English: Stops the execution of the worker thread.
+        # Deutsch: Stoppt die Ausführung des Worker-Threads.
+        """
         self.is_running = False
 
 
@@ -225,16 +288,36 @@ class MeasurementWorker(QThread):
 # 3. DAS PROTOKOLL-POPUP (Custom Dialog)
 # ---------------------------------------------------------
 class CalibrationReportDialog(QDialog):
+    """
+    # English:
+    # A custom dialog to display the calibration report. It allows the user
+    # to view the results, show a regression graph, and decide whether to
+    # apply the new calibration values to the device.
+    # Deutsch:
+    # Ein benutzerdefinierter Dialog zur Anzeige des Kalibrierungsprotokolls. Er ermöglicht
+    # dem Benutzer, die Ergebnisse anzusehen, einen Regressionsgraphen anzuzeigen und
+    # zu entscheiden, ob die neuen Kalibrierwerte auf das Gerät angewendet werden sollen.
+    """
     def __init__(self, parent, target_ip, final_values, is_reapply, report_info, credentials_manager):
+        """
+        # English: Initializes the CalibrationReportDialog.
+        # Deutsch: Initialisiert den CalibrationReportDialog.
+
+        :param parent: The parent widget.
+        :param target_ip: (str) IP address of the target device.
+        :param final_values: (dict) Dictionary with the calculated final calibration values.
+        :param is_reapply: (bool) True if this is a re-apply action on an old report.
+        :param report_info: (dict) A dictionary containing metadata about the report.
+        :param credentials_manager: The manager for handling device credentials.
+        """
         super().__init__(parent)
         self.target_ip = target_ip
         self.final_values = final_values
         self.is_reapply = is_reapply
-        self.report_info = report_info # Enthält device_path, session_ts, dut_info, ref_info
+        self.report_info = report_info 
         self.credentials_manager = credentials_manager
         self.log_callback = parent.ui.log_output.appendPlainText
         self.chosen_pcal = 0
-        # Wichtig: Der Pfad zum aktuell angezeigten Report
         self.current_report_path = report_info['original_path']
 
         self.setWindowTitle("Kalibrierungsprotokoll & Anwendung")
@@ -276,6 +359,10 @@ class CalibrationReportDialog(QDialog):
         self.layout.addLayout(self.btn_layout)
 
     def load_report_text(self):
+        """
+        # English: Loads the content of the report file into the text edit widget.
+        # Deutsch: Lädt den Inhalt der Protokolldatei in das Text-Edit-Widget.
+        """
         try:
             with open(self.current_report_path, 'r', encoding='utf-8', errors='replace') as f:
                 content = f.read()
@@ -285,6 +372,12 @@ class CalibrationReportDialog(QDialog):
             self.text_edit.setPlainText(f"Fehler beim Laden des Berichts:\n{e}")
 
     def show_regression_graph(self):
+        """
+        # English:
+        # Reads all CSV data for the session and displays a regression plot for power values.
+        # Deutsch:
+        # Liest alle CSV-Daten der Sitzung und zeigt einen Regressions-Plot für die Leistungswerte an.
+        """
         if self.is_reapply:
             QMessageBox.warning(self, "Keine Daten", "Die Regressions-Grafik ist nur bei einer neuen Messung verfügbar.")
             return
@@ -322,7 +415,16 @@ class CalibrationReportDialog(QDialog):
         graph_dialog.exec()
 
     def apply_calibration_action(self):
-        # 1. Dialog zur Methodenauswahl anzeigen
+        """
+        # English:
+        # Handles the user's decision to apply the calibration. It asks for the PowerCal method,
+        # then calls the function to send the data to the device.
+        # Deutsch:
+        # Behandelt die Entscheidung des Benutzers, die Kalibrierung anzuwenden. Fragt nach der
+        # PowerCal-Methode und ruft dann die Funktion zum Senden der Daten an das Gerät auf.
+        """
+        # English: Show a dialog to choose the PowerCal method.
+        # Deutsch: Zeige einen Dialog zur Auswahl der PowerCal-Methode an.
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("PowerCal-Methode wählen")
         msg_box.setText("Welcher Wert soll für <b>PowerCal</b> verwendet werden?")
@@ -342,9 +444,10 @@ class CalibrationReportDialog(QDialog):
             self.log_callback("ℹ️ PowerCal-Methode: Mittelwert ausgewählt.")
         else:
             self.log_callback("ℹ️ Kalibrierung im Auswahl-Dialog abgebrochen.")
-            return # Hier abbrechen, Dialog bleibt offen, Kalib-Button sichtbar
+            return
 
-        # 2. Buttons umschalten und Kalibrierung im Hintergrund durchführen
+        # English: Toggle buttons to prevent multiple clicks.
+        # Deutsch: Schalte die Buttons um, um Mehrfachklicks zu verhindern.
         self.btn_calibrate.hide()
         self.btn_cancel.hide()
         QApplication.processEvents()
@@ -354,8 +457,8 @@ class CalibrationReportDialog(QDialog):
 
         self.log_callback("\n🚀 Starte Übertragung an die Dose...")
         
-        # English: Get auth tuple from manager
-        # Deutsch: Hole Auth-Tupel aus dem Manager
+        # English: Get auth tuple from manager.
+        # Deutsch: Hole Auth-Tupel aus dem Manager.
         auth = None
         creds = self.credentials_manager.get_credentials(self.target_ip)
         if creds:
@@ -369,19 +472,20 @@ class CalibrationReportDialog(QDialog):
             report_to_update = self.report_info['original_path']
             engine = CalibrationEngine(self.report_info['device_path'])
 
-            # Bei Re-Apply einen neuen, kurzen Report erstellen
+            # English: If re-applying, create a new, short report.
+            # Deutsch: Bei einer Wiederanwendung, erstelle ein neues, kurzes Protokoll.
             if self.is_reapply:
                 new_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
                 new_report_path = os.path.join(self.report_info['device_path'], f"{new_ts}_ReApply_Protokoll.txt")
                 engine.write_reapply_summary(new_report_path, self.report_info['original_path'], self.report_info['dut_info'], self.report_info['ref_info'])
                 report_to_update = new_report_path
             
-            # 3. "As Found/Left" an den korrekten Report anhängen
+            # English: Append the "As Found/Left" block to the correct report.
+            # Deutsch: Hänge den "As Found/Left"-Block an das korrekte Protokoll an.
             try:
                 with open(report_to_update, "a", encoding="utf-8") as f:
                     f.write(as_found_left_string)
                 self.log_callback(f"✅ Report '{os.path.basename(report_to_update)}' aktualisiert.")
-                # Wichtig: Den Pfad zum angezeigten Report aktualisieren und neu laden
                 self.current_report_path = report_to_update
                 self.load_report_text()
             except Exception as e:
@@ -389,7 +493,6 @@ class CalibrationReportDialog(QDialog):
         else:
             self.log_callback("❌ Übertragung fehlgeschlagen. Siehe Log für Details.")
         
-        # 4. Final den Schließen-Button anzeigen
         self.btn_close.show()
 
 
@@ -459,11 +562,26 @@ class CredentialDialog(QDialog):
 # 5. DAS HAUPTFENSTER (GUI)
 # ---------------------------------------------------------
 class MainWindow(QMainWindow):
+    """
+    # English:
+    # The main window of the application. It loads the UI, sets up all connections,
+    # handles user interactions, and manages the measurement process.
+    # Deutsch:
+    # Das Hauptfenster der Anwendung. Es lädt die Benutzeroberfläche, richtet alle
+    # Verbindungen ein, behandelt Benutzerinteraktionen und verwaltet den Messprozess.
+    """
     def __init__(self):
+        """
+        # English: Initializes the main window, loads the UI file, and sets up all components.
+        # Deutsch: Initialisiert das Hauptfenster, lädt die UI-Datei und richtet alle Komponenten ein.
+        """
         super().__init__()
         self.cm = ConfigManager()
         self.credentials_manager = CredentialsManager()
         self.wait_msgbox = None   
+        
+        # English: Load the UI from the .ui file created with Qt Designer.
+        # Deutsch: Lade die Benutzeroberfläche aus der .ui-Datei, die mit dem Qt Designer erstellt wurde.
         ui_path = os.path.join(os.path.dirname(__file__), "main_gui.ui")
         ui_file = QFile(ui_path)
         ui_file.open(QFile.ReadOnly)
@@ -473,8 +591,10 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.ui)
         self.resize(self.ui.size())
-        self.setWindowTitle("Tasmota Precision Calibrator v5.1")
+        self.setWindowTitle("Tasmota Precision Calibrator v5.1") # Will be updated later
 
+        # English: Redirect stdout to the log widget in the GUI.
+        # Deutsch: Leite stdout an das Log-Widget in der GUI um.
         self.log_proxy = OutputStreamProxy()
         self.log_proxy.message_signal.connect(self.ui.log_output.appendPlainText)
         sys.stdout = self.log_proxy
@@ -505,6 +625,10 @@ class MainWindow(QMainWindow):
                 getattr(self.ui, lcd).setSegmentStyle(pg.QtWidgets.QLCDNumber.Flat)
 
     def setup_graphs(self):
+        """
+        # English: Initializes the live-data plotting graphs.
+        # Deutsch: Initialisiert die Graphen für die Live-Daten-Darstellung.
+        """
         pg.setConfigOption('background', '#1e1e1e')
         pg.setConfigOption('foreground', 'w')
         self.curves = {}
@@ -574,6 +698,10 @@ class MainWindow(QMainWindow):
                     self.curves[curve_key].setData(x=x_values, y=plot_data)
 
     def setup_ui_logic(self):
+        """
+        # English: Connects all UI element signals (like button clicks) to their corresponding slots (methods).
+        # Deutsch: Verbindet alle Signale der UI-Elemente (wie Button-Klicks) mit den zugehörigen Slots (Methoden).
+        """
         self.ui.btn_start.clicked.connect(self.toggle_measurement)
         self.ui.check_ref_pro.toggled.connect(lambda c: self.ui.check_ref_home.setChecked(False) if c else None)
         self.ui.check_ref_home.toggled.connect(lambda c: self.ui.check_ref_pro.setChecked(False) if c else None)
@@ -600,6 +728,10 @@ class MainWindow(QMainWindow):
             self.ui.action_show_license.triggered.connect(self.show_license_info)
 
     def load_values_from_config(self):
+        """
+        # English: Loads default values from the config.ini file into the UI widgets.
+        # Deutsch: Lädt Standardwerte aus der config.ini-Datei in die UI-Widgets.
+        """
         try:
             if hasattr(self.ui, 'edit_dut_ip'): self.ui.edit_dut_ip.setText(self.cm.config.get('TARGET', 'ip_address', fallback='0.0.0.0'))
             if hasattr(self.ui, 'spin_steps'): self.ui.spin_steps.setValue(self.cm.config.getint('TARGET', 'measurement_steps', fallback=3))
@@ -608,6 +740,10 @@ class MainWindow(QMainWindow):
             self.ui.log_output.appendPlainText(f"❌ Fehler beim Laden der INI: {e}")
 
     def open_setup_general(self):
+        """
+        # English: Opens the general setup dialog from a .ui file.
+        # Deutsch: Öffnet den Dialog für die allgemeinen Einstellungen aus einer .ui-Datei.
+        """
         ui_path = os.path.join(os.path.dirname(__file__), "setup_general.ui")
         if not os.path.exists(ui_path):
             return QMessageBox.warning(self, "Fehler", "Datei setup_general.ui nicht gefunden!")
@@ -643,6 +779,10 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def open_setup_fluke(self):
+        """
+        # English: Opens the Fluke setup dialog from a .ui file.
+        # Deutsch: Öffnet den Dialog für die Fluke-Einstellungen aus einer .ui-Datei.
+        """
         ui_path = os.path.join(os.path.dirname(__file__), "setup_fluke.ui")
         if not os.path.exists(ui_path):
             return QMessageBox.warning(self, "Fehler", "Datei setup_fluke.ui nicht gefunden!")
@@ -672,6 +812,10 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def open_setup_tasmota(self):
+        """
+        # English: Opens the Tasmota reference setup dialog from a .ui file.
+        # Deutsch: Öffnet den Dialog für die Tasmota-Referenz-Einstellungen aus einer .ui-Datei.
+        """
         ui_path = os.path.join(os.path.dirname(__file__), "setup_tasmota.ui")
         if not os.path.exists(ui_path):
             return QMessageBox.warning(self, "Fehler", "Datei setup_tasmota.ui nicht gefunden!")
@@ -697,6 +841,10 @@ class MainWindow(QMainWindow):
         dialog.exec()
 
     def open_report_folder(self):
+        """
+        # English: Opens the root directory for reports in the system's file explorer.
+        # Deutsch: Öffnet das Stammverzeichnis für Protokolle im Datei-Explorer des Systems.
+        """
         report_path = os.path.abspath(self.cm.root_dir)
         if os.path.exists(report_path):
             os.startfile(report_path) 
@@ -704,6 +852,10 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Ordner nicht gefunden", f"Der Pfad existiert noch nicht oder wurde noch nicht erstellt:\n{report_path}")
 
     def save_log_to_file(self):
+        """
+        # English: Saves the content of the log widget to a text file.
+        # Deutsch: Speichert den Inhalt des Log-Widgets in eine Textdatei.
+        """
         log_content = self.ui.log_output.toPlainText()
         if not log_content.strip():
             return QMessageBox.information(self, "Log leer", "Es gibt noch keine Einträge zum Speichern.")
@@ -721,6 +873,10 @@ class MainWindow(QMainWindow):
                 QMessageBox.critical(self, "Fehler", f"Log konnte nicht gespeichert werden:\n{e}")
 
     def show_power_popup(self, message):
+        """
+        # English: Shows a non-blocking popup to ask the user to turn on the power.
+        # Deutsch: Zeigt ein nicht-blockierendes Popup an, das den Benutzer zum Einschalten auffordert.
+        """
         if self.wait_msgbox is not None:
             self.wait_msgbox.accept()
             
@@ -734,6 +890,10 @@ class MainWindow(QMainWindow):
         self.wait_msgbox.show()
 
     def hide_power_popup(self):
+        """
+        # English: Hides the power-on popup if it is visible.
+        # Deutsch: Schließt das Einschalt-Popup, falls es sichtbar ist.
+        """
         if self.wait_msgbox is not None:
             try:
                 self.wait_msgbox.rejected.disconnect(self.cancel_from_popup)
@@ -743,12 +903,20 @@ class MainWindow(QMainWindow):
             self.wait_msgbox = None
 
     def cancel_from_popup(self):
+        """
+        # English: Slot that is called when the user clicks 'Cancel' in the power-on popup.
+        # Deutsch: Slot, der aufgerufen wird, wenn der Benutzer im Einschalt-Popup auf 'Abbrechen' klickt.
+        """
         self.ui.log_output.appendPlainText("⚠️ Abbruch durch Benutzer im Popup-Fenster.")
         if hasattr(self, 'worker') and self.worker.isRunning():
             self.worker.stop()
             self.ui.btn_start.setEnabled(False) 
 
     def toggle_measurement(self):
+        """
+        # English: Starts the measurement if not running, or stops it if it is running.
+        # Deutsch: Startet die Messung, wenn sie nicht läuft, oder stoppt sie, wenn sie läuft.
+        """
         if hasattr(self, 'worker') and self.worker.isRunning():
             self.ui.log_output.appendPlainText("⚠️ Sende Abbruch-Signal... Bitte warten.")
             self.worker.stop()
@@ -757,6 +925,14 @@ class MainWindow(QMainWindow):
             self.start_measurement()
 
     def start_measurement(self):
+        """
+        # English:
+        # Prepares and starts the measurement process. It validates inputs,
+        # checks device availability, and starts the MeasurementWorker thread.
+        # Deutsch:
+        # Bereitet den Messprozess vor und startet ihn. Validiert Eingaben,
+        # prüft die Geräteverfügbarkeit und startet den MeasurementWorker-Thread.
+        """
         self.credentials_manager.clear_all_credentials()
         is_pro = self.ui.check_ref_pro.isChecked()
         is_home = self.ui.check_ref_home.isChecked()
@@ -871,6 +1047,10 @@ class MainWindow(QMainWindow):
         self.worker.start()
 
     def measurement_finished(self, message):
+        """
+        # English: Slot that is called when the measurement worker is finished or has been aborted.
+        # Deutsch: Slot, der aufgerufen wird, wenn der Mess-Worker fertig oder abgebrochen wurde.
+        """
         self.credentials_manager.clear_all_credentials()
         if message: 
             self.ui.log_output.appendPlainText(message)
@@ -881,6 +1061,10 @@ class MainWindow(QMainWindow):
         self.reset_lcd_displays()
 
     def _parse_report_for_values(self, report_path):
+        """
+        # English: Parses a report file to extract the final suggested calibration values.
+        # Deutsch: Parst eine Protokolldatei, um die finalen vorgeschlagenen Kalibrierwerte zu extrahieren.
+        """
         try:
             with open(report_path, 'r', encoding='utf-8') as f:
                 content = f.read()
@@ -902,6 +1086,14 @@ class MainWindow(QMainWindow):
         return None
 
     def prompt_apply_calibration(self, original_report_path, target_ip, all_results, dut_info_str, ref_info_str):
+        """
+        # English:
+        # This slot is called when the worker has finished processing. It prepares the final values
+        # and shows the CalibrationReportDialog to the user.
+        # Deutsch:
+        # Dieser Slot wird aufgerufen, wenn der Worker mit der Verarbeitung fertig ist. Er bereitet die
+        # finalen Werte vor und zeigt dem Benutzer den CalibrationReportDialog an.
+        """
         is_reapply = not all_results
         final_values = None
         
@@ -921,7 +1113,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.critical(self, "Fehler", f"Die Kalibrierwerte konnten nicht aus dem Report '{os.path.basename(original_report_path)}' gelesen werden.")
                 self.measurement_finished("")
                 return
-        else: # Neue Messung
+        else: # New measurement
             self.ui.log_output.appendPlainText("-> Kalibrierung auf Basis einer neuen Messung.")
             vcal = int(sum(r['Stufen_Cal']['VCal'] for r in all_results) / len(all_results))
             acal = int(sum(r['Stufen_Cal']['ACal'] for r in all_results) / len(all_results))
@@ -950,6 +1142,10 @@ class MainWindow(QMainWindow):
         self.measurement_finished("🏁 Der gesamte Kalibrierprozess ist beendet.")
 
     def show_license_info(self):
+        """
+        # English: Displays a message box with license and author information.
+        # Deutsch: Zeigt eine Message-Box mit Lizenz- und Autoreninformationen an.
+        """
         license_text = (
             "Tasmota Precision Calibrator v5.2.0\n"
             "Erstellt von: Arnulf Greilberger\n\n"
@@ -972,6 +1168,10 @@ class MainWindow(QMainWindow):
         QMessageBox.about(self, "Lizenz & Info", license_text)
 
     def on_online_check_clicked(self):
+        """
+        # English: Slot for the 'Online Check' button. Fetches and displays info from the DUT.
+        # Deutsch: Slot für den 'Online Check'-Button. Holt und zeigt Infos vom DUT an.
+        """
         ip = self.ui.edit_dut_ip.text().strip()
         
         if len(ip) >= 7 and ip.count('.') == 3:
@@ -983,8 +1183,18 @@ class MainWindow(QMainWindow):
                 self.ui.split_info.setVisible(False)
 
     def _handle_auth_error(self, ip, attempt):
-        # English: Shows a dialog to get credentials from the user.
-        # Deutsch: Zeigt einen Dialog an, um Zugangsdaten vom Benutzer zu erhalten.
+        """
+        # English:
+        # Shows a dialog to get credentials from the user and stores them in the manager.
+        # This is called when a 401 Unauthorized error is detected.
+        # Deutsch:
+        # Zeigt einen Dialog an, um Zugangsdaten vom Benutzer zu erhalten und speichert diese im Manager.
+        # Wird aufgerufen, wenn ein 401 Unauthorized-Fehler erkannt wird.
+        
+        :param ip: (str) The IP of the device that requires authentication.
+        :param attempt: (int) The current attempt number (1-3).
+        :return: (bool) True if the user provided credentials, False if they cancelled.
+        """
         device_name = f"Gerät bei IP {ip}"
         dialog = CredentialDialog(device_name, attempt, self)
         
@@ -1000,6 +1210,18 @@ class MainWindow(QMainWindow):
         return False # break loop
 
     def fetch_tasmota_info(self, ip, is_dut=True):
+        """
+        # English:
+        # Fetches status information from a Tasmota device.
+        # Handles authentication by retrying up to 3 times if a 401 error occurs.
+        # Deutsch:
+        # Holt Status-Informationen von einem Tasmota-Gerät.
+        # Behandelt die Authentifizierung durch bis zu 3 Wiederholungsversuche bei einem 401-Fehler.
+
+        :param ip: (str) The IP address of the device.
+        :param is_dut: (bool) True if the device is the DUT (to update specific UI labels).
+        :return: (dict or None) A dictionary with device info on success, otherwise None.
+        """
         auth = None
         for attempt in range(1, 4):
             try:
@@ -1059,9 +1281,11 @@ class MainWindow(QMainWindow):
             self.ui.split_info.setVisible(False)
         return None
 
-
     def reset_lcd_displays(self):
-        """Setzt alle LCD-Anzeigen auf das 'Keine Daten' Format."""
+        """
+        # English: Resets all reference LCD displays to a 'no data' state.
+        # Deutsch: Setzt alle Referenz-LCD-Anzeigen auf einen 'Keine Daten'-Zustand zurück.
+        """
         for lcd_name in ['lcd_volt', 'lcd_amp', 'lcd_watt']:
             if hasattr(self.ui, lcd_name):
                 lcd = getattr(self.ui, lcd_name)
