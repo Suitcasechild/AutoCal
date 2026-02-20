@@ -714,8 +714,24 @@ class MainWindow(QMainWindow):
                 pen_dut = pg.mkPen(col_dut, width=2)
                 self.curves[f"{key}_dut"] = plot_widget.plot(pen=pen_dut, name=f"Ist (DUT)")
                 
-                layout.addWidget(plot_widget)
-    def update_live_data(self, data):
+                                layout.addWidget(plot_widget)
+                
+                    def set_ui_locked(self, locked: bool):
+                        """
+                        # English: Locks or unlocks the UI frames during measurement.
+                        # Deutsch: Sperrt oder entsperrt die UI-Frames während der Messung.
+                        """
+                        state = not locked
+                        if hasattr(self.ui, 'frame_2'): self.ui.frame_2.setEnabled(state)
+                        if hasattr(self.ui, 'frame_3'): self.ui.frame_3.setEnabled(state)
+                        if hasattr(self.ui, 'frame_4'): self.ui.frame_4.setEnabled(state)
+                        
+                        # English: Also disable setup actions in the menu
+                        # Deutsch: Deaktiviere auch die Setup-Aktionen im Menü
+                        if hasattr(self.ui, 'menuSetup'): self.ui.menuSetup.setEnabled(state)
+                
+                    def update_live_data(self, data):
+                
         """
         # English: Updates the LCD displays and labels with the latest measurement data.
         # Deutsch: Aktualisiert die LCD-Anzeigen und Labels mit den neuesten Messdaten.
@@ -1143,6 +1159,10 @@ class MainWindow(QMainWindow):
         self.worker.show_popup_signal.connect(self.show_power_popup)
         self.worker.hide_popup_signal.connect(self.hide_power_popup)
         
+        # English: Lock relevant UI frames and the setup menu during measurement.
+        # Deutsch: Sperre relevante UI-Frames und das Setup-Menü während der Messung.
+        self.set_ui_locked(True)
+
         self.ui.btn_start.setText("⛔ Messung abbrechen")
         self.ui.btn_start.setStyleSheet("background-color: darkred; color: white; font-weight: bold;")
         self.ui.log_output.appendPlainText("-" * 50)
@@ -1160,6 +1180,11 @@ class MainWindow(QMainWindow):
         self.ui.btn_start.setText("Kalibrierung Starten")
         self.ui.btn_start.setStyleSheet("") 
         self.ui.btn_start.setEnabled(True)
+        
+        # English: Re-enable UI frames and menu after measurement.
+        # Deutsch: Gebe UI-Frames und Menü nach der Messung wieder frei.
+        self.set_ui_locked(False)
+
         self.hide_power_popup()
         self.reset_lcd_displays()
 

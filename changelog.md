@@ -3,7 +3,10 @@
 ## v5.3.0 (2026-02-20)
 
 ### ✨ Features
-*   **Automatisches Ausschalten bei Abbruch:** Wenn die Messung manuell über den "Messung abbrechen"-Button beendet wird, versucht das Programm nun automatisch, die Zieldose (Prüfling) auszuschalten, um einen sicheren Zustand zu gewährleisten.
+*   **UI-Stabilität (Eingabesperre):** Während eines aktiven Kalibrierlaufs werden nun die Bedienelemente zur Auswahl der Referenz, der IP-Eingabe und der Messparameter (Frames 2, 3 und 4) sowie das Setup-Menü gesperrt. Dies verhindert versehentliche Fehlkonfigurationen während der laufenden Messung. Nach Abschluss oder Abbruch der Messung werden die Elemente automatisch wieder freigegeben.
+    *   **English:** UI Stability (Input Locking): During an active calibration run, the controls for reference selection, IP input, and measurement parameters (Frames 2, 3, and 4), as well as the setup menu, are now locked. This prevents accidental misconfigurations during the ongoing measurement. After completion or cancellation of the measurement, the elements are automatically re-enabled.
+*   **Automatisches Ausschalten bei Abbruch:**
+ Wenn die Messung manuell über den "Messung abbrechen"-Button beendet wird, versucht das Programm nun automatisch, die Zieldose (Prüfling) auszuschalten, um einen sicheren Zustand zu gewährleisten.
     *   **English:** Automatic Power-Off on Abort: When the measurement is manually ended via the "Cancel Measurement" button, the program now automatically attempts to power off the DUT (device under test) to ensure a safe state.
 *   **Verbesserte Robustheit der CalibrationEngine:**
     *   **CSV-Validierung:** Vor der Verarbeitung von Messdaten wird nun geprüft, ob alle erforderlichen Spalten vorhanden sind.
