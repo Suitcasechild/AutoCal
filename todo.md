@@ -172,3 +172,9 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     - [x] Integration der "----" Anzeige bei Inaktivität oder `dut_off`.
 - [x] **Erweiterung Reset-Logik (`reset_lcd_displays`):**
     - [x] Hinzufügen der neuen Referenz-Labels (`lbl_v_ref`, `lbl_a_ref`, `lbl_w_ref` sowie Info-Labels) zum Reset-Vorgang.
+
+---
+
+### UI-Zukunft & Internationalisierung
+
+- [ ] **Automatische Sprachumschaltung:** Implementierung eines Lokalisierungs-Systems (i18n), das die App-Oberfläche automatisch auf Basis der Systemeinstellungen zwischen Deutsch und Englisch umschaltet oder eine manuelle Wahl ermöglicht.

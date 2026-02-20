@@ -58,6 +58,7 @@ It supports two main modes for reference measurements:
 *   **Automated Reporting:** For every calibration run, detailed `.csv` files with raw measurement data and a comprehensive `.txt` protocol are generated and stored.
 *   **Non-Blocking UI:** Live data is displayed using `pyqtgraph`, and all communication (HTTP and Serial) runs in a background thread (`QThread`) to keep the UI responsive.
 *   **Safety & Robustness:** Automatically turns off the device on manual abort, locks input fields during active runs to prevent errors, and handles noisy data by excluding min/max outliers.
+*   **Coming Soon:** Automatic language switching between English and German based on system settings or manual selection.
 
 ---
 
@@ -220,6 +221,7 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
 *   **Interaktive Entscheidungsfindung:** Vor dem Anwenden sehen Sie einen detaillierten Bericht und können zwischen regressionsbasiertem `PowerCal` (empfohlen) oder Mittelwert wählen.
 *   **Automatisierte Protokollierung:** Detaillierte `.csv`-Rohdaten und ein umfassendes `.txt`-Protokoll werden für jeden Lauf gespeichert.
 *   **Sicherheit & Stabilität:** Automatisches Ausschalten des Prüflings bei Abbruch, Sperrung der Eingabefelder während der Messung und robuster Umgang mit instabilen Netzwerkdaten.
+*   **In Kürze:** Automatische Sprachumschaltung zwischen Deutsch und Englisch basierend auf den Systemeinstellungen oder manueller Wahl.
 
 ---
 
