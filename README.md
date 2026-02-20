@@ -1,6 +1,34 @@
 # Tasmota Precision Calibrator
 
+*99% AI-Generated: A journey from zero Python knowledge to a fully functional PyQt application using solely prompt-driven development.*
+
 **(Deutsche Beschreibung unten)**
+
+---
+
+## 🚀 The Vibecoding Experiment: 95% AI-Generated
+
+*Welcome behind the scenes! This project is not just a piece of software, but the result of a fascinating experiment in modern application development.*
+
+**The code in this repository was 95% created exclusively through prompts in the Gemini CLI.** And the most exciting part? The entire project was started from the perspective of an absolute beginner – **without any prior knowledge of Python or setting up development environments.** The goal was to find out if it's possible to build a functioning application simply by "feeling" the logic (vibecoding) and cleverly communicating with an AI.
+
+### 🏛️ The Pillars: Structure as a Foundation
+Vibecoding does not mean firing off commands aimlessly. For an AI-driven project of this scale to succeed without prior knowledge, strong organization is required. The AI handled the programming, but the control was managed through a strict documentary framework:
+* **The Requirements Document (Pflichtenheft):** A crystal-clear vision of what the software must be able to do.
+* **Plans & To-Dos:** Detailed roadmaps to divide the development process into logical stages.
+* **The Changelog:** Seamless documentation of all steps and changes as the project's "memory".
+* **The Gemini Rules:** Specific rules dictating exactly how the AI should approach tasks, format code, and communicate.
+* **Git & Version Control:** The ultimate safety net. Since much was built through trial and error, AI-guided Git support was essential for saving working milestones and rolling back failed experiments safely.
+
+### 🛠️ The Journey: From "Zero Knowledge" to a Running App
+The process took place in three major phases:
+1.  **Setting up the Toolchain:** The AI served as a patient mentor for absolute basics (installing Python, understanding `pip`, setting up an IDE, and basic Git commands).
+2.  **Integrating the Gemini CLI:** Learning how to use the terminal to communicate with the AI model directly from the development environment.
+3.  **The "Vibecoding" Process:** Instead of typing syntax, requirements and workflows were formulated in natural language based on the *Plans* and *To-Dos*. The AI translated these "vibes" into executable Python code. Crashes and stack traces were simply fed back to the AI for immediate fixes. Complex elements (like live graphs) were built iteratively through constant inquiry, guided by the *Gemini Rules* and secured by *Git commits*.
+
+*When reading the code, look at it through this lens: It is the product of an intensive, highly structured conversation between human and machine.*
+
+---
 
 A GUI-based tool for high-precision calibration and validation of Tasmota-based energy monitoring devices (like smart plugs). This application automates the process of measuring, calculating, and applying new calibration values to enhance the accuracy of power, voltage, and current readings.
 
@@ -32,6 +60,34 @@ It supports two main modes for reference measurements:
 ---
 
 # Tasmota Precision Calibrator (DE)
+
+*99% KI-generiert: Eine Reise von Null Python-Wissen zu einer voll funktionsfähigen PyQt-Anwendung, ausschließlich durch Prompt-gesteuerte Entwicklung.*
+
+---
+
+## 🚀 Das Vibecoding-Experiment: 95 % KI-generiert
+
+*Willkommen hinter den Kulissen! Dieses Projekt ist nicht nur eine Software, sondern das Ergebnis eines faszinierenden Experiments in der modernen Anwendungsentwicklung.*
+
+**Der Code in diesem Repository wurde zu 95 % ausschließlich durch Prompts im Gemini-CLI erstellt.** Und das Spannendste daran? Das gesamte Projekt wurde aus der Perspektive eines absoluten Anfängers gestartet – **ohne jegliche Vorkenntnisse in Python oder der Einrichtung von Entwicklungsumgebungen.** Das Ziel war herauszufinden, ob es möglich ist, eine funktionierende Anwendung zu bauen, indem man sich einfach in die Logik "hineinfühlt" (Vibecoding) und geschickt mit einer KI kommuniziert.
+
+### 🏛️ Die Säulen: Struktur als Fundament
+Vibecoding bedeutet nicht, ziellos Befehle abzufeuern. Damit ein KI-gesteuertes Projekt dieser Größenordnung ohne Vorkenntnisse gelingt, ist eine starke Organisation erforderlich. Die KI übernahm die Programmierung, aber die Steuerung erfolgte über einen strengen dokumentarischen Rahmen:
+* **Das Pflichtenheft:** Eine glasklare Vision dessen, was die Software können muss.
+* **Pläne & To-Dos:** Detaillierte Roadmaps, um den Entwicklungsprozess in logische Phasen zu unterteilen.
+* **Das Changelog:** Lückenlose Dokumentation aller Schritte und Änderungen als "Gedächtnis" des Projekts.
+* **Die Gemini-Regeln:** Spezifische Regeln, die genau vorschreiben, wie die KI an Aufgaben herangehen, Code formatieren und kommunizieren soll.
+* **Git & Versionskontrolle:** Das ultimative Sicherheitsnetz. Da vieles durch Ausprobieren (Trial and Error) entstand, war KI-geführte Git-Unterstützung unerlässlich, um funktionierende Meilensteine zu speichern und gescheiterte Experimente sicher rückgängig zu machen.
+
+### 🛠️ Die Reise: Vom „Nullwissen“ zur laufenden App
+Der Prozess fand in drei großen Phasen statt:
+1.  **Einrichtung der Toolchain:** Die KI diente als geduldiger Mentor für absolute Grundlagen (Installation von Python, Verständnis von `pip`, Einrichtung einer IDE und grundlegende Git-Befehle).
+2.  **Integration des Gemini-CLI:** Erlernen der Nutzung des Terminals, um direkt aus der Entwicklungsumgebung mit dem KI-Modell zu kommunizieren.
+3.  **Der „Vibecoding“-Prozess:** Anstatt Syntax zu tippen, wurden Anforderungen und Arbeitsabläufe in natürlicher Sprache auf Basis der *Pläne* und *To-Dos* formuliert. Die KI übersetzte diese „Vibes“ in ausführbaren Python-Code. Abstürze und Stack-Traces wurden einfach an die KI zurückgegeben, um sofortige Korrekturen zu erhalten. Komplexe Elemente (wie Live-Graphen) wurden iterativ durch ständiges Nachfragen aufgebaut, geleitet von den *Gemini-Regeln* und abgesichert durch *Git-Commits*.
+
+*Wenn Sie den Code lesen, betrachten Sie ihn durch diese Brille: Er ist das Produkt eines intensiven, hochstrukturierten Gesprächs zwischen Mensch und Maschine.*
+
+---
 
 Ein GUI-basiertes Werkzeug zur hochpräzisen Kalibrierung und Validierung von Tasmota-basierten Energiemessgeräten (z.B. Smart Plugs). Die Anwendung automatisiert den Prozess des Messens, Berechnens und Anwendens neuer Kalibrierwerte, um die Genauigkeit von Leistungs-, Spannungs- und Strommessungen zu verbessern.
 
