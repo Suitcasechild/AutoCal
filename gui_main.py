@@ -194,9 +194,20 @@ class MeasurementWorker(QThread):
                     self.log_signal.emit(f"⚠️ Warnung: Automatisches Ausschalten fehlgeschlagen: {e}")
 
                 if not self.is_running: return
+                
+                # English: Wait for 5 seconds to ensure DUT is fully off before measuring offset.
+                # Deutsch: Warte 5 Sekunden, um sicherzustellen, dass die DUT vollständig ausgeschaltet ist, bevor der Offset gemessen wird.
+                self.log_signal.emit("⏳ Warte 5 Sekunden, bis Ziel-Dose vollständig AUS ist...")
+                time.sleep(5)
+                
                 from refhome_offset import ermittle_offset
                 offset_a, offset_w = ermittle_offset(ref_ip, ref_auth)
                 ref_manager.set_home_offset(offset_a, offset_w)
+
+            # English: Adjust requested measurements for min/max exclusion.
+            # Deutsch: Angefragte Messungen für Min/Max-Ausschluss anpassen.
+            num_measurements_base = self.params['measurements']
+            num_measurements_compensated = num_measurements_base + 2
 
             # English: Loop through all measurement steps.
             # Deutsch: Schleife durch alle Messstufen.
@@ -210,36 +221,69 @@ class MeasurementWorker(QThread):
 
                 if not self.is_running: break
 
-                self.log_signal.emit(f"\n▶️ Zeichne Messdaten auf (Stufe {stufe}/{self.params['steps']} | {self.params['measurements']} Messungen)...")
+                self.log_signal.emit(f"\n▶️ Zeichne Messdaten auf (Stufe {stufe}/{self.params['steps']} | {num_measurements_compensated} Messungen)...")
                 step_data_list = []
                 
                 # English: Inner loop for taking multiple measurements per step.
                 # Deutsch: Innere Schleife für mehrere Messungen pro Stufe.
-                for i in range(self.params['measurements']):
-                    if not self.is_running: break
+                measurement_attempt_count = 0
+                while len(step_data_list) < num_measurements_compensated:
+                    measurement_attempt_count += 1
+                    ref_v, ref_a, ref_w = None, None, None
+                    dut_v, dut_a, dut_w = None, None, None
                     
                     try:
                         ref_v, ref_a, ref_w = ref_manager.get_reference_data(ref_auth)
-                        if ref_v is None: ref_v, ref_a, ref_w = 0.0, 0.0, 0.0
+                        if ref_v is None: 
+                            self.log_signal.emit(f"[WARN] Messversuch {measurement_attempt_count}: Referenzdaten unvollständig. Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
+                            time.sleep(0.5)
+                            continue
                     except Exception as e:
-                        self.log_signal.emit(f"⚠️ REFERENZ LESE-FEHLER: {e}")
-                        ref_v, ref_a, ref_w = 0.0, 0.0, 0.0
+                        self.log_signal.emit(f"[WARN] Messversuch {measurement_attempt_count}: REFERENZ LESE-FEHLER: {e}. Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
+                        time.sleep(0.5)
+                        continue
                     
+                    # English: Check for abort signal before potentially blocking I/O (DUT data).
+                    # Deutsch: Prüfe auf Abbruchsignal vor potenziell blockierendem I/O (DUT-Daten).
+                    if not self.is_running: break 
                     try:
                         r = httpx.get(f"http://{dut_ip}/cm?cmnd=Status%208", timeout=2, auth=dut_auth)
                         r.raise_for_status()
                         d = r.json()['StatusSNS']['ENERGY']
                         dut_v, dut_a, dut_w = float(d['Voltage']), float(d['Current']), float(d['Power'])
                     except Exception as e: 
-                        self.log_signal.emit(f"❌ Fehler beim Lesen der Zieldose: {e}")
-                        dut_v, dut_a, dut_w = 0.0, 0.0, 0.0
+                        self.log_signal.emit(f"❌ Messversuch {measurement_attempt_count}: Fehler beim Lesen der Zieldose: {e}. Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
+                        time.sleep(0.5)
+                        continue
 
+                    # English: Check for zero values, which are considered invalid.
+                    # Deutsch: Prüfe auf Nullwerte, die als ungültig gelten.
+                    if any(val == 0 for val in [ref_v, ref_a, ref_w, dut_v, dut_a, dut_w] if val is not None):
+                        self.log_signal.emit(f"[WARN] Messversuch {measurement_attempt_count}: Ungültige Messung (0-Wert). Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
+                        time.sleep(0.5)
+                        continue
+                    
+                    # English: If everything is valid, add to list and emit signal.
+                    # Deutsch: Wenn alles gültig ist, zur Liste hinzufügen und Signal senden.
+                    # English: Check for abort signal before emitting and appending valid data.
+                    # Deutsch: Prüfe auf Abbruchsignal vor dem Emittieren und Anhängen gültiger Daten.
+                    if not self.is_running: break
                     self.data_signal.emit({'volt_ref': ref_v, 'volt_dut': dut_v, 'amp_ref': ref_a, 'amp_dut': dut_a, 'watt_ref': ref_w, 'watt_dut': dut_w, 'dut_off': (dut_w <= 0) })
                     step_data_list.append({'Ref_Volt': ref_v, 'Ref_Amp': ref_a, 'Ref_Watt': ref_w, 'Target_Volt': dut_v, 'Target_Amp': dut_a, 'Target_Watt': dut_w})
-                    time.sleep(1)
+                    # English: Removed logging of individual measurement values as requested by the user.
+                    # Deutsch: Protokollierung der einzelnen Messwerte wurde auf Benutzerwunsch entfernt.
+                    # self.log_signal.emit(f"[{len(step_data_list):>3}/{num_measurements_compensated}] Ref: {ref_w:.2f}W | DUT: {dut_w:.2f}W")
+                    time.sleep(1) # Wait for 1 second between valid measurements (original value)
+
 
                 if step_data_list and self.is_running:
                     df = pd.DataFrame(step_data_list)
+                    # English: Round relevant columns to 3 decimal places.
+                    # Deutsch: Runde relevante Spalten auf 3 Nachkommastellen.
+                    for col in ["Ref_Volt", "Ref_Amp", "Ref_Watt", "Target_Volt", "Target_Amp", "Target_Watt"]:
+                        if col in df.columns:
+                            df[col] = df[col].round(3)
+                    
                     csv_name = f"{data_ts}_Stufe_{stufe}.csv"
                     csv_path = os.path.join(self.params['device_path'], csv_name)
                     df.to_csv(csv_path, index=False)
@@ -694,7 +738,9 @@ class MainWindow(QMainWindow):
             if curve_key in self.curves:
                 plot_data = self.graph_data[data_key][-100:]
                 if plot_data:
-                    x_values = list(range(len(plot_data)))
+                    # English: Generate 1-based x-values for plotting.
+                    # Deutsch: Erzeuge 1-basierte X-Werte für die Plot-Darstellung.
+                    x_values = list(range(1, len(plot_data) + 1))
                     self.curves[curve_key].setData(x=x_values, y=plot_data)
 
     def setup_ui_logic(self):

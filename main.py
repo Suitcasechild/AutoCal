@@ -68,36 +68,58 @@ def wait_for_power_on(target_ip, auth=None):
             pass
         time.sleep(1)
 
-def perform_measurement(target_ip, rm, device_path, step, duration, ts, auth=None):
+def perform_measurement(target_ip, rm, device_path, step, num_measurements, ts, auth=None):
     """
-    # English: Performs the measurement for a single step, collecting data for a specific duration.
-    # Deutsch: Führt die Messung für eine einzelne Stufe durch und sammelt Daten für eine bestimmte Dauer.
+    # English: Performs the measurement for a single step, collecting a specific number of valid data points.
+    # Deutsch: Führt die Messung für eine einzelne Stufe durch und sammelt eine bestimmte Anzahl gültiger Datenpunkte.
     """
-    results = []
-    start = time.time()
-    print(f"Starte Messung Stufe {step} ({duration}s)...")
-    while (time.time() - start) < duration:
+    valid_results = []
+    measurement_attempt_count = 0
+    print(f"Starte Messung Stufe {step} ({num_measurements} gültige Messungen)...")
+    while len(valid_results) < num_measurements:
+        measurement_attempt_count += 1
         rv, ra, rw = rm.get_reference_data() # Assumes reference device does not need auth here
         try:
             rt_res = httpx.get(f"http://{target_ip}/cm?cmnd=Status%208", timeout=2, auth=auth).json()
             rt = rt_res['StatusSNS']['ENERGY']
             tv, ta, tw = float(rt['Voltage']), float(rt['Current']), float(rt['Power'])
-            if rv is not None:
-                results.append({
+
+            # English: Check for zero values, which are considered invalid.
+            # Deutsch: Prüfe auf Nullwerte, die als ungültig gelten.
+            if any(val == 0 for val in [rv, ra, rw, tv, ta, tw] if val is not None):
+                print(f"[WARN] Messversuch {measurement_attempt_count}: Ungültige Messung (0-Wert). Wiederhole Messung... ({len(valid_results)}/{num_measurements})", end="\r")
+                time.sleep(0.5) # Small delay before retrying
+                continue # Skip this measurement and try again
+            
+            if rv is not None: # Ensure reference data is available
+                valid_results.append({
                     "Ref_Volt": rv, "Ref_Amp": ra, "Ref_Watt": rw, 
                     "Target_Volt": tv, "Target_Amp": ta, "Target_Watt": tw
                 })
-                print(f"[{int(time.time()-start):>3}s] Ref: {rw:.2f}W | DUT: {tw:.2f}W", end="\r")
-        except: 
-            pass
-    if not results:
-        print("\n[FEHLER] Keine Daten gesammelt!")
+                # English: Removed logging of individual measurement values as requested by the user.
+                # Deutsch: Protokollierung der einzelnen Messwerte wurde auf Benutzerwunsch entfernt.
+                # print(f"[{len(valid_results):>3}/{num_measurements}] Ref: {rw:.2f}W | DUT: {tw:.2f}W", end="\r")
+        except Exception as e: 
+            # English: Log other errors during measurement attempt.
+            # Deutsch: Protokolliere andere Fehler während des Messversuchs.
+            print(f"[FEHLER] Messversuch {measurement_attempt_count}: {e}. Wiederhole Messung... ({len(valid_results)}/{num_measurements})", end="\r")
+        time.sleep(1) # Wait for 1 second between valid measurements / attempts to not overload devices
+
+    if not valid_results:
+        print("\n[FEHLER] Keine gültigen Daten gesammelt!")
         return None
     
+    # English: Create DataFrame and round relevant columns to 3 decimal places.
+    # Deutsch: Erstelle DataFrame und runde relevante Spalten auf 3 Nachkommastellen.
+    df_results = pd.DataFrame(valid_results)
+    for col in ["Ref_Volt", "Ref_Amp", "Ref_Watt", "Target_Volt", "Target_Amp", "Target_Watt"]:
+        if col in df_results.columns:
+            df_results[col] = df_results[col].round(3)
+
     # English: Save the collected data to a CSV file.
     # Deutsch: Speichere die gesammelten Daten in einer CSV-Datei.
     csv_path = os.path.join(device_path, f"{ts}_Stufe_{step}.csv")
-    pd.DataFrame(results).to_csv(csv_path, index=False)
+    df_results.to_csv(csv_path, index=False)
     return csv_path
 
 if __name__ == "__main__":
@@ -184,11 +206,15 @@ if __name__ == "__main__":
 
         # --- MEASUREMENT LOOP ---
         steps = int(cm.config['TARGET']['measurement_steps'])
-        duration = int(cm.config['TARGET']['duration_per_step'])
+        # English: Increase the number of measurements by 2 internally to compensate for min/max exclusion.
+        # Deutsch: Erhöhe die Anzahl der Messungen intern um 2, um den Ausschluss von Min/Max-Werten zu kompensieren.
+        num_measurements_base = int(cm.config['TARGET']['measurements_per_step'])
+        num_measurements_compensated = num_measurements_base + 2
+
         for s in range(1, steps + 1):
             print(f"\n--- LASTSTUFE {s} von {steps} ---")
             if wait_for_power_on(target_ip):
-                csv = perform_measurement(target_ip, rm, device_path, s, duration, data_ts)
+                csv = perform_measurement(target_ip, rm, device_path, s, num_measurements_compensated, data_ts)
                 if csv:
                     res = engine.calculate_new_calibration(csv, old_cal)
                     res['Stufe'] = s

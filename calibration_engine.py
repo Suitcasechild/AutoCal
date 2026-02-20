@@ -46,10 +46,18 @@ class CalibrationEngine:
         # Deutsch: Lese die Messdaten aus der CSV-Datei.
         df = pd.read_csv(csv_file)
         
-        # English: Calculate the mean values for reference (Soll) and DUT (Ist).
-        # Deutsch: Berechne die Mittelwerte für Referenz (Soll) und Prüfling (Ist).
-        soll = {"V": df['Ref_Volt'].mean(), "A": df['Ref_Amp'].mean(), "W": df['Ref_Watt'].mean()}
-        ist = {"V": df['Target_Volt'].mean(), "A": df['Target_Amp'].mean(), "W": df['Target_Watt'].mean()}
+        # English: Calculate the mean values for reference (Soll) and DUT (Ist), excluding the highest and lowest values.
+        # Deutsch: Berechne die Mittelwerte für Referenz (Soll) und Prüfling (Ist), wobei der höchste und niedrigste Wert ausgeschlossen werden.
+        soll = {
+            "V": df['Ref_Volt'].sort_values().iloc[1:-1].mean(),
+            "A": df['Ref_Amp'].sort_values().iloc[1:-1].mean(),
+            "W": df['Ref_Watt'].sort_values().iloc[1:-1].mean()
+        }
+        ist = {
+            "V": df['Target_Volt'].sort_values().iloc[1:-1].mean(),
+            "A": df['Target_Amp'].sort_values().iloc[1:-1].mean(),
+            "W": df['Target_Watt'].sort_values().iloc[1:-1].mean()
+        }
 
         # English: Calculate absolute and relative differences.
         # Deutsch: Berechne die absoluten und relativen Abweichungen.

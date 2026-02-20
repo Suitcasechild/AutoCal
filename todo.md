@@ -105,3 +105,46 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
         d. Der Verbindungsversuch wird mit den neuen Daten wiederholt.
     3.  **Wenn die Verbindung nach insgesamt drei Versuchen weiterhin fehlschlägt**, wird der Vorgang mit einer klaren Fehlermeldung ("Verbindung zu [Gerätename] fehlgeschlagen. Bitte Zugangsdaten prüfen.") abgebrochen.
     4.  Nach einer erfolgreichen Verbindung werden für alle weiteren Anfragen an dieses Gerät die funktionierenden Zugangsdaten aus dem `CredentialsManager` verwendet.
+
+### Verbesserungen der Messwertverarbeitung und GUI
+
+*   **1. Messlogik anpassen (Nullwerte und Wiederholung)**
+    *   **Ziel:** Ungültige Messwerte (0) sollen nicht protokolliert, sondern durch zusätzliche gültige Messungen ersetzt werden.
+    *   **Betroffene Dateien:** `main.py`, `refhome_offset.py`
+    *   **Aufgabe:**
+        *   Implementiere eine Prüfung innerhalb der Messschleife: Wenn ein Referenz- oder Prüflingswert `0` ist, wird das Messpaar verworfen.
+        *   Protokolliere eine Meldung im Log über die ungültige Messung und die erneute Messung.
+        *   Stelle sicher, dass die gewünschte Anzahl an *gültigen* Messungen pro Stufe erreicht wird.
+        *   Intern erhöhe die Anzahl der zu nehmenden Messungen um 2, um den Ausschluss von Min/Max-Werten zu kompensieren (siehe Punkt 3).
+        *   Wende diese Logik auf normale Kalibrierung und Offset-Prüfung an.
+
+*   **2. Plot-Darstellung anpassen (X-Achse und Absolutwerte)**
+    *   **Ziel:** Plots sollen absolute Messwerte anzeigen und die X-Achse soll bei 1 beginnen.
+    *   **Betroffene Datei:** `gui_main.py`
+    *   **Aufgabe:**
+        *   Passe die X-Achsen-Generierung in der Live-Plot-Aktualisierung an, sodass sie bei `1` beginnt (`range(1, len(plot_data) + 1)`).
+        *   Bestätige, dass die Plots stets die absoluten, validen Messwerte anzeigen und "0"-Werte, falls vorhanden, nicht sichtbar sind (dies sollte durch Punkt 1 gelöst sein).
+
+*   **3. Mittelwertberechnung anpassen (Min/Max-Ausschluss)**
+    *   **Ziel:** Mittelwerte sollen robuster gegen Ausreißer sein.
+    *   **Betroffene Datei:** `calibration_engine.py`
+    *   **Aufgabe:**
+        *   Ändere die Mittelwertberechnung so, dass der niedrigste und der höchste Wert einer Messreihe vor der Berechnung ausgeschlossen werden.
+        *   Dies gilt für alle Mittelwerte (Volt, Ampere, Watt) in allen Berechnungen der Anwendung.
+
+*   **4. CSV-Export auf 3 Nachkommastellen runden**
+    *   **Ziel:** Einheitliche und präzise Darstellung der Messwerte in den CSV-Dateien.
+    *   **Betroffene Dateien:** `main.py`, `gui_main.py` (und ggf. `data_analyzer.py` bei direkten Schreiboperationen)
+    *   **Aufgabe:**
+        *   Stelle sicher, dass alle Messwerte (Ref_Volt, Target_Volt, Ref_Amp, Target_Amp, Ref_Watt, Target_Watt) vor dem Speichern in eine CSV-Datei auf maximal 3 Nachkommastellen gerundet werden.
+-   [x] **GUI anpassen: Achsenbeschriftung:** In `gui_main.py` die Beschriftung der X-Achse von `plot_widget.setLabel('bottom', 'Zeit', units='s')` zu `plot_widget.setLabel('bottom', 'Messung', units='#')` ändern. (Bereits implementiert)
+
+### Feature: Anzeige der DUT-Messwerte in Labels
+
+*   **Ziel:** Live-Anzeige von Spannung, Strom, Leistung des Prüflings in dedizierten Labels in der GUI.
+*   **Betroffene Datei:** `gui_main.py`
+*   **Aufgabe:**
+    *   Erweitere die `update_live_data`-Methode, um die Labels `lbl_v_dut`, `lbl_a_dut` und `lbl_w_dut` mit den entsprechenden Werten des Prüflings zu aktualisieren.
+    *   Wende die vorgegebenen Nachkommastellen an: Spannung 2, Strom 3, Leistung 2.
+    *   Sorge dafür, dass die Labels "----" anzeigen, wenn keine Messung aktiv ist oder die DUT ausgeschaltet ist (durch Integration in die bestehende Logik für die LCD-Anzeigen).
+    *   Erweitere die `reset_lcd_displays`-Methode, um auch diese neuen Labels zurückzusetzen.

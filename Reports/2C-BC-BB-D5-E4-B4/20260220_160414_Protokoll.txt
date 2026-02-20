@@ -13,29 +13,29 @@ TASMOTA PRECISION CALIBRATION REPORT
 
 MESSUNGSDETAILS
   Kalibrier-Modus:  HOME
-  Datenquelle (CSV): 20260219_194821
-  Report erstellt:    20260219_194821
+  Datenquelle (CSV): 20260220_160414
+  Report erstellt:    20260220_160414
 =====================================================================================
 
 [1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
 
 STUFE 1:
-  Spannung: Ref  228.10V | DUT  457.49V | Err: +229.39V (+100.56%) -> Cal-Vorschlag: 1538
-  Strom:    Ref   0.268A | DUT   0.535A | Err: +0.267A (+99.55%) -> Cal-Vorschlag: 3194
-  Leistung: Ref   62.99W | DUT   63.78W | Err:  +0.79W ( +1.26%) -> Cal-Vorschlag: 9601
+  Spannung: Ref  227.31V | DUT  227.59V | Err:  +0.29V ( +0.13%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.265A | DUT   0.270A | Err: +0.004A ( +1.67%) -> Cal-Vorschlag: 3165
+  Leistung: Ref   62.14W | DUT   61.35W | Err:  -0.79W ( -1.27%) -> Cal-Vorschlag: 9522
 
 =====================================================================================
 [2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
 Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
-  Leistung (W): Steigung m = 0.987554 | Bestimmtheitsmaß R2 = 0.009785
+  Leistung (W): Steigung m = 1.012839 | Bestimmtheitsmaß R2 = 0.042159
 
 =====================================================================================
 [3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
 
-    VoltageCal 3086                     VoltageCal 1538 (Mittelwert der Stufen)
-    CurrentCal 6375                     CurrentCal 3194 (Mittelwert der Stufen)
-      PowerCal 9722                       PowerCal 9600 (aus Regression, empfohlen)
-                                          └─ Alternative: 9601 (Mittelwert der Stufen)
+    VoltageCal 1542                     VoltageCal 1540 (Mittelwert der Stufen)
+    CurrentCal 3218                     CurrentCal 3165 (Mittelwert der Stufen)
+      PowerCal 9402                       PowerCal 9522 (aus Regression, empfohlen)
+                                          └─ Alternative: 9522 (Mittelwert der Stufen)
 
 =====================================================================================
 ENDE DES PROTOKOLLS
