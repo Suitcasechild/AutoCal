@@ -69,17 +69,17 @@ It supports two main modes for reference measurements:
     * [Option B: From Source Code](#option-b-from-source-code-for-developers)
     * [Configuring config.ini](#config-file-details)
 2. [Interface Overview](#2-the-main-window-interface)
-    * [Input and Configuration Frames](#input-and-configuration)
-    * [Real-time Displays (DUT vs. Reference)](#real-time-displays)
+    * [Input and Configuration](#input-and-configuration)
+    * [Real-time Displays](#real-time-displays)
     * [Live Charts](#live-charts)
 3. [Executing a Calibration](#3-performing-a-calibration-step-by-step)
     * [Online Check & Authentication](#31-online-check--authentication)
     * [Reference Selection](#32-reference-selection)
     * [The Measurement Run](#33-the-measurement-run)
-    * [Safety Features (Locking & Abort)](#34-safety-features)
+    * [Safety Features](#34-safety-features)
 4. [Results and Verification](#4-analysis-and-application)
     * [Understanding the Report](#41-understanding-the-report)
-    * [Applying Values (As Found / As Left)](#42-applying-values)
+    * [Applying Values](#42-applying-values)
     * [Re-Applying Old Data](#43-using-existing-data-re-apply)
 
 ---
@@ -101,14 +101,18 @@ Adjust the `config.ini` file if needed. You can set the default report directory
 
 ### 2. The Main Window Interface
 
-The UI is divided into several logical areas to keep you informed during the process:
-*   **Input Area (Top Left):** Select your reference (Pro, Home, or Manual) and enter the DUT IP.
-*   **Configuration (Top Right):** Set the number of steps (load points) and measurements per step.
-*   **Device Info (Middle Left):** Shows the DUT's name, version, and MAC address. Includes live labels for Voltage, Current, and Power.
-*   **Reference Info (Middle Center):** 
-    *   If **PRO** is selected: Displays the Fluke 45 LCDs for precision Soll-values.
-    *   If **HOME** is selected: Displays a dedicated frame with the reference device's name, MAC, and live sensor readings.
-*   **Charts (Right):** Displays real-time plotting of Soll (Reference) vs. Ist (DUT) for all three metrics.
+#### Input and Configuration
+The top section of the UI allows you to select your reference source (PRO, HOME, or Manual) and enter the target device (DUT) IP address. Here, you also define the measurement parameters: **Steps** (number of load levels) and **Measurements per Step** (number of samples per level).
+
+#### Real-time Displays
+The middle section provides live status information for both the DUT and the chosen reference. 
+*   **DUT Info:** Displays the device's hostname, MAC address, and firmware version, alongside live sensor readings for voltage, current, and power.
+*   **Reference Info:** 
+    *   In **PRO mode**, the large LCD numbers mimic the Fluke 45's dual display.
+    *   In **HOME mode**, a dedicated panel shows the reference Tasmota device's identity and live sensor data for side-by-side comparison.
+
+#### Live Charts
+The right-hand panel features high-performance `pyqtgraph` charts. These plots show the **Soll (Reference)** and **Ist (DUT)** values simultaneously, allowing you to visually assess the deviation and stabilization of the measurement in real-time.
 
 ---
 
@@ -227,18 +231,18 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
     * [Option B: Aus dem Quellcode](#option-b-aus-dem-quellcode-für-entwickler)
     * [Konfiguration (config.ini)](#konfiguration-der-configini)
 2. [Die Benutzeroberfläche im Detail](#2-die-benutzeroberfläche-im-detail)
-    * [Eingabe- und Konfigurationsbereiche](#eingabe-und-konfiguration)
-    * [Echtzeit-Anzeigen (Prüfling vs. Referenz)](#echtzeit-anzeigen)
+    * [Eingabe und Konfiguration](#eingabe-und-konfiguration)
+    * [Echtzeit-Anzeigen](#echtzeit-anzeigen)
     * [Live-Diagramme](#live-diagramme)
 3. [Durchführung einer Kalibrierung](#3-durchführung-einer-kalibrierung-schritt-für-schritt)
     * [Online-Check & Authentifizierung](#31-online-check--authentifizierung)
     * [Wahl der Referenz](#32-referenz-auswahl)
     * [Der Messvorgang](#33-der-messvorgang)
-    * [Sicherheitsfunktionen (Locking & Abbruch)](#34-sicherheitsfunktionen)
+    * [Sicherheitsfunktionen](#34-sicherheitsfunktionen)
 4. [Auswertung & Anwendung](#4-auswertung--anwendung)
-    * [Den Report verstehen](#41-den-bericht-verstehen)
-    * [Werte anwenden (As Found / As Left)](#42-kalibrierung-anwenden)
-    * [Wiederverwendung alter Daten (Re-Apply)](#43-verwendung-bestehender-daten-re-apply)
+    * [Den Bericht verstehen](#41-den-bericht-verstehen)
+    * [Kalibrierung anwenden](#42-kalibrierung-anwenden)
+    * [Verwendung bestehender Daten](#43-verwendung-bestehender-daten-re-apply)
 
 ---
 
@@ -259,13 +263,18 @@ In der `config.ini` können Sie Standard-Pfade für Reports sowie COM-Ports für
 
 ### 2. Die Benutzeroberfläche im Detail
 
-*   **Eingabebereich (Oben Links):** Auswahl des Modus (Pro, Home, Manuell) und Eingabe der Ziel-IP.
-*   **Konfiguration (Oben Rechts):** Festlegen der Laststufen und Messwerte pro Stufe (empfohlen: 15-30).
-*   **Prüfling-Info (Mitte Links):** Zeigt Name, MAC und Version des DUT sowie Live-Messwerte für V, A und W.
-*   **Referenz-Info (Mitte):** 
-    *   Im **PRO-Modus**: Die digitalen Anzeigen des Fluke 45 Multimeters.
-    *   Im **HOME-Modus**: Ein dedizierter Bereich für die Referenz-Dose mit eigenen Live-Werten und Geräte-Infos.
-*   **Diagramme (Rechts):** Echtzeit-Visualisierung der Soll- und Ist-Werte.
+#### Eingabe und Konfiguration
+Im oberen Bereich wählen Sie Ihre Referenzquelle (PRO, HOME oder Manuell) und geben die IP des Prüflings (DUT) ein. Hier legen Sie auch die Messparameter fest: **Stufen** (Anzahl der Lastpunkte) und **Messwerte pro Stufe** (Anzahl der Stichproben pro Punkt).
+
+#### Echtzeit-Anzeigen
+Der mittlere Bereich informiert Sie live über den Status beider Geräte.
+*   **Prüfling-Info:** Zeigt Hostnamen, MAC-Adresse und Firmware-Version sowie die aktuellen Sensorwerte für Spannung, Strom und Leistung an.
+*   **Referenz-Info:** 
+    *   Im **PRO-Modus** spiegeln große LCD-Anzeigen das Display des Fluke 45 wider.
+    *   Im **HOME-Modus** sehen Sie einen dedizierten Bereich mit der Identität und den Live-Werten der Referenz-Dose zum direkten Vergleich.
+
+#### Live-Diagramme
+Auf der rechten Seite befinden sich drei hochperformante Diagramme (`pyqtgraph`). Diese zeichnen simultan die **Soll- (Referenz)** und **Ist-Werte (Prüfling)** auf, sodass Sie Abweichungen und die Stabilisierung der Werte sofort visuell beurteilen können.
 
 ---
 
@@ -275,33 +284,33 @@ In der `config.ini` können Sie Standard-Pfade für Reports sowie COM-Ports für
 Geben Sie die IP ein und klicken Sie auf `🌐`. Falls das Gerät ein Passwort hat, öffnet sich ein Dialog. Diese Daten werden nur temporär im Speicher gehalten.
 
 #### 3.2 Referenz-Auswahl
-*   **PRO:** Verbinden Sie das Fluke 45 via RS232.
-*   **HOME:** Stellen Sie sicher, dass die Referenzdose kalibriert ist. Der Eigenverbrauch des Prüflings wird vorab automatisch als Offset ermittelt.
+*   **PRO:** Verbinden Sie das Fluke 45 via RS232. Stellen Sie den korrekten COM-Port im Fluke-Setup ein.
+*   **HOME:** Nutzen Sie eine bereits kalibrierte Steckdose. Das Programm ermittelt vorab automatisch den Eigenverbrauch des Prüflings und zieht diesen als Offset ab.
 
 #### 3.3 Der Messvorgang
 Klicken Sie auf **"Kalibrierung Starten"**:
-1.  **Stabilisierung:** Nach dem Einschalten filtert ein 7-sekündiger Algorithmus den Einschaltstrom aus.
-2.  **Datenerfassung:** Messwerte werden gesammelt. Min/Max-Ausreißer werden automatisch entfernt.
-3.  **Stufenwechsel:** Das Gerät wird zwischen den Stufen ausgeschaltet, um den Lastwechsel sicher zu ermöglichen.
+1.  **Stabilisierung:** Ein 7-sekündiger Filter sorgt nach dem Einschalten dafür, dass der Einschaltstrom abgeklungen ist.
+2.  **Datenerfassung:** Es werden mehrere Messungen durchgeführt. Min/Max-Ausreißer werden automatisch entfernt, um Rauschen zu eliminieren.
+3.  **Stufenwechsel:** Zwischen den Stufen wird der Prüfling ausgeschaltet, damit Sie die Last sicher wechseln können.
 
 #### 3.4 Sicherheitsfunktionen
-*   **Eingabesperre (UI-Locking):** Während der Messung werden alle Checkboxen, Eingabefelder und Setup-Menüs deaktiviert.
-*   **Abbruch-Sicherheit:** Beim Klick auf "Messung abbrechen" sendet die Software sofort einen `Power OFF` Befehl an den Prüfling.
+*   **Eingabesperre (UI-Locking):** Während der Messung werden alle Steuerelemente deaktiviert, um Fehlbedienungen zu vermeiden.
+*   **Abbruch-Sicherheit:** Beim Klick auf "Messung abbrechen" wird sofort ein `Power OFF` an den Prüfling gesendet.
 
 ---
 
 ### 4. Auswertung & Anwendung
 
 #### 4.1 Den Bericht verstehen
-Der Report-Dialog zeigt die Abweichung jeder Stufe. Für `PowerCal` gibt es zwei Vorschläge:
-*   **Regression (Empfohlen):** Berechnet die Steigung mathematisch über alle Punkte für höchste Linearität.
+Nach der Messung zeigt ein Dialog das Protokoll mit allen Abweichungen. Für `PowerCal` gibt es zwei Optionen:
+*   **Regression (Empfohlen):** Nutzt mathematische Steigungsanalyse für höchste Präzision über den gesamten Bereich.
 *   **Mittelwert:** Einfacher Durchschnitt der Abweichungen.
 
 #### 4.2 Kalibrierung anwenden
-Klicken Sie auf **"KALIBRIEREN"**. Die Werte werden gesendet und sofort verifiziert. Ein "As Found / As Left" Block dokumentiert den Erfolg am Ende des Reports.
+Klicken Sie auf **"KALIBRIEREN"**. Das Programm sendet die Werte, verifiziert den Schreibvorgang und ergänzt das Protokoll um einen "As Found / As Left"-Block als Nachweis für den Erfolg.
 
 #### 4.3 Verwendung bestehender Daten (Re-Apply)
-Findet das Programm alte Reports für ein Gerät, können Sie die Messung überspringen und direkt die alten Werte erneut anwenden.
+Findet das Programm alte Reports, können Sie die Messung überspringen und direkt die letzten guten Kalibrierwerte erneut an die Dose senden.
 
 ---
 
