@@ -2,15 +2,23 @@
 
 *99% AI-Generated: A journey from zero Python knowledge to a fully functional PyQt application using solely prompt-driven development.*
 
-**(Deutsche Beschreibung unten)**
+([Deutsche Beschreibung unten](#tasmota-precision-calibrator-de))
 
 ---
 
-## 🚀 The Vibecoding Experiment: 95% AI-Generated
+## Table of Contents
+1. [The Vibecoding Experiment](#-the-vibecoding-experiment-99-ai-generated)
+2. [Key Features](#key-features)
+3. [User Guide](#user-guide)
+4. [Technical Stack](#technical-stack)
+
+---
+
+## 🚀 The Vibecoding Experiment: 99% AI-Generated
 
 *Welcome behind the scenes! This project is not just a piece of software, but the result of a fascinating experiment in modern application development.*
 
-**The code in this repository was 95% created exclusively through prompts in the Gemini CLI.** And the most exciting part? The entire project was started from the perspective of an absolute beginner – **without any prior knowledge of Python or setting up development environments.** The goal was to find out if it's possible to build a functioning application simply by "feeling" the logic (vibecoding) and cleverly communicating with an AI.
+**The code in this repository was 99% created exclusively through prompts in the Gemini CLI.** And the most exciting part? The entire project was started from the perspective of an absolute beginner – **without any prior knowledge of Python or setting up development environments.** The goal was to find out if it's possible to build a functioning application simply by "feeling" the logic (vibecoding) and cleverly communicating with an AI.
 
 ### 🏛️ The Pillars: Structure as a Foundation
 Vibecoding does not mean firing off commands aimlessly. For an AI-driven project of this scale to succeed without prior knowledge, strong organization is required. The AI handled the programming, but the control was managed through a strict documentary framework:
@@ -48,6 +56,50 @@ It supports two main modes for reference measurements:
 *   **Non-Blocking UI:** Live data is displayed using `pyqtgraph`, and all communication (HTTP and Serial) runs in a background thread (`QThread`) to keep the UI responsive.
 *   **Pre-Measurement Checks:** Automatically verifies device settings (`SetOption21`, resolution) and allows re-applying calibration from previous reports without new measurements.
 
+---
+
+## User Guide
+
+### 1. Preparation & Installation
+**Option A: Pre-compiled Version (Recommended for Users)**
+
+For users who do not want to install Python, a pre-compiled version (`.exe` for Windows) is available in the [Releases tab](https://github.com/Suitcasechild/AutoCal/releases). Simply download the latest `TasmotaCalibrator.exe` and run it.
+
+**Option B: From Source Code (For Developers)**
+
+1.  **Clone Repository:** Download the project to your computer, e.g., with `git clone https://github.com/Suitcasechild/AutoCal.git`.
+2.  **Install Dependencies:** The project includes a `requirements.txt` file. Install all required libraries using the command:  
+    `pip install -r requirements.txt`
+3.  **Configuration (`config.ini`):** If necessary, adjust the `config.ini` file. Here you can set default IP addresses and the storage location for reports (`root_report_dir`).
+
+### 2. The Main Window
+*   **IP Address of DUT:** Enter the IP address of the Tasmota device you want to calibrate.
+*   **Calibration Parameters:**
+    *   **Steps:** The number of different load points you want to measure (e.g., 3 for 60W, 100W, 200W).
+    *   **Measurements per Step:** The number of individual measurements per load step. More measurements (e.g., 15-30) lead to more stable average values.
+*   **Reference Selection:** Choose your reference source.
+    *   **PRO (Fluke 45):** For measurement with the multimeter.
+    *   **HOME (Tasmota):** For measurement using another Tasmota device as a reference.
+*   **Graphs & Log:** The graphs display live measurement data. The log window below documents the entire process flow and shows errors.
+
+### 3. Performing a Calibration
+1.  **Preparation:** Enter the DUT's IP and select your reference.
+2.  **Online Check (Optional):** Click the `🌐` button to check if the device is reachable and to display its device data (Name, Version, MAC).
+3.  **Start Measurement:** Click **"Start Calibration"**.
+4.  **Handling Password Protection:** If one of your Tasmota devices (DUT or reference) is password-protected, a dialog will automatically appear. Enter the username and password. This data is only held in memory for the current session and is **never** saved. You have up to three attempts in case of a typo.
+5.  **Follow Instructions:** The software will now prompt you to turn on the load for the first step. Do this and wait for the measurement for the step to complete.
+6.  **Further Steps:** The software automatically turns off the load and prompts you to prepare and turn on the next load step. Repeat this for all configured steps.
+7.  **Completion & Analysis:** After the last step, the **Report Dialog** will appear. Here you will see the complete analysis.
+8.  **Apply Calibration:** In the report dialog, you have the choice:
+    *   **CALIBRATE:** Click here to send the new values. You will be asked whether to use the `PowerCal` value from the regression (recommended) or the average value.
+    *   **DO NOT CALIBRATE:** Closes the dialog without sending the new values. The reports are still saved.
+
+### 4. Using Existing Data (Re-Apply)
+*   If you start a calibration for a device for which data already exists, the software will ask if you want to perform a **"New Measurement"** or **"Use Old Report"**.
+*   If you choose "Use Old Report," the measurement is skipped, and the report dialog is displayed directly with the values from the last calibration. This is useful if you just want to re-apply the values.
+
+---
+
 ## Technical Stack
 
 *   **Language:** Python 3.12+
@@ -65,11 +117,19 @@ It supports two main modes for reference measurements:
 
 ---
 
-## 🚀 Das Vibecoding-Experiment: 95 % KI-generiert
+## Inhaltsverzeichnis
+1. [Das Vibecoding-Experiment](#-das-vibecoding-experiment-99-ki-generiert)
+2. [Hauptmerkmale](#hauptmerkmale)
+3. [Bedienungsanleitung](#bedienungsanleitung)
+4. [Technischer Überblick](#technischer-überblick)
+
+---
+
+## 🚀 Das Vibecoding-Experiment: 99% KI-generiert
 
 *Willkommen hinter den Kulissen! Dieses Projekt ist nicht nur eine Software, sondern das Ergebnis eines faszinierenden Experiments in der modernen Anwendungsentwicklung.*
 
-**Der Code in diesem Repository wurde zu 95 % ausschließlich durch Prompts im Gemini-CLI erstellt.** Und das Spannendste daran? Das gesamte Projekt wurde aus der Perspektive eines absoluten Anfängers gestartet – **ohne jegliche Vorkenntnisse in Python oder der Einrichtung von Entwicklungsumgebungen.** Das Ziel war herauszufinden, ob es möglich ist, eine funktionierende Anwendung zu bauen, indem man sich einfach in die Logik "hineinfühlt" (Vibecoding) und geschickt mit einer KI kommuniziert.
+**Der Code in diesem Repository wurde zu 99% ausschließlich durch Prompts im Gemini-CLI erstellt.** Und das Spannendste daran? Das gesamte Projekt wurde aus der Perspektive eines absoluten Anfängers gestartet – **ohne jegliche Vorkenntnisse in Python oder der Einrichtung von Entwicklungsumgebungen.** Das Ziel war herauszufinden, ob es möglich ist, eine funktionierende Anwendung zu bauen, indem man sich einfach in die Logik "hineinfühlt" (Vibecoding) und geschickt mit einer KI kommuniziert.
 
 ### 🏛️ Die Säulen: Struktur als Fundament
 Vibecoding bedeutet nicht, ziellos Befehle abzufeuern. Damit ein KI-gesteuertes Projekt dieser Größenordnung ohne Vorkenntnisse gelingt, ist eine starke Organisation erforderlich. Die KI übernahm die Programmierung, aber die Steuerung erfolgte über einen strengen dokumentarischen Rahmen:
@@ -149,6 +209,8 @@ Für Benutzer, die Python nicht installieren möchten, steht im [Releases-Tab](h
 *   Wenn Sie eine Kalibrierung für ein Gerät starten, für das bereits Daten existieren, fragt die Software, ob Sie eine **"Neue Messung"** oder den **"Alten Report nutzen"** möchten.
 *   Wenn Sie "Alten Report nutzen" wählen, wird die Messung übersprungen und direkt der Report-Dialog mit den Werten der letzten Kalibrierung angezeigt. Dies ist nützlich, wenn Sie die Werte lediglich erneut anwenden möchten.
 
+---
+
 ## Technischer Überblick
 
 *   **Sprache:** Python 3.12+
@@ -156,46 +218,3 @@ Für Benutzer, die Python nicht installieren möchten, steht im [Releases-Tab](h
 *   **Echtzeit-Graphen:** pyqtgraph
 *   **Kommunikation:** `pyserial` (für Fluke 45) & `httpx` (für Tasmota)
 *   **Datenverarbeitung:** `pandas` & `numpy`
-
----
-
-## User Guide
-
-### 1. Preparation & Installation
-**Option A: Pre-compiled Version (Recommended for Users)**
-
-For users who do not want to install Python, a pre-compiled version (`.exe` for Windows) is available in the [Releases tab](https://github.com/Suitcasechild/AutoCal/releases). Simply download the latest `TasmotaCalibrator.exe` and run it.
-
-**Option B: From Source Code (For Developers)**
-
-1.  **Clone Repository:** Download the project to your computer, e.g., with `git clone https://github.com/Suitcasechild/AutoCal.git`.
-2.  **Install Dependencies:** The project includes a `requirements.txt` file. Install all required libraries using the command:  
-    `pip install -r requirements.txt`
-3.  **Configuration (`config.ini`):** If necessary, adjust the `config.ini` file. Here you can set default IP addresses and the storage location for reports (`root_report_dir`).
-
-### 2. The Main Window
-*   **IP Address of DUT:** Enter the IP address of the Tasmota device you want to calibrate.
-*   **Calibration Parameters:**
-    *   **Steps:** The number of different load points you want to measure (e.g., 3 for 60W, 100W, 200W).
-    *   **Measurements per Step:** The number of individual measurements per load step. More measurements (e.g., 15-30) lead to more stable average values.
-*   **Reference Selection:** Choose your reference source.
-    *   **PRO (Fluke 45):** For measurement with the multimeter.
-    *   **HOME (Tasmota):** For measurement using another Tasmota device as a reference.
-*   **Graphs & Log:** The graphs display live measurement data. The log window below documents the entire process flow and shows errors.
-
-### 3. Performing a Calibration
-1.  **Preparation:** Enter the DUT's IP and select your reference.
-2.  **Online Check (Optional):** Click the `🌐` button to check if the device is reachable and to display its device data (Name, Version, MAC).
-3.  **Start Measurement:** Click **"Start Calibration"**.
-4.  **Handling Password Protection:** If one of your Tasmota devices (DUT or reference) is password-protected, a dialog will automatically appear. Enter the username and password. This data is only held in memory for the current session and is **never** saved. You have up to three attempts in case of a typo.
-5.  **Follow Instructions:** The software will now prompt you to turn on the load for the first step. Do this and wait for the measurement for the step to complete.
-6.  **Further Steps:** The software automatically turns off the load and prompts you to prepare and turn on the next load step. Repeat this for all configured steps.
-7.  **Completion & Analysis:** After the last step, the **Report Dialog** will appear. Here you will see the complete analysis.
-8.  **Apply Calibration:** In the report dialog, you have the choice:
-    *   **CALIBRATE:** Click here to send the new values. You will be asked whether to use the `PowerCal` value from the regression (recommended) or the average value.
-    *   **DO NOT CALIBRATE:** Closes the dialog without sending the new values. The reports are still saved.
-
-### 4. Using Existing Data (Re-Apply)
-*   If you start a calibration for a device for which data already exists, the software will ask if you want to perform a **"New Measurement"** or **"Use Old Report"**.
-*   If you choose "Use Old Report," the measurement is skipped, and the report dialog is displayed directly with the values from the last calibration. This is useful if you just want to re-apply the values.
-
