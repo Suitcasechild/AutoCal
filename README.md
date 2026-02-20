@@ -57,59 +57,104 @@ It supports two main modes for reference measurements:
 *   **Interactive Decision Making:** Before applying any changes, the tool presents a detailed report. You can choose whether to apply the new values and even select between the regression-based `PowerCal` (recommended) or a simpler mean-based value.
 *   **Automated Reporting:** For every calibration run, detailed `.csv` files with raw measurement data and a comprehensive `.txt` protocol are generated and stored.
 *   **Non-Blocking UI:** Live data is displayed using `pyqtgraph`, and all communication (HTTP and Serial) runs in a background thread (`QThread`) to keep the UI responsive.
-*   **Pre-Measurement Checks:** Automatically verifies device settings (`SetOption21`, resolution) and allows re-applying calibration from previous reports without new measurements.
+*   **Safety & Robustness:** Automatically turns off the device on manual abort, locks input fields during active runs to prevent errors, and handles noisy data by excluding min/max outliers.
 
 ---
 
 ## User Guide
 
-### 1. Preparation & Installation
-**Option A: Pre-compiled Version (Recommended for Users)**
+### Detailed Table of Contents
+1. [Setup and Installation](#1-setup-and-installation)
+    * [Option A: Pre-compiled EXE](#option-a-pre-compiled-version-recommended-for-users)
+    * [Option B: From Source Code](#option-b-from-source-code-for-developers)
+    * [Configuring config.ini](#config-file-details)
+2. [Interface Overview](#2-the-main-window-interface)
+    * [Input and Configuration Frames](#input-and-configuration)
+    * [Real-time Displays (DUT vs. Reference)](#real-time-displays)
+    * [Live Charts](#live-charts)
+3. [Executing a Calibration](#3-performing-a-calibration-step-by-step)
+    * [Online Check & Authentication](#31-online-check--authentication)
+    * [Reference Selection](#32-reference-selection)
+    * [The Measurement Run](#33-the-measurement-run)
+    * [Safety Features (Locking & Abort)](#34-safety-features)
+4. [Results and Verification](#4-analysis-and-application)
+    * [Understanding the Report](#41-understanding-the-report)
+    * [Applying Values (As Found / As Left)](#42-applying-values)
+    * [Re-Applying Old Data](#43-using-existing-data-re-apply)
 
+---
+
+### 1. Setup and Installation
+
+#### Option A: Pre-compiled Version (Recommended for Users)
 For users who do not want to install Python, a pre-compiled version (`.exe` for Windows) is available in the [Releases tab](https://github.com/Suitcasechild/AutoCal/releases). Simply download the latest `TasmotaCalibrator.exe` and run it.
 
-**Option B: From Source Code (For Developers)**
+#### Option B: From Source Code (For Developers)
+1.  **Clone Repository:** `git clone https://github.com/Suitcasechild/AutoCal.git`.
+2.  **Install Dependencies:** `pip install -r requirements.txt`.
+3.  **Run Application:** `python gui_main.py`.
 
-1.  **Clone Repository:** Download the project to your computer, e.g., with `git clone https://github.com/Suitcasechild/AutoCal.git`.
-2.  **Install Dependencies:** The project includes a `requirements.txt` file. Install all required libraries using the command:  
-    `pip install -r requirements.txt`
-3.  **Configuration (`config.ini`):** If necessary, adjust the `config.ini` file. Here you can set default IP addresses and the storage location for reports (`root_report_dir`).
+#### Config File Details
+Adjust the `config.ini` file if needed. You can set the default report directory and pre-configure COM ports for the Fluke 45 or the IP of your reference Tasmota plug.
 
-### 2. The Main Window
-*   **IP Address of DUT:** Enter the IP address of the Tasmota device you want to calibrate.
-*   **Calibration Parameters:**
-    *   **Steps:** The number of different load points you want to measure (e.g., 3 for 60W, 100W, 200W).
-    *   **Measurements per Step:** The number of individual measurements per load step. More measurements (e.g., 15-30) lead to more stable average values.
-*   **Reference Selection:** Choose your reference source.
-    *   **PRO (Fluke 45):** For measurement with the multimeter.
-    *   **HOME (Tasmota):** For measurement using another Tasmota device as a reference.
-*   **Graphs & Log:** The graphs display live measurement data. The log window below documents the entire process flow and shows errors.
+---
 
-### 3. Performing a Calibration
-1.  **Preparation:** Enter the DUT's IP and select your reference.
-2.  **Online Check (Optional):** Click the `🌐` button to check if the device is reachable and to display its device data (Name, Version, MAC).
-3.  **Start Measurement:** Click **"Start Calibration"**.
-4.  **Handling Password Protection:** If one of your Tasmota devices (DUT or reference) is password-protected, a dialog will automatically appear. Enter the username and password. This data is only held in memory for the current session and is **never** saved. You have up to three attempts in case of a typo.
-5.  **Follow Instructions:** The software will now prompt you to turn on the load for the first step. Do this and wait for the measurement for the step to complete.
-6.  **Further Steps:** The software automatically turns off the load and prompts you to prepare and turn on the next load step. Repeat this for all configured steps.
-7.  **Completion & Analysis:** After the last step, the **Report Dialog** will appear. Here you will see the complete analysis.
-8.  **Apply Calibration:** In the report dialog, you have the choice:
-    *   **CALIBRATE:** Click here to send the new values. You will be asked whether to use the `PowerCal` value from the regression (recommended) or the average value.
-    *   **DO NOT CALIBRATE:** Closes the dialog without sending the new values. The reports are still saved.
+### 2. The Main Window Interface
 
-### 4. Using Existing Data (Re-Apply)
-*   If you start a calibration for a device for which data already exists, the software will ask if you want to perform a **"New Measurement"** or **"Use Old Report"**.
-*   If you choose "Use Old Report," the measurement is skipped, and the report dialog is displayed directly with the values from the last calibration. This is useful if you just want to re-apply the values.
+The UI is divided into several logical areas to keep you informed during the process:
+*   **Input Area (Top Left):** Select your reference (Pro, Home, or Manual) and enter the DUT IP.
+*   **Configuration (Top Right):** Set the number of steps (load points) and measurements per step.
+*   **Device Info (Middle Left):** Shows the DUT's name, version, and MAC address. Includes live labels for Voltage, Current, and Power.
+*   **Reference Info (Middle Center):** 
+    *   If **PRO** is selected: Displays the Fluke 45 LCDs for precision Soll-values.
+    *   If **HOME** is selected: Displays a dedicated frame with the reference device's name, MAC, and live sensor readings.
+*   **Charts (Right):** Displays real-time plotting of Soll (Reference) vs. Ist (DUT) for all three metrics.
+
+---
+
+### 3. Performing a Calibration (Step-by-Step)
+
+#### 3.1 Online Check & Authentication
+Enter the IP of your DUT. Click the `🌐` button. If the device is password-protected, a dialog will appear. Your credentials are kept in temporary memory and never stored on disk.
+
+#### 3.2 Reference Selection
+*   **PRO (Fluke 45):** Connect your multimeter via RS232. Ensure the adapter is correctly addressed in the Fluke Setup menu.
+*   **HOME (Tasmota):** Ensure your reference plug is calibrated. The software will automatically calculate and subtract the DUT's self-consumption (Offset) before starting.
+
+#### 3.3 The Measurement Run
+Click **"Start Calibration"**. The software will guide you:
+1.  **Stabilization:** After turning on the load, a 7-second filter ensures the inrush current has settled.
+2.  **Data Collection:** Multiple measurements are taken. Min/Max values are automatically discarded to eliminate noise.
+3.  **Step Transition:** The DUT is automatically turned off between steps to allow you to change the load safely.
+
+#### 3.4 Safety Features
+*   **UI Locking:** Once a run starts, all configuration frames and setup menus are disabled to prevent accidental changes.
+*   **Automatic Power-Off:** If you click "Cancel Measurement", the software immediately sends a `Power OFF` command to the DUT to ensure the load is not left active.
+
+---
+
+### 4. Analysis and Application
+
+#### 4.1 Understanding the Report
+After the final step, a dialog displays the detailed protocol. It shows the deviation for every single step and provides two suggestions for `PowerCal`:
+*   **Regression (Recommended):** Uses mathematical slope analysis for best accuracy across the whole range.
+*   **Mean Value:** A simple average of the deviation.
+
+#### 4.2 Applying Values
+Click **"CALIBRATE"**. The software sends the commands, waits for the device to acknowledge, and then performs a **Verification Read**. It appends an "As Found / As Left" block to your report to prove the calibration was successful.
+
+#### 4.3 Using Existing Data (Re-Apply)
+If you start a calibration for a device with existing reports, you can skip the measurement and directly jump to the application dialog to re-send the last known good values.
 
 ---
 
 ## Technical Stack
 
 *   **Language:** Python 3.12+
-*   **GUI:** PySide6
+*   **GUI:** PySide6 (Qt)
 *   **Real-time Graphs:** pyqtgraph
-*   **Communication:** `pyserial` (for Fluke 45) & `httpx` (for Tasmota)
-*   **Data Handling:** `pandas` & `numpy`
+*   **Communication:** `pyserial` (Fluke 45) & `httpx` (Tasmota HTTP API)
+*   **Data Analysis:** `pandas` & `numpy`
 
 ---
 ---
@@ -124,7 +169,7 @@ For users who do not want to install Python, a pre-compiled version (`.exe` for 
 1. [Das Vibecoding-Experiment](#-das-vibecoding-experiment-99-ki-generiert)
 2. [Über das Programm](#über-das-programm)
 3. [Hauptmerkmale](#hauptmerkmale)
-4. [Bedienungsanleitung](#bedienungsanleitung)
+4. [Bedienungsanleitung](#bedienungsanleitung-de)
 5. [Technischer Überblick](#technischer-überblick)
 
 ---
@@ -167,60 +212,103 @@ Es unterstützt zwei Hauptmodi für die Referenzmessung:
 
 *   **Geführter Kalibrierprozess:** Die Benutzeroberfläche führt Sie durch jeden Schritt, von der Gerätekonfiguration bis zur Anwendung der finalen Kalibrierung.
 *   **Duale Referenz-Unterstützung:** Wählen Sie zwischen einem professionellen Multimeter (Fluke 45) oder einem bereits kalibrierten Tasmota-Stecker.
-*   **Fortgeschrittene mathematische Analyse:** Verwendet lineare Regression (`numpy`), um den genauesten `PowerCal`-Wert über den gesamten Messbereich zu berechnen und die Linearität zu verbessern. `VoltageCal` und `CurrentCal` werden auf Basis der mittleren Abweichung berechnet.
-*   **Interaktive Entscheidungsfindung:** Vor dem Anwenden von Änderungen zeigt das Tool einen detaillierten Bericht an. Sie können entscheiden, ob Sie die neuen Werte anwenden und sogar zwischen dem regressionsbasierten `PowerCal`-Wert (empfohlen) oder einem einfacheren Mittelwert wählen.
-*   **Automatisierte Protokollierung:** Für jeden Kalibrierdurchlauf werden detaillierte `.csv`-Dateien mit Rohmessdaten und ein umfassendes `.txt`-Protokoll erstellt und gespeichert.
-*   **Nicht-blockierende GUI:** Live-Daten werden mit `pyqtgraph` angezeigt, und die gesamte Kommunikation (HTTP und Seriell) läuft in einem Hintergrund-Thread (`QThread`), um die Oberfläche reaktionsfähig zu halten.
-*   **Prüfung vor der Messung:** Überprüft automatisch Geräteeinstellungen (`SetOption21`, Auflösung) und ermöglicht das erneute Anwenden einer Kalibrierung aus alten Protokollen, ohne eine neue Messung durchführen zu müssen.
+*   **Fortgeschrittene mathematische Analyse:** Verwendet lineare Regression (`numpy`), um den genauesten `PowerCal`-Wert über den gesamten Messbereich zu berechnen. Extremwerte (Min/Max) werden automatisch gefiltert.
+*   **Interaktive Entscheidungsfindung:** Vor dem Anwenden sehen Sie einen detaillierten Bericht und können zwischen regressionsbasiertem `PowerCal` (empfohlen) oder Mittelwert wählen.
+*   **Automatisierte Protokollierung:** Detaillierte `.csv`-Rohdaten und ein umfassendes `.txt`-Protokoll werden für jeden Lauf gespeichert.
+*   **Sicherheit & Stabilität:** Automatisches Ausschalten des Prüflings bei Abbruch, Sperrung der Eingabefelder während der Messung und robuster Umgang mit instabilen Netzwerkdaten.
 
 ---
 
-## Bedienungsanleitung
+## Bedienungsanleitung (DE)
+
+### Detailliertes Inhaltsverzeichnis
+1. [Vorbereitung & Installation](#1-vorbereitung--installation)
+    * [Option A: Vorkompilierte EXE](#option-a-vorkompilierte-version-empfohlen-für-anwender)
+    * [Option B: Aus dem Quellcode](#option-b-aus-dem-quellcode-für-entwickler)
+    * [Konfiguration (config.ini)](#konfiguration-der-configini)
+2. [Die Benutzeroberfläche im Detail](#2-die-benutzeroberfläche-im-detail)
+    * [Eingabe- und Konfigurationsbereiche](#eingabe-und-konfiguration)
+    * [Echtzeit-Anzeigen (Prüfling vs. Referenz)](#echtzeit-anzeigen)
+    * [Live-Diagramme](#live-diagramme)
+3. [Durchführung einer Kalibrierung](#3-durchführung-einer-kalibrierung-schritt-für-schritt)
+    * [Online-Check & Authentifizierung](#31-online-check--authentifizierung)
+    * [Wahl der Referenz](#32-referenz-auswahl)
+    * [Der Messvorgang](#33-der-messvorgang)
+    * [Sicherheitsfunktionen (Locking & Abbruch)](#34-sicherheitsfunktionen)
+4. [Auswertung & Anwendung](#4-auswertung--anwendung)
+    * [Den Report verstehen](#41-den-bericht-verstehen)
+    * [Werte anwenden (As Found / As Left)](#42-kalibrierung-anwenden)
+    * [Wiederverwendung alter Daten (Re-Apply)](#43-verwendung-bestehender-daten-re-apply)
+
+---
 
 ### 1. Vorbereitung & Installation
-**Option A: Vorkompilierte Version (Empfohlen für Anwender)**
 
-Für Benutzer, die Python nicht installieren möchten, steht im [Releases-Tab](https://github.com/Suitcasechild/AutoCal/releases) eine vorkompilierte Version (`.exe` für Windows) zur Verfügung. Laden Sie einfach die neueste `TasmotaCalibrator.exe` herunter und führen Sie sie aus.
+#### Option A: Vorkompilierte Version (Empfohlen für Anwender)
+Laden Sie einfach die neueste `TasmotaCalibrator.exe` aus den [Releases](https://github.com/Suitcasechild/AutoCal/releases) herunter. Keine Python-Installation nötig.
 
-**Option B: Aus dem Quellcode (Für Entwickler)**
+#### Option B: Aus dem Quellcode (Für Entwickler)
+1.  **Repository klonen:** `git clone https://github.com/Suitcasechild/AutoCal.git`.
+2.  **Abhängigkeiten installieren:** `pip install -r requirements.txt`.
+3.  **Starten:** `python gui_main.py`.
 
-1.  **Repository klonen:** Laden Sie das Projekt auf Ihren Computer herunter, z.B. mit `git clone https://github.com/Suitcasechild/AutoCal.git`.
-2.  **Abhängigkeiten installieren:** Das Projekt enthält eine `requirements.txt`-Datei. Installieren Sie alle benötigten Bibliotheken mit dem Befehl:  
-    `pip install -r requirements.txt`
-3.  **Konfiguration (`config.ini`):** Passen Sie bei Bedarf die `config.ini`-Datei an. Hier können Sie Standard-IP-Adressen und den Speicherort für die Reports (`root_report_dir`) festlegen.
+#### Konfiguration der config.ini
+In der `config.ini` können Sie Standard-Pfade für Reports sowie COM-Ports für das Fluke 45 fest hinterlegen. Das Programm findet diese Datei nun automatisch über einen absoluten Pfad.
 
-### 2. Das Hauptfenster
-*   **IP-Adresse des Prüflings (DUT):** Geben Sie hier die IP-Adresse der Tasmota-Dose ein, die Sie kalibrieren möchten.
-*   **Kalibrier-Parameter:**
-    *   **Stufen:** Anzahl der verschiedenen Lastpunkte, die Sie messen möchten (z.B. 3 für 60W, 100W, 200W).
-    *   **Messungen pro Stufe:** Anzahl der Einzelmessungen pro Laststufe. Mehr Messungen (z.B. 15-30) führen zu stabileren Mittelwerten.
-*   **Referenz-Auswahl:** Wählen Sie Ihre Referenzquelle aus.
-    *   **PRO (Fluke 45):** Für die Messung mit dem Multimeter.
-    *   **HOME (Tasmota):** Für die Messung mit einer anderen Tasmota-Dose als Referenz.
-*   **Graphen & Log:** Die Graphen zeigen Live-Messdaten an. Das Log-Fenster darunter dokumentiert den gesamten Prozessablauf und zeigt Fehler an.
+---
 
-### 3. Durchführung einer Kalibrierung
-1.  **Vorbereitung:** Geben Sie die IP des Prüflings ein und wählen Sie Ihre Referenz.
-2.  **Online Check (Optional):** Klicken Sie auf den `🌐`-Button, um zu prüfen, ob das Gerät erreichbar ist und um dessen Gerätedaten (Name, Version, MAC) anzuzeigen.
-3.  **Messung starten:** Klicken Sie auf **"Kalibrierung Starten"**.
-4.  **Umgang mit Passwortschutz:** Falls eines Ihrer Tasmota-Geräte (Prüfling oder Referenz) passwortgeschützt ist, erscheint automatisch ein Dialog. Geben Sie Benutzername und Passwort ein. Diese Daten werden nur für die aktuelle Sitzung im Speicher gehalten und **niemals** gespeichert. Bei Fehleingabe haben Sie bis zu drei Versuche.
-5.  **Anweisungen folgen:** Die Software wird Sie nun auffordern, die Last für die erste Stufe einzuschalten. Tun Sie dies und warten Sie, bis die Messung für die Stufe abgeschlossen ist.
-6.  **Weitere Stufen:** Die Software schaltet die Last automatisch ab und fordert Sie auf, die nächste Laststufe vorzubereiten und einzuschalten. Wiederholen Sie dies für alle konfigurierten Stufen.
-7.  **Abschluss & Auswertung:** Nach der letzten Stufe erscheint der **Report-Dialog**. Hier sehen Sie die vollständige Auswertung.
-8.  **Kalibrierung anwenden:** Im Report-Dialog haben Sie die Wahl:
-    *   **KALIBRIEREN:** Klicken Sie hier, um die neuen Werte zu senden. Sie werden gefragt, ob der `PowerCal`-Wert aus der Regression (empfohlen) oder dem Mittelwert verwendet werden soll.
-    *   **NICHT KALIBRIEREN:** Schließt den Dialog, ohne die neuen Werte zu senden. Die Protokolle werden trotzdem gespeichert.
+### 2. Die Benutzeroberfläche im Detail
 
-### 4. Verwendung bestehender Daten (Re-Apply)
-*   Wenn Sie eine Kalibrierung für ein Gerät starten, für das bereits Daten existieren, fragt die Software, ob Sie eine **"Neue Messung"** oder den **"Alten Report nutzen"** möchten.
-*   Wenn Sie "Alten Report nutzen" wählen, wird die Messung übersprungen und direkt der Report-Dialog mit den Werten der letzten Kalibrierung angezeigt. Dies ist nützlich, wenn Sie die Werte lediglich erneut anwenden möchten.
+*   **Eingabebereich (Oben Links):** Auswahl des Modus (Pro, Home, Manuell) und Eingabe der Ziel-IP.
+*   **Konfiguration (Oben Rechts):** Festlegen der Laststufen und Messwerte pro Stufe (empfohlen: 15-30).
+*   **Prüfling-Info (Mitte Links):** Zeigt Name, MAC und Version des DUT sowie Live-Messwerte für V, A und W.
+*   **Referenz-Info (Mitte):** 
+    *   Im **PRO-Modus**: Die digitalen Anzeigen des Fluke 45 Multimeters.
+    *   Im **HOME-Modus**: Ein dedizierter Bereich für die Referenz-Dose mit eigenen Live-Werten und Geräte-Infos.
+*   **Diagramme (Rechts):** Echtzeit-Visualisierung der Soll- und Ist-Werte.
+
+---
+
+### 3. Durchführung einer Kalibrierung (Schritt-für-Schritt)
+
+#### 3.1 Online-Check & Authentifizierung
+Geben Sie die IP ein und klicken Sie auf `🌐`. Falls das Gerät ein Passwort hat, öffnet sich ein Dialog. Diese Daten werden nur temporär im Speicher gehalten.
+
+#### 3.2 Referenz-Auswahl
+*   **PRO:** Verbinden Sie das Fluke 45 via RS232.
+*   **HOME:** Stellen Sie sicher, dass die Referenzdose kalibriert ist. Der Eigenverbrauch des Prüflings wird vorab automatisch als Offset ermittelt.
+
+#### 3.3 Der Messvorgang
+Klicken Sie auf **"Kalibrierung Starten"**:
+1.  **Stabilisierung:** Nach dem Einschalten filtert ein 7-sekündiger Algorithmus den Einschaltstrom aus.
+2.  **Datenerfassung:** Messwerte werden gesammelt. Min/Max-Ausreißer werden automatisch entfernt.
+3.  **Stufenwechsel:** Das Gerät wird zwischen den Stufen ausgeschaltet, um den Lastwechsel sicher zu ermöglichen.
+
+#### 3.4 Sicherheitsfunktionen
+*   **Eingabesperre (UI-Locking):** Während der Messung werden alle Checkboxen, Eingabefelder und Setup-Menüs deaktiviert.
+*   **Abbruch-Sicherheit:** Beim Klick auf "Messung abbrechen" sendet die Software sofort einen `Power OFF` Befehl an den Prüfling.
+
+---
+
+### 4. Auswertung & Anwendung
+
+#### 4.1 Den Bericht verstehen
+Der Report-Dialog zeigt die Abweichung jeder Stufe. Für `PowerCal` gibt es zwei Vorschläge:
+*   **Regression (Empfohlen):** Berechnet die Steigung mathematisch über alle Punkte für höchste Linearität.
+*   **Mittelwert:** Einfacher Durchschnitt der Abweichungen.
+
+#### 4.2 Kalibrierung anwenden
+Klicken Sie auf **"KALIBRIEREN"**. Die Werte werden gesendet und sofort verifiziert. Ein "As Found / As Left" Block dokumentiert den Erfolg am Ende des Reports.
+
+#### 4.3 Verwendung bestehender Daten (Re-Apply)
+Findet das Programm alte Reports für ein Gerät, können Sie die Messung überspringen und direkt die alten Werte erneut anwenden.
 
 ---
 
 ## Technischer Überblick
 
 *   **Sprache:** Python 3.12+
-*   **GUI:** PySide6
-*   **Echtzeit-Graphen:** pyqtgraph
-*   **Kommunikation:** `pyserial` (for Fluke 45) & `httpx` (for Tasmota)
+*   **GUI:** PySide6 (Qt)
+*   **Echtzeit-Diagramme:** pyqtgraph
+*   **Kommunikation:** `pyserial` (Fluke 45) & `httpx` (Tasmota API)
 *   **Datenverarbeitung:** `pandas` & `numpy`
