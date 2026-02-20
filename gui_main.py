@@ -314,6 +314,15 @@ class MeasurementWorker(QThread):
                 return # Job is done, main thread takes over via dialog.
 
             if not self.is_running:
+                # English: Attempt to power off the DUT automatically on manual abort.
+                # Deutsch: Versuche die Zieldose bei manuellem Abbruch automatisch auszuschalten.
+                try:
+                    self.log_signal.emit("🔌 Abbruch erkannt: Schalte Ziel-Dose AUS...")
+                    self.data_signal.emit({'volt_ref': None, 'volt_dut': 0.0, 'amp_ref': None, 'amp_dut': 0.0, 'watt_ref': None, 'watt_dut': 0.0, 'dut_off': True})
+                    httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2, auth=dut_auth)
+                except Exception as e:
+                    self.log_signal.emit(f"⚠️ Warnung: Zieldose konnte beim Abbruch nicht ausgeschaltet werden: {e}")
+                
                 self.finished_signal.emit("⚠️ Messung wurde vom Benutzer abgebrochen.")
             else:
                 self.finished_signal.emit("ℹ️ Messung beendet, aber es wurden keine Ergebnisse zum Anwenden generiert.")
@@ -855,7 +864,7 @@ class MainWindow(QMainWindow):
                 self.cm.config['GENERAL']['root_report_dir'] = dialog.edit_report_dir.text().strip()
                 self.cm.root_dir = self.cm.config['GENERAL']['root_report_dir'] 
             
-            with open('config.ini', 'w') as f: self.cm.config.write(f)
+            with open(self.cm.config_path, 'w') as f: self.cm.config.write(f)
             self.ui.log_output.appendPlainText("✅ Allgemeines Setup in config.ini gespeichert.")
             dialog.accept()
             
@@ -888,7 +897,7 @@ class MainWindow(QMainWindow):
             if hasattr(dialog, 'edit_baudrate'):
                 self.cm.config['REFERENCE_PRO']['baudrate'] = dialog.edit_baudrate.text().strip()
                 
-            with open('config.ini', 'w') as f: self.cm.config.write(f)
+            with open(self.cm.config_path, 'w') as f: self.cm.config.write(f)
             self.ui.log_output.appendPlainText("✅ Fluke Setup in config.ini gespeichert.")
             dialog.accept()
             
@@ -917,7 +926,7 @@ class MainWindow(QMainWindow):
             if hasattr(dialog, 'edit_ref_ip'):
                 self.cm.config['REFERENCE_HOME']['ip_address'] = dialog.edit_ref_ip.text().strip()
                 
-            with open('config.ini', 'w') as f: self.cm.config.write(f)
+            with open(self.cm.config_path, 'w') as f: self.cm.config.write(f)
             self.ui.log_output.appendPlainText("✅ Tasmota Setup in config.ini gespeichert.")
             dialog.accept()
             
@@ -1063,12 +1072,20 @@ class MainWindow(QMainWindow):
         try:
             self.cm.config['TARGET']['measurement_steps'] = str(steps)
             self.cm.config['TARGET']['measurements_per_step'] = str(measurements)
-            with open('config.ini', 'w') as configfile: self.cm.config.write(configfile)
+            # English: Use the centralized config path from the manager.
+            # Deutsch: Nutze den zentralen Konfigurationspfad aus dem Manager.
+            with open(self.cm.config_path, 'w') as configfile: self.cm.config.write(configfile)
         except: return
 
-        mac = dut_info['mac'].replace(":", "-") if ":" in dut_info['mac'] else "Unknown_Device"
-        device_path = os.path.join(self.cm.root_dir, mac)
-        os.makedirs(device_path, exist_ok=True)
+        # English: Use the ConfigManager to determine MAC and setup directory (eliminates redundancy).
+        # Deutsch: Nutze den ConfigManager zur MAC-Ermittlung und Verzeichnis-Erstellung (eliminiert Redundanz).
+        dut_auth = None
+        creds = self.credentials_manager.get_credentials(dut_ip)
+        if creds:
+            dut_auth = (creds['user'], creds['password'])
+            
+        device_path = self.cm.setup_device_directory(auth=dut_auth)
+        mac_display = os.path.basename(device_path)
 
         existing_csvs = glob.glob(os.path.join(device_path, "*_Stufe_*.csv"))
         use_existing = False
@@ -1089,7 +1106,7 @@ class MainWindow(QMainWindow):
                 msg_box = QMessageBox(self)
                 msg_box.setIcon(QMessageBox.Question)
                 msg_box.setWindowTitle("Alte Messdaten gefunden")
-                msg_box.setText(f"Für diese Tasmota-Dose ({mac}) existieren bereits Messdaten vom:\n\n{display_time}\n\nMöchtest du komplett neue Daten aufzeichnen oder die Werte des letzten Reports erneut anwenden?")
+                msg_box.setText(f"Für diese Tasmota-Dose ({mac_display}) existieren bereits Messdaten vom:\n\n{display_time}\n\nMöchtest du komplett neue Daten aufzeichnen oder die Werte des letzten Reports erneut anwenden?")
                 
                 btn_new = msg_box.addButton("Neue Messung", QMessageBox.AcceptRole)
                 btn_old = msg_box.addButton("Alten Report nutzen", QMessageBox.AcceptRole)

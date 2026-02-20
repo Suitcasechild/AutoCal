@@ -44,20 +44,50 @@ class CalibrationEngine:
         """
         # English: Read the measurement data from the CSV file.
         # Deutsch: Lese die Messdaten aus der CSV-Datei.
-        df = pd.read_csv(csv_file)
-        
-        # English: Calculate the mean values for reference (Soll) and DUT (Ist), excluding the highest and lowest values.
-        # Deutsch: Berechne die Mittelwerte für Referenz (Soll) und Prüfling (Ist), wobei der höchste und niedrigste Wert ausgeschlossen werden.
-        soll = {
-            "V": df['Ref_Volt'].sort_values().iloc[1:-1].mean(),
-            "A": df['Ref_Amp'].sort_values().iloc[1:-1].mean(),
-            "W": df['Ref_Watt'].sort_values().iloc[1:-1].mean()
-        }
-        ist = {
-            "V": df['Target_Volt'].sort_values().iloc[1:-1].mean(),
-            "A": df['Target_Amp'].sort_values().iloc[1:-1].mean(),
-            "W": df['Target_Watt'].sort_values().iloc[1:-1].mean()
-        }
+        try:
+            df = pd.read_csv(csv_file)
+        except Exception as e:
+            print(f"❌ Fehler beim Lesen der CSV {csv_file}: {e}")
+            return None
+
+        # English: Validate required columns.
+        # Deutsch: Erforderliche Spalten validieren.
+        required_cols = ['Ref_Volt', 'Ref_Amp', 'Ref_Watt', 'Target_Volt', 'Target_Amp', 'Target_Watt']
+        if not all(col in df.columns for col in required_cols):
+            print(f"❌ Fehler: CSV {csv_file} enthält nicht alle erforderlichen Spalten.")
+            return None
+
+        if len(df) == 0:
+            print(f"⚠️ Warnung: CSV {csv_file} ist leer.")
+            return None
+
+        # English: Calculate the mean values. If we have at least 3 values, exclude min/max.
+        # Otherwise, take the simple mean of all available values.
+        # Deutsch: Mittelwerte berechnen. Bei mindestens 3 Werten Min/Max ausschließen.
+        # Andernfalls den einfachen Mittelwert aller verfügbaren Werte nehmen.
+        if len(df) >= 3:
+            soll = {
+                "V": df['Ref_Volt'].sort_values().iloc[1:-1].mean(),
+                "A": df['Ref_Amp'].sort_values().iloc[1:-1].mean(),
+                "W": df['Ref_Watt'].sort_values().iloc[1:-1].mean()
+            }
+            ist = {
+                "V": df['Target_Volt'].sort_values().iloc[1:-1].mean(),
+                "A": df['Target_Amp'].sort_values().iloc[1:-1].mean(),
+                "W": df['Target_Watt'].sort_values().iloc[1:-1].mean()
+            }
+        else:
+            print(f"ℹ️ Hinweis: Zu wenige Datenpunkte ({len(df)}) in {os.path.basename(csv_file)} für Min/Max-Ausschluss. Nutze einfachen Mittelwert.")
+            soll = {
+                "V": df['Ref_Volt'].mean(),
+                "A": df['Ref_Amp'].mean(),
+                "W": df['Ref_Watt'].mean()
+            }
+            ist = {
+                "V": df['Target_Volt'].mean(),
+                "A": df['Target_Amp'].mean(),
+                "W": df['Target_Watt'].mean()
+            }
 
         # English: Calculate absolute and relative differences.
         # Deutsch: Berechne die absoluten und relativen Abweichungen.

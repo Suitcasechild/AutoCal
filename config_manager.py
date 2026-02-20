@@ -24,19 +24,24 @@ class ConfigManager:
         :param config_file: (str) The name of the configuration file to load.
                             (str) Der Name der zu ladenden Konfigurationsdatei.
         """
+        # English: Use an absolute path to the config file to ensure it's found regardless of the working directory.
+        # Deutsch: Nutze einen absoluten Pfad zur Konfigurationsdatei, um sicherzustellen, dass sie unabhängig vom Arbeitsverzeichnis gefunden wird.
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.config_path = os.path.join(base_dir, config_file)
+
         # English: Create a new ConfigParser instance.
         # Deutsch: Erstelle eine neue ConfigParser-Instanz.
         self.config = configparser.ConfigParser()
         
         # English: Read the specified config file.
         # Deutsch: Lese die angegebene Konfigurationsdatei.
-        self.config.read(config_file)
+        self.config.read(self.config_path)
         
         # English: Store the root directory for reports from the config.
         # Deutsch: Speichere das Stammverzeichnis für Protokolle aus der Konfiguration.
         self.root_dir = self.config['GENERAL']['root_report_dir']
 
-    def get_target_mac(self):
+    def get_target_mac(self, auth=None):
         """
         # English:
         # Queries the MAC address of the target device via the Tasmota API.
@@ -45,6 +50,7 @@ class ConfigManager:
         # Fragt die MAC-Adresse der Ziel-Dose via Tasmota API ab.
         # Dies wird zur Erstellung eines eindeutigen Verzeichnisses für das Gerät verwendet.
 
+        :param auth: (tuple, optional) Auth tuple (user, password) for the device.
         :return: (str) The MAC address without colons, or "Unknown_Device" on error.
                  (str) Die MAC-Adresse ohne Doppelpunkte oder "Unknown_Device" bei einem Fehler.
         """
@@ -54,7 +60,7 @@ class ConfigManager:
         try:
             # English: Status 5 provides network info including the MAC address.
             # Deutsch: Status 5 liefert Netzwerk-Infos inklusive der MAC-Adresse.
-            response = httpx.get(f"http://{target_ip}/cm?cmnd=Status%205", timeout=5)
+            response = httpx.get(f"http://{target_ip}/cm?cmnd=Status%205", timeout=5, auth=auth)
             data = response.json()
             
             # English: Extract the MAC address (e.g., 40:F5:20:...).
@@ -70,7 +76,7 @@ class ConfigManager:
             print(f"Fehler beim Abrufen der MAC: {e}")
             return "Unknown_Device"
 
-    def setup_device_directory(self):
+    def setup_device_directory(self, auth=None):
         """
         # English:
         # Creates a directory for the specific device based on its MAC address.
@@ -79,12 +85,13 @@ class ConfigManager:
         # Erstellt den Ordner für das spezifische Gerät basierend auf seiner MAC-Adresse.
         # Falls das Verzeichnis bereits existiert, wird nichts unternommen.
 
+        :param auth: (tuple, optional) Auth tuple for the device.
         :return: (str) The path to the device-specific directory.
                  (str) Der Pfad zum gerätespezifischen Verzeichnis.
         """
         # English: Get the MAC address to use for the folder name.
         # Deutsch: Hole die MAC-Adresse, die als Ordnername verwendet wird.
-        mac = self.get_target_mac()
+        mac = self.get_target_mac(auth=auth)
         
         # English: Construct the full path.
         # Deutsch: Konstruiere den vollständigen Pfad.

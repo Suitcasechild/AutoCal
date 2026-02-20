@@ -3,6 +3,15 @@
 ## v5.3.0 (2026-02-20)
 
 ### ✨ Features
+*   **Automatisches Ausschalten bei Abbruch:** Wenn die Messung manuell über den "Messung abbrechen"-Button beendet wird, versucht das Programm nun automatisch, die Zieldose (Prüfling) auszuschalten, um einen sicheren Zustand zu gewährleisten.
+    *   **English:** Automatic Power-Off on Abort: When the measurement is manually ended via the "Cancel Measurement" button, the program now automatically attempts to power off the DUT (device under test) to ensure a safe state.
+*   **Verbesserte Robustheit der CalibrationEngine:**
+    *   **CSV-Validierung:** Vor der Verarbeitung von Messdaten wird nun geprüft, ob alle erforderlichen Spalten vorhanden sind.
+    *   **Handling kleiner Datensätze:** Bei weniger als 3 Messpunkten erfolgt nun ein automatischer Fallback auf den einfachen Mittelwert, um Abstürze beim Ausschluss von Extremwerten zu verhindern.
+*   **Zentralisierung & Wartbarkeit:**
+    *   **Zentrale Pfadverwaltung:** Die `config.ini` wird nun über einen absoluten Pfad verwaltet, was den Start der App aus beliebigen Verzeichnissen ermöglicht.
+    *   **Redundanz-Eliminierung:** Die Logik zur MAC-Ermittlung und Verzeichnisverwaltung wurde im `ConfigManager` zentralisiert.
+    *   **Authentifizierungs-Support:** Der automatische Abruf der MAC-Adresse unterstützt nun Zugangsdaten.
 *   **Behebung von Stabilitäts- und Performance-Problemen:**
     *   **Speicherleck behoben:** Die Live-Graphen nutzen nun `collections.deque` mit einer Begrenzung auf 1000 Datenpunkte. Dies verhindert, dass der Arbeitsspeicher bei langen Laufzeiten unbegrenzt anwächst.
     *   **Typsicherheit verbessert:** Ein potenzieller Absturz (`TypeError`) bei der Verarbeitung von Messwerten wurde behoben. Werte werden nun erst in Zahlen (`float`) umgewandelt, bevor Vergleiche durchgeführt werden.
