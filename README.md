@@ -8,9 +8,10 @@
 
 ## Table of Contents
 1. [The Vibecoding Experiment](#-the-vibecoding-experiment-99-ai-generated)
-2. [Key Features](#key-features)
-3. [User Guide](#user-guide)
-4. [Technical Stack](#technical-stack)
+2. [About the Tool](#about-the-tool)
+3. [Key Features](#key-features)
+4. [User Guide](#user-guide)
+5. [Technical Stack](#technical-stack)
 
 ---
 
@@ -37,6 +38,8 @@ The process took place in three major phases:
 *When reading the code, look at it through this lens: It is the product of an intensive, highly structured conversation between human and machine.*
 
 ---
+
+## About the Tool
 
 A GUI-based tool for high-precision calibration and validation of Tasmota-based energy monitoring devices (like smart plugs). This application automates the process of measuring, calculating, and applying new calibration values to enhance the accuracy of power, voltage, and current readings.
 
@@ -119,9 +122,10 @@ For users who do not want to install Python, a pre-compiled version (`.exe` for 
 
 ## Inhaltsverzeichnis
 1. [Das Vibecoding-Experiment](#-das-vibecoding-experiment-99-ki-generiert)
-2. [Hauptmerkmale](#hauptmerkmale)
-3. [Bedienungsanleitung](#bedienungsanleitung)
-4. [Technischer Überblick](#technischer-überblick)
+2. [Über das Programm](#über-das-programm)
+3. [Hauptmerkmale](#hauptmerkmale)
+4. [Bedienungsanleitung](#bedienungsanleitung)
+5. [Technischer Überblick](#technischer-überblick)
 
 ---
 
@@ -148,6 +152,8 @@ Der Prozess fand in drei großen Phasen statt:
 *Wenn Sie den Code lesen, betrachten Sie ihn durch diese Brille: Er ist das Produkt eines intensiven, hochstrukturierten Gesprächs zwischen Mensch und Maschine.*
 
 ---
+
+## Über das Programm
 
 Ein GUI-basiertes Werkzeug zur hochpräzisen Kalibrierung und Validierung von Tasmota-basierten Energiemessgeräten (z.B. Smart Plugs). Die Anwendung automatisiert den Prozess des Messens, Berechnens und Anwendens neuer Kalibrierwerte, um die Genauigkeit von Leistungs-, Spannungs- und Strommessungen zu verbessern.
 
@@ -216,5 +222,5 @@ Für Benutzer, die Python nicht installieren möchten, steht im [Releases-Tab](h
 *   **Sprache:** Python 3.12+
 *   **GUI:** PySide6
 *   **Echtzeit-Graphen:** pyqtgraph
-*   **Kommunikation:** `pyserial` (für Fluke 45) & `httpx` (für Tasmota)
+*   **Kommunikation:** `pyserial` (for Fluke 45) & `httpx` (for Tasmota)
 *   **Datenverarbeitung:** `pandas` & `numpy`
