@@ -714,23 +714,23 @@ class MainWindow(QMainWindow):
                 pen_dut = pg.mkPen(col_dut, width=2)
                 self.curves[f"{key}_dut"] = plot_widget.plot(pen=pen_dut, name=f"Ist (DUT)")
                 
-                                layout.addWidget(plot_widget)
-                
-                    def set_ui_locked(self, locked: bool):
-                        """
-                        # English: Locks or unlocks the UI frames during measurement.
-                        # Deutsch: Sperrt oder entsperrt die UI-Frames während der Messung.
-                        """
-                        state = not locked
-                        if hasattr(self.ui, 'frame_2'): self.ui.frame_2.setEnabled(state)
-                        if hasattr(self.ui, 'frame_3'): self.ui.frame_3.setEnabled(state)
-                        if hasattr(self.ui, 'frame_4'): self.ui.frame_4.setEnabled(state)
-                        
-                        # English: Also disable setup actions in the menu
-                        # Deutsch: Deaktiviere auch die Setup-Aktionen im Menü
-                        if hasattr(self.ui, 'menuSetup'): self.ui.menuSetup.setEnabled(state)
-                
-                    def update_live_data(self, data):
+                layout.addWidget(plot_widget)
+
+    def set_ui_locked(self, locked: bool):
+        """
+        # English: Locks or unlocks the UI frames during measurement.
+        # Deutsch: Sperrt oder entsperrt die UI-Frames während der Messung.
+        """
+        state = not locked
+        if hasattr(self.ui, 'frame_2'): self.ui.frame_2.setEnabled(state)
+        if hasattr(self.ui, 'frame_3'): self.ui.frame_3.setEnabled(state)
+        if hasattr(self.ui, 'frame_4'): self.ui.frame_4.setEnabled(state)
+        
+        # English: Also disable setup actions in the menu
+        # Deutsch: Deaktiviere auch die Setup-Aktionen im Menü
+        if hasattr(self.ui, 'menuSetup'): self.ui.menuSetup.setEnabled(state)
+
+    def update_live_data(self, data):
                 
         """
         # English: Updates the LCD displays and labels with the latest measurement data.
