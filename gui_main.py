@@ -8,6 +8,7 @@ import glob
 import numpy as np
 import pandas as pd
 from datetime import datetime
+from collections import deque
 import pyqtgraph as pg
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QMessageBox, 
                                QDialog, QTextEdit, QHBoxLayout, QPushButton, QFileDialog,
@@ -643,7 +644,13 @@ class MainWindow(QMainWindow):
         self.log_proxy.message_signal.connect(self.ui.log_output.appendPlainText)
         sys.stdout = self.log_proxy
 
-        self.graph_data = {'volt_ref': [], 'volt_dut': [], 'amp_ref': [], 'amp_dut': [], 'watt_ref': [], 'watt_dut': []}
+        # English: Use deque with maxlen to prevent memory leaks from infinite growth.
+        # Deutsch: Nutze deque mit maxlen, um Speicherlecks durch unbegrenztes Wachstum zu verhindern.
+        self.graph_data = {
+            'volt_ref': deque(maxlen=1000), 'volt_dut': deque(maxlen=1000), 
+            'amp_ref':  deque(maxlen=1000), 'amp_dut':  deque(maxlen=1000), 
+            'watt_ref': deque(maxlen=1000), 'watt_dut': deque(maxlen=1000)
+        }
         
         self.setup_graphs()
         self.setup_ui_logic()
@@ -699,30 +706,58 @@ class MainWindow(QMainWindow):
                 self.curves[f"{key}_dut"] = plot_widget.plot(pen=pen_dut, name=f"Ist (DUT)")
                 
                 layout.addWidget(plot_widget)
-
     def update_live_data(self, data):
-        is_pro = self.ui.check_ref_pro.isChecked()
+        """
+        # English: Updates the LCD displays and labels with the latest measurement data.
+        # Deutsch: Aktualisiert die LCD-Anzeigen und Labels mit den neuesten Messdaten.
+        """
         dut_is_off = data.get('dut_off', False)
         v_ref = data.get('volt_ref')
+        v_dut = data.get('volt_dut')
         
-        if not is_pro or dut_is_off or v_ref is None:
-            for lcd_name in ['lcd_volt', 'lcd_amp', 'lcd_watt']:
-                if hasattr(self.ui, lcd_name):
-                    getattr(self.ui, lcd_name).display("------")
-        else:
+        # --- Referenz-LCDs aktualisieren (Soll-Werte) ---
+        # English: Show reference values if available and DUT is not powered off
+        # Deutsch: Zeige Referenzwerte an, wenn verfügbar und die Dose nicht ausgeschaltet ist
+        if v_ref is not None and not dut_is_off:
             if hasattr(self.ui, 'lcd_volt'): self.ui.lcd_volt.display(f"{v_ref:.2f}")
             if hasattr(self.ui, 'lcd_amp'):  self.ui.lcd_amp.display(f"{data.get('amp_ref', 0):.3f}")
             if hasattr(self.ui, 'lcd_watt'): self.ui.lcd_watt.display(f"{data.get('watt_ref', 0):.2f}")
+        else:
+            for lcd_name in ['lcd_volt', 'lcd_amp', 'lcd_watt']:
+                if hasattr(self.ui, lcd_name):
+                    getattr(self.ui, lcd_name).display("------")
+                    
+        # --- Prüfling-Labels aktualisieren (Ist-Werte) ---
+        # English: Show DUT values if available and DUT is not powered off
+        # Deutsch: Zeige DUT-Werte an, wenn verfügbar und die Dose nicht ausgeschaltet ist
+        if v_dut is not None and not dut_is_off:
+            if hasattr(self.ui, 'lbl_v_dut'): self.ui.lbl_v_dut.setText(f"{v_dut:.2f}V")
+            if hasattr(self.ui, 'lbl_a_dut'): self.ui.lbl_a_dut.setText(f"{data.get('amp_dut', 0):.3f}A")
+            if hasattr(self.ui, 'lbl_w_dut'): self.ui.lbl_w_dut.setText(f"{data.get('watt_dut', 0):.2f}W")
+        else:
+            if hasattr(self.ui, 'lbl_v_dut'): self.ui.lbl_v_dut.setText("----")
+            if hasattr(self.ui, 'lbl_a_dut'): self.ui.lbl_a_dut.setText("----")
+            if hasattr(self.ui, 'lbl_w_dut'): self.ui.lbl_w_dut.setText("----")
 
-        if v_ref is None:
-            return 
+        # --- Graphen-Daten aktualisieren ---
+        # English: Return early if no data is available to avoid graph errors
+        # Deutsch: Frühzeitiger Abbruch, wenn keine Daten vorhanden sind, um Graphen-Fehler zu vermeiden
+        if v_ref is None and v_dut is None:
+            return
 
         for key in ['volt_ref', 'volt_dut', 'amp_ref', 'amp_dut', 'watt_ref', 'watt_dut']:
             val = data.get(key)
             
-            if val is not None and val > 0:
+            # English: Safely convert to float first, then check for > 0 to prevent TypeError if val is a string.
+            # Deutsch: Zuerst sicher in Float umwandeln, dann auf > 0 prüfen, um einen TypeError zu verhindern, falls val ein String ist.
+            try:
+                val_float = float(val) if val is not None else None
+            except (ValueError, TypeError):
+                val_float = None
+
+            if val_float is not None and val_float > 0:
                 if key in self.graph_data:
-                    self.graph_data[key].append(float(val))
+                    self.graph_data[key].append(val_float)
             elif key in self.graph_data and len(self.graph_data[key]) > 0:
                 self.graph_data[key].append(self.graph_data[key][-1])
             elif key in self.graph_data:
@@ -736,12 +771,16 @@ class MainWindow(QMainWindow):
 
         for data_key, curve_key in mapping.items():
             if curve_key in self.curves:
-                plot_data = self.graph_data[data_key][-100:]
+                # English: Convert deque to a list for plotting (only last 100 entries).
+                # Deutsch: Deque für die Darstellung in eine Liste umwandeln (nur die letzten 100 Einträge).
+                plot_data = list(self.graph_data[data_key])[-100:]
                 if plot_data:
                     # English: Generate 1-based x-values for plotting.
                     # Deutsch: Erzeuge 1-basierte X-Werte für die Plot-Darstellung.
                     x_values = list(range(1, len(plot_data) + 1))
                     self.curves[curve_key].setData(x=x_values, y=plot_data)
+
+
 
     def setup_ui_logic(self):
         """
@@ -1076,7 +1115,8 @@ class MainWindow(QMainWindow):
             'ref_info': ref_info
         }
 
-        for key in self.graph_data: self.graph_data[key] = []
+        for key in self.graph_data: 
+            self.graph_data[key].clear()
         
         self.worker = MeasurementWorker(self.cm.config, params, self.credentials_manager)
         
@@ -1337,6 +1377,11 @@ class MainWindow(QMainWindow):
                 lcd = getattr(self.ui, lcd_name)
                 #lcd.setDigitCount(7)
                 lcd.display("------")
+        # English: Also reset DUT measurement labels.
+        # Deutsch: Setze auch die DUT-Messwert-Labels zurück.
+        if hasattr(self.ui, 'lbl_v_dut'): self.ui.lbl_v_dut.setText("----")
+        if hasattr(self.ui, 'lbl_a_dut'): self.ui.lbl_a_dut.setText("----")
+        if hasattr(self.ui, 'lbl_w_dut'): self.ui.lbl_w_dut.setText("----")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -3,6 +3,12 @@
 ## v5.3.0 (2026-02-20)
 
 ### ✨ Features
+*   **Behebung von Stabilitäts- und Performance-Problemen:**
+    *   **Speicherleck behoben:** Die Live-Graphen nutzen nun `collections.deque` mit einer Begrenzung auf 1000 Datenpunkte. Dies verhindert, dass der Arbeitsspeicher bei langen Laufzeiten unbegrenzt anwächst.
+    *   **Typsicherheit verbessert:** Ein potenzieller Absturz (`TypeError`) bei der Verarbeitung von Messwerten wurde behoben. Werte werden nun erst in Zahlen (`float`) umgewandelt, bevor Vergleiche durchgeführt werden.
+    *   **English:** Stability and Performance Bugfixes: Fixed a memory leak in live graphs by using `collections.deque` with a 1000-point limit. Improved type safety by ensuring values are converted to `float` before comparison, preventing potential `TypeError` crashes.
+*   **Entkoppelung der Messwertanzeige:** Die Anzeige der Messwerte des Prüflings (DUT) in der GUI ist nun unabhängig vom gewählten Referenzmodus. Zuvor wurden die DUT-Werte nur angezeigt, wenn das Fluke als Referenz gewählt war. Zusätzlich wurde veralteter, auskommentierter Code in der Anzeige-Logik entfernt.
+    *   **English:** Decoupling of Measurement Display: The display of DUT measurement values in the GUI is now independent of the selected reference mode. Previously, DUT values were only shown when the Fluke was selected as the reference. Additionally, obsolete commented-out code in the display logic was removed.
 *   **Verbesserte Mittelwertberechnung:** Die Berechnung der Mittelwerte für Spannung, Strom und Leistung schließt nun den höchsten und niedrigsten Messwert jeder Reihe aus. Dies erhöht die Robustheit der Kalibrierergebnisse gegenüber Ausreißern.
     *   **English:** Improved Mean Calculation: The calculation of mean values for voltage, current, and power now excludes the highest and lowest measurement from each series. This enhances the robustness of calibration results against outliers.
 *   **Verbesserte Messwerterfassung (Nullwert-Behandlung):** Messungen, bei denen Referenz- oder Prüflingswerte `0` ergeben, werden nun als ungültig erkannt und automatisch wiederholt. Dies stellt sicher, dass nur valide Messdaten für die Kalibrierung verwendet werden. Für die Hauptkalibrierung wird die intern benötigte Anzahl an Messungen um 2 erhöht, um den Ausschluss von Minimal- und Maximalwerten bei der Mittelwertbildung zu kompensieren. Auch die Offset-Prüfung berücksichtigt nun ungültige Messwerte.
@@ -21,6 +27,10 @@
     *   **English:** Offset Measurement Wait Time: A 5-second pause has been added to the GUI version to ensure the target device is fully stable after powering off before the offset measurement begins.
 *   **Verbesserte Abbruch-Reaktion (GUI):** Die Reaktionsfähigkeit des "Messung abbrechen"-Buttons im GUI wurde verbessert, um ein sofortigeres Anhalten des Messvorgangs zu gewährleisten. Dies wurde durch häufigere Prüfungen des Abbruchsignals (`self.is_running`) vor kritischen I/O-Operationen erreicht. Die `time.sleep`-Dauer nach jeder gültigen Messung wurde auf den ursprünglichen Wert von 1 Sekunde zurückgesetzt. Die Timeouts für HTTP-Anfragen bleiben unverändert.
     *   **English:** Improved Abort Responsiveness (GUI): The responsiveness of the "Cancel Measurement" button in the GUI has been improved to ensure a more immediate halt of the measurement process. This was achieved by more frequent checks of the abort signal (`self.is_running`) before critical I/O operations. The `time.sleep` duration after each valid measurement has been reverted to its original value of 1 second. HTTP request timeouts remain unchanged.
+*   **Fehlerbehebung Einrückung (GUI):** Ein `IndentationError` in `gui_main.py` in der `update_live_data`-Methode wurde behoben, der durch eine fehlerhafte Einrückung des `if/else`-Blocks zur Aktualisierung der LCD-Anzeigen und DUT-Labels verursacht wurde.
+    *   **English:** Indentation Error Fix (GUI): An `IndentationError` in `gui_main.py` within the `update_live_data` method was resolved, caused by incorrect indentation of the `if/else` block responsible for updating LCD displays and DUT labels.
+*   **Behoben: IndentationError in update_live_data (Benutzerkorrektur):** Der in `gui_main.py` aufgetretene `IndentationError` in der `update_live_data`-Methode wurde vom Benutzer behoben.
+    *   **English:** Fixed: IndentationError in update_live_data (User Correction): The `IndentationError` encountered in `gui_main.py` within the `update_live_data` method was resolved by the user.
 
 ## v5.2.0 (2026-02-19)
 

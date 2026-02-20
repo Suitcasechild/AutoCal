@@ -1,0 +1,41 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D5E4B4-1204
+  MAC Address: 2C:BC:BB:D5:E4:B4
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260220_174703
+  Report erstellt:    20260220_174703
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  227.64V | DUT  227.85V | Err:  +0.20V ( +0.09%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.264A | DUT   0.270A | Err: +0.006A ( +2.16%) -> Cal-Vorschlag: 3150
+  Leistung: Ref   62.18W | DUT   61.49W | Err:  -0.69W ( -1.12%) -> Cal-Vorschlag: 9508
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 1.011244 | Bestimmtheitsmaß R2 = 0.409428
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1540 (Mittelwert der Stufen)
+    CurrentCal 3218                     CurrentCal 3150 (Mittelwert der Stufen)
+      PowerCal 9402                       PowerCal 9507 (aus Regression, empfohlen)
+                                          └─ Alternative: 9508 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
