@@ -669,6 +669,13 @@ class MainWindow(QMainWindow):
         if hasattr(self.ui, 'split_info'):
             self.ui.split_info.setVisible(False)
         
+        # English: Initialize visibility of reference frames based on checkbox state.
+        # Deutsch: Initialisiere Sichtbarkeit der Referenz-Frames basierend auf dem Checkbox-Status.
+        if hasattr(self.ui, 'frame_fluke'):
+            self.ui.frame_fluke.setVisible(self.ui.check_ref_pro.isChecked())
+        if hasattr(self.ui, 'frame_tasref'):
+            self.ui.frame_tasref.setVisible(self.ui.check_ref_home.isChecked())
+            
         if hasattr(self.ui, 'btn_onlinechk'):
             self.ui.btn_onlinechk.clicked.connect(self.on_online_check_clicked)
             
@@ -731,7 +738,6 @@ class MainWindow(QMainWindow):
         if hasattr(self.ui, 'menuSetup'): self.ui.menuSetup.setEnabled(state)
 
     def update_live_data(self, data):
-                
         """
         # English: Updates the LCD displays and labels with the latest measurement data.
         # Deutsch: Aktualisiert die LCD-Anzeigen und Labels mit den neuesten Messdaten.
@@ -747,10 +753,22 @@ class MainWindow(QMainWindow):
             if hasattr(self.ui, 'lcd_volt'): self.ui.lcd_volt.display(f"{v_ref:.2f}")
             if hasattr(self.ui, 'lcd_amp'):  self.ui.lcd_amp.display(f"{data.get('amp_ref', 0):.3f}")
             if hasattr(self.ui, 'lcd_watt'): self.ui.lcd_watt.display(f"{data.get('watt_ref', 0):.2f}")
+            
+            # English: Also update the new reference labels
+            # Deutsch: Aktualisiere auch die neuen Referenz-Labels
+            if hasattr(self.ui, 'lbl_v_ref'): self.ui.lbl_v_ref.setText(f"{v_ref:.2f}V")
+            if hasattr(self.ui, 'lbl_a_ref'): self.ui.lbl_a_ref.setText(f"{data.get('amp_ref', 0):.3f}A")
+            if hasattr(self.ui, 'lbl_w_ref'): self.ui.lbl_w_ref.setText(f"{data.get('watt_ref', 0):.2f}W")
         else:
             for lcd_name in ['lcd_volt', 'lcd_amp', 'lcd_watt']:
                 if hasattr(self.ui, lcd_name):
                     getattr(self.ui, lcd_name).display("------")
+            
+            # English: Reset reference labels
+            # Deutsch: Referenz-Labels zurücksetzen
+            if hasattr(self.ui, 'lbl_v_ref'): self.ui.lbl_v_ref.setText("----")
+            if hasattr(self.ui, 'lbl_a_ref'): self.ui.lbl_a_ref.setText("----")
+            if hasattr(self.ui, 'lbl_w_ref'): self.ui.lbl_w_ref.setText("----")
                     
         # --- Prüfling-Labels aktualisieren (Ist-Werte) ---
         # English: Show DUT values if available and DUT is not powered off
@@ -819,6 +837,10 @@ class MainWindow(QMainWindow):
         if hasattr(self.ui, 'frame_fluke'):
             self.ui.check_ref_pro.toggled.connect(self.ui.frame_fluke.setVisible)
             self.ui.frame_fluke.setVisible(self.ui.check_ref_pro.isChecked())
+
+        if hasattr(self.ui, 'frame_tasref'):
+            self.ui.check_ref_home.toggled.connect(self.ui.frame_tasref.setVisible)
+            self.ui.frame_tasref.setVisible(self.ui.check_ref_home.isChecked())
 
         if hasattr(self.ui, 'action_setup_general'):
             self.ui.action_setup_general.triggered.connect(self.open_setup_general)
@@ -1086,6 +1108,7 @@ class MainWindow(QMainWindow):
             if not ref_info: return self.ui.log_output.appendPlainText("❌ ABBRUCH: Referenz-Dose nicht erreichbar!")
 
         try:
+            self.cm.config['TARGET']['ip_address'] = dut_ip
             self.cm.config['TARGET']['measurement_steps'] = str(steps)
             self.cm.config['TARGET']['measurements_per_step'] = str(measurements)
             # English: Use the centralized config path from the manager.
@@ -1093,14 +1116,17 @@ class MainWindow(QMainWindow):
             with open(self.cm.config_path, 'w') as configfile: self.cm.config.write(configfile)
         except: return
 
-        # English: Use the ConfigManager to determine MAC and setup directory (eliminates redundancy).
-        # Deutsch: Nutze den ConfigManager zur MAC-Ermittlung und Verzeichnis-Erstellung (eliminiert Redundanz).
+        # English: Use the ConfigManager to determine MAC and setup directory (ip is passed explicitly).
+        # Deutsch: Nutze den ConfigManager zur MAC-Ermittlung und Verzeichnis-Erstellung (IP wird explizit übergeben).
         dut_auth = None
         creds = self.credentials_manager.get_credentials(dut_ip)
         if creds:
             dut_auth = (creds['user'], creds['password'])
             
-        device_path = self.cm.setup_device_directory(auth=dut_auth)
+        # English: Use the MAC from dut_info if available to avoid a redundant call.
+        # Deutsch: Nutze die MAC aus dut_info, falls verfügbar, um einen redundanten Aufruf zu vermeiden.
+        mac_param = dut_info.get('mac').replace(":", "-") if dut_info and dut_info.get('mac') else None
+        device_path = self.cm.setup_device_directory(ip=dut_ip, auth=dut_auth, mac=mac_param)
         mac_display = os.path.basename(device_path)
 
         existing_csvs = glob.glob(os.path.join(device_path, "*_Stufe_*.csv"))
@@ -1384,7 +1410,17 @@ class MainWindow(QMainWindow):
 
                     if hasattr(self.ui, 'split_info'):
                         self.ui.split_info.setVisible(True)
-                
+                else:
+                    # English: Update reference-specific labels
+                    # Deutsch: Aktualisiere referenzspezifische Labels
+                    raw_version = data.get('StatusFWR', {}).get('Version', 'Unbekannt')
+                    clean_version = raw_version.split('(')[0]
+                    
+                    if hasattr(self.ui, 'lbl_name_ref'): self.ui.lbl_name_ref.setText(f"{device_name}")
+                    if hasattr(self.ui, 'lbl_version_ref'): self.ui.lbl_version_ref.setText(f"{clean_version}")
+                    if hasattr(self.ui, 'lbl_host_ref'): self.ui.lbl_host_ref.setText(f"{hostname}")
+                    if hasattr(self.ui, 'lbl_mac_ref'): self.ui.lbl_mac_ref.setText(f"{mac_addr}")
+
                 self.ui.log_output.appendPlainText(f"✅ Dose '{device_name}' ({ip}) erfolgreich gefunden.")
                 return info
 
@@ -1411,19 +1447,33 @@ class MainWindow(QMainWindow):
 
     def reset_lcd_displays(self):
         """
-        # English: Resets all reference LCD displays to a 'no data' state.
-        # Deutsch: Setzt alle Referenz-LCD-Anzeigen auf einen 'Keine Daten'-Zustand zurück.
+        # English: Resets all reference LCD displays and labels to a 'no data' state.
+        # Deutsch: Setzt alle Referenz-LCD-Anzeigen und Labels auf einen 'Keine Daten'-Zustand zurück.
         """
         for lcd_name in ['lcd_volt', 'lcd_amp', 'lcd_watt']:
             if hasattr(self.ui, lcd_name):
                 lcd = getattr(self.ui, lcd_name)
                 #lcd.setDigitCount(7)
                 lcd.display("------")
-        # English: Also reset DUT measurement labels.
-        # Deutsch: Setze auch die DUT-Messwert-Labels zurück.
+        
+        # English: Reset DUT measurement labels.
+        # Deutsch: Setze DUT-Messwert-Labels zurück.
         if hasattr(self.ui, 'lbl_v_dut'): self.ui.lbl_v_dut.setText("----")
         if hasattr(self.ui, 'lbl_a_dut'): self.ui.lbl_a_dut.setText("----")
         if hasattr(self.ui, 'lbl_w_dut'): self.ui.lbl_w_dut.setText("----")
+
+        # English: Reset Reference measurement labels.
+        # Deutsch: Setze Referenz-Messwert-Labels zurück.
+        if hasattr(self.ui, 'lbl_v_ref'): self.ui.lbl_v_ref.setText("----")
+        if hasattr(self.ui, 'lbl_a_ref'): self.ui.lbl_a_ref.setText("----")
+        if hasattr(self.ui, 'lbl_w_ref'): self.ui.lbl_w_ref.setText("----")
+
+        # English: Reset Reference device info labels.
+        # Deutsch: Setze Referenz-Geräte-Info-Labels zurück.
+        if hasattr(self.ui, 'lbl_name_ref'): self.ui.lbl_name_ref.setText("Devicename")
+        if hasattr(self.ui, 'lbl_host_ref'): self.ui.lbl_host_ref.setText("Hostname")
+        if hasattr(self.ui, 'lbl_mac_ref'): self.ui.lbl_mac_ref.setText("MAC")
+        if hasattr(self.ui, 'lbl_version_ref'): self.ui.lbl_version_ref.setText("Version")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -156,3 +156,19 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     - [x] Erstellen einer Methode `set_ui_locked(self, locked: bool)` in `MainWindow`.
     - [x] Aufruf von `set_ui_locked(True)` beim Start der Messung.
     - [x] Aufruf von `set_ui_locked(False)` am Ende oder beim Abbruch der Messung.
+
+---
+
+### Feature: Anzeige der Tasmota-Referenz-Informationen (frame_tas_ref)
+
+- [x] **Sichtbarkeitssteuerung (Visibility):**
+    - [x] Verbindung von `check_ref_home.toggled` mit `frame_tas_ref.setVisible` in `setup_ui_logic`.
+    - [x] Initialer Aufruf von `frame_tas_ref.setVisible(check_ref_home.isChecked())` in `MainWindow.__init__`.
+- [x] **Erweiterung Geräte-Info (`fetch_tasmota_info`):**
+    - [x] Implementierung der Logik für `is_dut=False`, um `lbl_name_ref`, `lbl_host_ref`, `lbl_mac_ref` und `lbl_version_ref` zu befüllen.
+- [x] **Erweiterung Live-Anzeige (`update_live_data`):**
+    - [x] Abbildung der Referenz-Messwerte auf `lbl_v_ref`, `lbl_a_ref` und `lbl_w_ref`.
+    - [x] Anwendung der Formatierung (Spannung 2, Strom 3, Leistung 2 Nachkommastellen).
+    - [x] Integration der "----" Anzeige bei Inaktivität oder `dut_off`.
+- [x] **Erweiterung Reset-Logik (`reset_lcd_displays`):**
+    - [x] Hinzufügen der neuen Referenz-Labels (`lbl_v_ref`, `lbl_a_ref`, `lbl_w_ref` sowie Info-Labels) zum Reset-Vorgang.

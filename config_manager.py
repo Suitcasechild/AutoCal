@@ -41,57 +41,63 @@ class ConfigManager:
         # Deutsch: Speichere das Stammverzeichnis für Protokolle aus der Konfiguration.
         self.root_dir = self.config['GENERAL']['root_report_dir']
 
-    def get_target_mac(self, auth=None):
+    def get_target_mac(self, ip=None, auth=None, mac=None):
         """
         # English:
-        # Queries the MAC address of the target device via the Tasmota API.
-        # This is used for creating a unique directory for the device.
+        # Queries the MAC address of a Tasmota device via its API.
         # Deutsch:
-        # Fragt die MAC-Adresse der Ziel-Dose via Tasmota API ab.
-        # Dies wird zur Erstellung eines eindeutigen Verzeichnisses für das Gerät verwendet.
+        # Fragt die MAC-Adresse einer Tasmota-Dose via API ab.
 
+        :param ip: (str, optional) The IP address. If None, uses the one from config.
         :param auth: (tuple, optional) Auth tuple (user, password) for the device.
+        :param mac: (str, optional) Already known MAC address to avoid API call.
         :return: (str) The MAC address without colons, or "Unknown_Device" on error.
-                 (str) Die MAC-Adresse ohne Doppelpunkte oder "Unknown_Device" bei einem Fehler.
         """
-        # English: Get the IP address of the target device from the config.
-        # Deutsch: Hole die IP-Adresse des Zielgeräts aus der Konfiguration.
-        target_ip = self.config['TARGET']['ip_address']
+        if mac:
+            # English: If MAC is provided, ensure colons are replaced by hyphens.
+            # Deutsch: Wenn die MAC übergeben wurde, sicherstellen, dass Doppelpunkte durch Bindestriche ersetzt werden.
+            return mac.replace(":", "-")
+
+        target_ip = ip if ip else self.config['TARGET']['ip_address']
+        
+        # English: Ensure the IP has a protocol prefix.
+        # Deutsch: Stelle sicher, dass die IP ein Protokoll-Präfix hat.
+        if target_ip and not target_ip.startswith("http"):
+            url = f"http://{target_ip}/cm?cmnd=Status%205"
+        else:
+            url = f"{target_ip}/cm?cmnd=Status%205"
+
         try:
-            # English: Status 5 provides network info including the MAC address.
-            # Deutsch: Status 5 liefert Netzwerk-Infos inklusive der MAC-Adresse.
-            response = httpx.get(f"http://{target_ip}/cm?cmnd=Status%205", timeout=5, auth=auth)
+            response = httpx.get(url, timeout=5, auth=auth)
             data = response.json()
-            
-            # English: Extract the MAC address (e.g., 40:F5:20:...).
-            # Deutsch: Extrahiere die MAC-Adresse (z.B. 40:F5:20:...).
             mac = data['StatusNET']['Mac']
-            
-            # English: Remove colons for use as a folder name.
-            # Deutsch: Entferne Doppelpunkte für die Verwendung als Ordnername.
-            return mac.replace(":", "") 
+            # English: Use hyphens for use as a folder name (compatible with old structure).
+            # Deutsch: Nutze Bindestriche für die Verwendung als Ordnername (kompatibel mit alter Struktur).
+            return mac.replace(":", "-") 
         except Exception as e:
-            # English: If any error occurs, print it and return a default name.
-            # Deutsch: Falls ein Fehler auftritt, gib ihn aus und gib einen Standardnamen zurück.
-            print(f"Fehler beim Abrufen der MAC: {e}")
+            print(f"Fehler beim Abrufen der MAC von {target_ip}: {e}")
             return "Unknown_Device"
 
-    def setup_device_directory(self, auth=None):
+    def setup_device_directory(self, ip=None, auth=None, mac=None):
         """
         # English:
         # Creates a directory for the specific device based on its MAC address.
-        # If the directory already exists, it does nothing.
         # Deutsch:
         # Erstellt den Ordner für das spezifische Gerät basierend auf seiner MAC-Adresse.
-        # Falls das Verzeichnis bereits existiert, wird nichts unternommen.
 
+        :param ip: (str, optional) The IP address of the device.
         :param auth: (tuple, optional) Auth tuple for the device.
+        :param mac: (str, optional) Already known MAC address to avoid API call.
         :return: (str) The path to the device-specific directory.
-                 (str) Der Pfad zum gerätespezifischen Verzeichnis.
         """
-        # English: Get the MAC address to use for the folder name.
-        # Deutsch: Hole die MAC-Adresse, die als Ordnername verwendet wird.
-        mac = self.get_target_mac(auth=auth)
+        mac = self.get_target_mac(ip=ip, auth=auth, mac=mac)
+        device_path = os.path.join(self.root_dir, mac)
+        
+        if not os.path.exists(device_path):
+            os.makedirs(device_path)
+            print(f"Verzeichnis erstellt: {device_path}")
+        
+        return device_path
         
         # English: Construct the full path.
         # Deutsch: Konstruiere den vollständigen Pfad.

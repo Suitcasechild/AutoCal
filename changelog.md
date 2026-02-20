@@ -3,7 +3,13 @@
 ## v5.3.0 (2026-02-20)
 
 ### ✨ Features
-*   **UI-Stabilität (Eingabesperre):** Während eines aktiven Kalibrierlaufs werden nun die Bedienelemente zur Auswahl der Referenz, der IP-Eingabe und der Messparameter (Frames 2, 3 und 4) sowie das Setup-Menü gesperrt. Dies verhindert versehentliche Fehlkonfigurationen während der laufenden Messung. Nach Abschluss oder Abbruch der Messung werden die Elemente automatisch wieder freigegeben.
+*   **Fehlerbehebung MAC-Abruf:** Ein Problem wurde behoben, bei dem der automatische Abruf der MAC-Adresse fehlschlug, wenn die IP-Adresse ohne Protokoll-Präfix (`http://`) eingegeben wurde. Zudem wird die IP-Adresse des Prüflings nun korrekt in der Konfiguration gespeichert.
+    *   **English:** MAC Retrieval Bugfix: Fixed an issue where the automatic retrieval of the MAC address failed if the IP address was entered without a protocol prefix (`http://`). Additionally, the DUT's IP address is now correctly saved in the configuration.
+*   **Detaillierte Anzeige der Tasmota-Referenz:**
+ Ein neuer Bereich (`frame_tas_ref`) wurde hinzugefügt, der detaillierte Informationen (Name, Host, MAC, Version) und Live-Messwerte der Tasmota-Referenzdose anzeigt. Dieser Bereich wird automatisch eingeblendet, wenn die Tasmota-Referenz gewählt ist, und analog zum Prüfling aktualisiert.
+    *   **English:** Detailed Tasmota Reference Display: A new section (`frame_tas_ref`) has been added to display detailed information (Name, Host, MAC, Version) and live measurement values of the Tasmota reference device. This section is automatically shown when the Tasmota reference is selected and is updated analogously to the DUT.
+*   **UI-Stabilität (Eingabesperre):**
+ Während eines aktiven Kalibrierlaufs werden nun die Bedienelemente zur Auswahl der Referenz, der IP-Eingabe und der Messparameter (Frames 2, 3 und 4) sowie das Setup-Menü gesperrt. Dies verhindert versehentliche Fehlkonfigurationen während der laufenden Messung. Nach Abschluss oder Abbruch der Messung werden die Elemente automatisch wieder freigegeben.
     *   **English:** UI Stability (Input Locking): During an active calibration run, the controls for reference selection, IP input, and measurement parameters (Frames 2, 3, and 4), as well as the setup menu, are now locked. This prevents accidental misconfigurations during the ongoing measurement. After completion or cancellation of the measurement, the elements are automatically re-enabled.
 *   **Automatisches Ausschalten bei Abbruch:**
  Wenn die Messung manuell über den "Messung abbrechen"-Button beendet wird, versucht das Programm nun automatisch, die Zieldose (Prüfling) auszuschalten, um einen sicheren Zustand zu gewährleisten.

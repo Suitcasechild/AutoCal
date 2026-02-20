@@ -13,29 +13,29 @@ TASMOTA PRECISION CALIBRATION REPORT
 
 MESSUNGSDETAILS
   Kalibrier-Modus:  HOME
-  Datenquelle (CSV): 20260220_180325
-  Report erstellt:    20260220_180325
+  Datenquelle (CSV): 20260220_191133
+  Report erstellt:    20260220_191133
 =====================================================================================
 
 [1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
 
 STUFE 1:
-  Spannung: Ref  228.37V | DUT  228.52V | Err:  +0.15V ( +0.07%) -> Cal-Vorschlag: 1540
-  Strom:    Ref   0.265A | DUT   0.271A | Err: +0.006A ( +2.22%) -> Cal-Vorschlag: 3148
-  Leistung: Ref   62.49W | DUT   61.84W | Err:  -0.65W ( -1.03%) -> Cal-Vorschlag: 9500
+  Spannung: Ref  227.46V | DUT  227.67V | Err:  +0.21V ( +0.09%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.264A | DUT   0.270A | Err: +0.006A ( +2.25%) -> Cal-Vorschlag: 3147
+  Leistung: Ref   62.00W | DUT   61.41W | Err:  -0.59W ( -0.95%) -> Cal-Vorschlag: 9492
 
 =====================================================================================
 [2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
 Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
-  Leistung (W): Steigung m = 1.010401 | Bestimmtheitsmaß R2 = 0.000546
+  Leistung (W): Steigung m = 1.009614 | Bestimmtheitsmaß R2 = 0.892459
 
 =====================================================================================
 [3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
 
     VoltageCal 1542                     VoltageCal 1540 (Mittelwert der Stufen)
-    CurrentCal 3218                     CurrentCal 3148 (Mittelwert der Stufen)
-      PowerCal 9402                       PowerCal 9499 (aus Regression, empfohlen)
-                                          └─ Alternative: 9500 (Mittelwert der Stufen)
+    CurrentCal 3218                     CurrentCal 3147 (Mittelwert der Stufen)
+      PowerCal 9402                       PowerCal 9492 (aus Regression, empfohlen)
+                                          └─ Alternative: 9492 (Mittelwert der Stufen)
 
 =====================================================================================
 ENDE DES PROTOKOLLS
