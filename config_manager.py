@@ -33,9 +33,26 @@ class ConfigManager:
         # Deutsch: Erstelle eine neue ConfigParser-Instanz.
         self.config = configparser.ConfigParser()
         
-        # English: Read the specified config file.
-        # Deutsch: Lese die angegebene Konfigurationsdatei.
-        self.config.read(self.config_path)
+        # English: If the config file is missing, create it with default values.
+        # Deutsch: Wenn die Konfigurationsdatei fehlt, erstelle sie mit Standardwerten.
+        if not os.path.exists(self.config_path):
+            print(f"ℹ️ {config_file} fehlt. Erstelle Standard-Konfiguration...")
+            self.config['GENERAL'] = {'root_report_dir': './Reports'}
+            self.config['REFERENCE_PRO'] = {'com_port': 'COM1', 'baudrate': '9600'}
+            self.config['REFERENCE_HOME'] = {'ip_address': ''}
+            # English: ip_address for TARGET is intentionally left empty for privacy/security.
+            # Deutsch: ip_address für TARGET bleibt aus Datenschutzgründen absichtlich leer.
+            self.config['TARGET'] = {'ip_address': '', 'measurement_steps': '1', 'measurements_per_step': '15'}
+            
+            try:
+                with open(self.config_path, 'w') as f:
+                    self.config.write(f)
+            except Exception as e:
+                print(f"❌ Fehler beim Erstellen der config.ini: {e}")
+        else:
+            # English: Read the specified config file.
+            # Deutsch: Lese die angegebene Konfigurationsdatei.
+            self.config.read(self.config_path)
         
         # English: Store the root directory for reports from the config.
         # Deutsch: Speichere das Stammverzeichnis für Protokolle aus der Konfiguration.

@@ -1108,7 +1108,8 @@ class MainWindow(QMainWindow):
             if not ref_info: return self.ui.log_output.appendPlainText("❌ ABBRUCH: Referenz-Dose nicht erreichbar!")
 
         try:
-            self.cm.config['TARGET']['ip_address'] = dut_ip
+            # English: Save measurement parameters, but NOT the DUT IP address as requested.
+            # Deutsch: Speichere Messparameter, aber NICHT die DUT-IP-Adresse (wie gewünscht).
             self.cm.config['TARGET']['measurement_steps'] = str(steps)
             self.cm.config['TARGET']['measurements_per_step'] = str(measurements)
             # English: Use the centralized config path from the manager.

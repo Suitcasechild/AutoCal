@@ -178,3 +178,10 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
 ### UI-Zukunft & Internationalisierung
 
 - [ ] **Automatische Sprachumschaltung:** Implementierung eines Lokalisierungs-Systems (i18n), das die App-Oberfläche automatisch auf Basis der Systemeinstellungen zwischen Deutsch und Englisch umschaltet oder eine manuelle Wahl ermöglicht.
+
+---
+
+### System-Robustheit
+
+- [x] **Automatische Konfigurations-Erstellung:** Falls die `config.ini` fehlt, wird sie automatisch mit Standardwerten (COM1, 1 Stufe, 15 Messungen) erstellt.
+- [x] **Datenschutz (DUT IP):** Die IP-Adresse des Prüflings wird aus Sicherheitsgründen **nicht** mehr dauerhaft in der `config.ini` gespeichert.
