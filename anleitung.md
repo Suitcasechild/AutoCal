@@ -100,7 +100,7 @@ Hier wird das Fluke mit einem Messadapter direkt hinter den Prüfling geschaltet
 <a name="ch3_3"></a>
 ### 3.3 ❓ Menü: Hilfe
 *   **📘 Anleitung:** Öffnet dieses Dokument. Das Fenster ist nicht-modal, Sie können also parallel in der GUI arbeiten.
-*   **ℹ️ Lizenz & Info:** Zeigt die aktuelle Softwareversion (z.B. v5.3.2) und Informationen zum Entwickler.
+*   **ℹ️ Lizenz & Info:** Zeigt die aktuelle Softwareversion (z.B. v5.3.3) und Informationen zum Entwickler.
 
 ---
 

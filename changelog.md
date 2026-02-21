@@ -1,5 +1,21 @@
 # Changelog
 
+## v5.3.3 (2026-02-21)
+
+### ✨ Features
+*   **Selektive Kalibrierung & Toleranz-Analyse:**
+    *   **Neuer Ergebnis-Dialog:** Der Dialog nach der Messung zeigt nun die Abweichung pro Messgröße (V, A, W) im Vergleich zum Ist-Zustand der Dose an.
+    *   **Farb-Kodierung:** Abweichungen innerhalb der Toleranz werden Grün, außerhalb Orange (Empfehlung) markiert.
+    *   **Checkbox-Steuerung:** Der Nutzer kann nun chirurgisch genau auswählen, welche Faktoren (`VoltageCal`, `CurrentCal`, `PowerCal`) an das Gerät gesendet werden sollen.
+    *   **Exklusive Auswahl:** Bei der Leistungskalibrierung wird automatisch zwischen Mittelwert und Regression unterschieden (Gegenseitiger Ausschluss).
+    *   **English:** Selective Calibration & Tolerance Analysis: New results dialog with deviation analysis, color-coded recommendations, and checkbox control for selective parameter updates.
+*   **Konfigurierbare Toleranzgrenzen:**
+    *   Über **Setup -> Allgemein** können nun eigene Limits für die Abweichung (in abs %) festgelegt werden. Diese Werte werden in der `config.ini` unter `[TOLERANCE abs%]` gespeichert.
+    *   **English:** Configurable Tolerance Limits: Users can now define their own deviation limits in the general setup.
+*   **Verbesserte Robustheit der DUT-Vorbereitung:**
+    *   Die Funktion `prepare_dut` sendet Befehle nun einzeln und mit expliziter URL-Kodierung. Dies stellt sicher, dass alle Einstellungen (Auflösung, Anzeige bei Power-Off) zuverlässig in der Dose ankommen.
+    *   **English:** Improved DUT Preparation: Commands are now sent individually with proper URL encoding to ensure reliability.
+
 ## v5.3.2 (2026-02-21)
 
 ### ✨ Features

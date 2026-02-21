@@ -1,4 +1,4 @@
-# Pflichtenheft: Tasmota Precision Calibrator (v1.1)
+# Pflichtenheft: Tasmota Precision Calibrator (v1.2)
 
 ## 1. Zielsetzung und Systemüberblick
 Entwicklung einer automatisierten Software zur hochpräzisen Kalibrierung und Genauigkeitsvalidierung von Tasmota-basierten Energiemessgeräten (z.B. Nous A8T). Das System eliminiert Messfehler durch statistische Langzeitmessung und lineare Regression. Es unterstützt zwei Betriebsmodi:
@@ -23,7 +23,7 @@ Die Anwendung bietet eine klare Menüführung zur administrativen Steuerung und 
 
 ### 2.3 Menü: Hilfe
 *   **Anleitung:** Öffnet die **integrierte, interaktive HTML-Bedienungsanleitung** mit Inhaltsverzeichnis und detaillierten Anweisungen.
-*   **Lizenz & Info:** Anzeige von Version (v5.3.2), Autor und rechtlichen Hinweisen.
+*   **Lizenz & Info:** Anzeige von Version (v5.3.3), Autor und rechtlichen Hinweisen.
 
 ## 3. Funktionale Anforderungen (Implementierung)
 

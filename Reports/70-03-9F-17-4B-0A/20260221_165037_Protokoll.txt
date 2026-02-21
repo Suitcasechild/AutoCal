@@ -1,0 +1,45 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Raphi_Power
+  Hostname:    Raphi-174B0A-2826
+  MAC Address: 70:03:9F:17:4B:0A
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260221_165037
+  Report erstellt:    20260221_165037
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  227.13V | DUT  227.26V | Err:  +0.13V ( +0.06%) -> Cal-Vorschlag: 1516
+  Strom:    Ref   3.634A | DUT   3.625A | Err: -0.008A ( -0.23%) -> Cal-Vorschlag: 3366
+  Leistung: Ref  825.28W | DUT 1089.43W | Err: +264.15W (+32.01%) -> Cal-Vorschlag: 9491
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.757477 | Bestimmtheitsmaß R2 = 0.637644
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1517                     VoltageCal 1516 (Mittelwert der Stufen)
+    CurrentCal 3359                     CurrentCal 3366 (Mittelwert der Stufen)
+      PowerCal 12530                      PowerCal 9491 (aus Regression, empfohlen)
+                                          └─ Alternative: 9491 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+[16:52:48] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE
+[16:52:48] PowerCal:   12530 -> 9491 | [OK]
+[16:52:48] Gesamtstatus: ERFOLGREICH
+=====================================================================================

@@ -4,6 +4,36 @@ This document provides an overview of the most important changes and innovations
 
 ---
 
+## [v5.3.3] - 2026-02-21
+
+This update focuses on surgical precision during the calibration process and improved reliability for device preparation.
+
+### 🌟 Top Features of this Version
+1.  **Selective Calibration:** Targeted updates for V, A, or W via checkboxes.
+2.  **Configurable Tolerance Limits:** Set absolute limits (abs %) in **Setup -> General**.
+3.  **Robust Device Preparation:** Commands sent individually with URL encoding.
+
+### 🛠️ Technical Improvements
+*   **Deviation Analysis:** Visual indicators (Green/Orange) for recommendations.
+*   **Backlog Stability:** Enhanced reliability during the initialization phase.
+
+---
+
+## [v5.3.3] - 2026-02-21 (DE)
+
+Dieses Update konzentriert sich auf chirurgische Präzision beim Kalibriervorgang und eine verbesserte Zuverlässigkeit bei der Gerätevorbereitung.
+
+### 🌟 Top-Features dieser Version
+1.  **Selektive Kalibrierung:** Gezielte Auswahl von V, A oder W über Checkboxen.
+2.  **Konfigurierbare Toleranzgrenzen:** Eigene Limits (abs %) in **Setup -> Allgemein** festlegbar.
+3.  **Robuste Gerätevorbereitung:** Befehle werden einzeln mit URL-Kodierung gesendet.
+
+### 🛠️ Technische Verbesserungen
+*   **Abweichungs-Analyse:** Visuelle Empfehlungen (Grün/Orange) im Ergebnis-Dialog.
+*   **Backlog-Stabilität:** Erhöhte Zuverlässigkeit bei der Initialisierung.
+
+---
+
 ## [v5.3.2] - 2026-02-21
 
 This version marks a milestone in user guidance and process reliability for the Tasmota Precision Calibrator. It bundles groundbreaking automations and surgical calibration logic.

@@ -24,18 +24,25 @@ from calibration_engine import CalibrationEngine
 
 def prepare_dut(target_ip, auth=None):
     """
-    # English: Prepares the Device Under Test by setting necessary Tasmota options.
-    # Deutsch: Bereitet den Prüfling (DUT) vor, indem notwendige Tasmota-Optionen gesetzt werden.
+    # English: Prepares the Device Under Test by setting necessary Tasmota options individually.
+    # Deutsch: Bereitet den Prüfling (DUT) vor, indem notwendige Tasmota-Optionen einzeln gesetzt werden.
     """
     print(f"Bereite Ziel-Dose vor (Auflösung & Optionen)...")
-    # English: Set resolution for voltage, power, current and enable SetOption21 for better measurements.
-    # Deutsch: Setze die Auflösung für Spannung, Leistung, Strom und aktiviere SetOption21 für bessere Messungen.
-    cmds = "VoltRes 2;WattRes 2;AmpRes 3;SetOption21 1"
-    try:
-        httpx.get(f"http://{target_ip}/cm?cmnd=Backlog%20{cmds}", timeout=5, auth=auth)
-        return True
-    except: 
-        return False
+    commands = ["VoltRes 2", "WattRes 2", "AmpRes 3", "SetOption21 1"]
+    success = True
+    
+    for cmd in commands:
+        try:
+            # English: Use 'params' to ensure correct URL encoding of the command string.
+            # Deutsch: Nutze 'params', um eine korrekte URL-Kodierung des Befehls sicherzustellen.
+            r = httpx.get(f"http://{target_ip}/cm", params={"cmnd": cmd}, timeout=5, auth=auth)
+            r.raise_for_status()
+            time.sleep(0.2) # English: Tiny delay between commands. / Deutsch: Kurze Pause zur Sicherheit.
+        except Exception as e:
+            print(f"  [WARN] Konfiguration '{cmd}' fehlgeschlagen: {e}")
+            success = False
+            
+    return success
 
 def check_device_availability(ip, name, auth=None):
     """

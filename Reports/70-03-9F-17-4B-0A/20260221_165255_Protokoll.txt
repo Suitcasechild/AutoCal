@@ -1,0 +1,39 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Raphi_Power
+  Hostname:    Raphi-174B0A-2826
+  MAC Address: 70:03:9F:17:4B:0A
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260221_165255
+  Report erstellt:    20260221_165255
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  226.51V | DUT  226.55V | Err:  +0.05V ( +0.02%) -> Cal-Vorschlag: 1516
+  Strom:    Ref   3.624A | DUT   3.616A | Err: -0.008A ( -0.22%) -> Cal-Vorschlag: 3366
+  Leistung: Ref  820.71W | DUT  820.88W | Err:  +0.18W ( +0.02%) -> Cal-Vorschlag: 9488
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.999832 | Bestimmtheitsmaß R2 = 0.558274
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1517                     VoltageCal 1516 (Mittelwert der Stufen)
+    CurrentCal 3359                     CurrentCal 3366 (Mittelwert der Stufen)
+      PowerCal 9491                       PowerCal 9489 (aus Regression, empfohlen)
+                                          └─ Alternative: 9488 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
