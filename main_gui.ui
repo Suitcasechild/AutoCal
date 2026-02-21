@@ -439,7 +439,7 @@
      <rect>
       <x>260</x>
       <y>220</y>
-      <width>401</width>
+      <width>231</width>
       <height>331</height>
      </rect>
     </property>
@@ -452,8 +452,8 @@
     <widget class="QLabel" name="label_7">
      <property name="geometry">
       <rect>
-       <x>190</x>
-       <y>140</y>
+       <x>30</x>
+       <y>220</y>
        <width>171</width>
        <height>20</height>
       </rect>
@@ -471,8 +471,8 @@
     <widget class="QLCDNumber" name="lcd_watt">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>160</y>
+       <x>20</x>
+       <y>240</y>
        <width>181</width>
        <height>51</height>
       </rect>
@@ -493,8 +493,8 @@
     <widget class="QLCDNumber" name="lcd_volt">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>70</y>
+       <x>20</x>
+       <y>80</y>
        <width>181</width>
        <height>51</height>
       </rect>
@@ -515,8 +515,8 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>200</x>
-       <y>50</y>
+       <x>40</x>
+       <y>140</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -531,8 +531,8 @@
     <widget class="QLCDNumber" name="lcd_amp">
      <property name="geometry">
       <rect>
-       <x>200</x>
-       <y>70</y>
+       <x>40</x>
+       <y>160</y>
        <width>161</width>
        <height>51</height>
       </rect>
@@ -553,8 +553,8 @@
     <widget class="QLabel" name="label_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>50</y>
+       <x>30</x>
+       <y>60</y>
        <width>171</width>
        <height>20</height>
       </rect>
@@ -576,7 +576,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Messgerät FLUKE 45</string>
+      <string>Referenz - FLUKE 45</string>
      </property>
     </widget>
    </widget>
@@ -772,6 +772,12 @@
      </layout>
     </widget>
    </widget>
+   <zorder>frame_tasref</zorder>
+   <zorder>log_output</zorder>
+   <zorder>frame</zorder>
+   <zorder>frame_charts</zorder>
+   <zorder>frame_info</zorder>
+   <zorder>frame_fluke</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
