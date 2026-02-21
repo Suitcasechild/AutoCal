@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>147</height>
+    <height>194</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
    <property name="geometry">
     <rect>
      <x>22</x>
-     <y>110</y>
+     <y>160</y>
      <width>111</width>
      <height>26</height>
     </rect>
@@ -76,13 +76,26 @@
    <property name="geometry">
     <rect>
      <x>172</x>
-     <y>110</y>
+     <y>160</y>
      <width>111</width>
      <height>26</height>
     </rect>
    </property>
    <property name="text">
     <string>Übernehmen</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_search_fluke">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>90</y>
+     <width>191</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Fluke finden</string>
    </property>
   </widget>
  </widget>
