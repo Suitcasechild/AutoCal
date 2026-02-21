@@ -35,6 +35,11 @@ GUIDANCE_HTML = """
         border-bottom: 1px solid #444;
         padding-bottom: 5px;
     }
+    h4 {
+        color: #4a9eff;
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
     .index { 
         background-color: #252525; 
         padding: 20px; 
@@ -122,7 +127,7 @@ GUIDANCE_HTML = """
             <ul>
                 <li><a href="#ch5_1">5.1 🛠️ Vorbereitung & Initialisierung</a></li>
                 <li><a href="#ch5_2">5.2 ▶️ Start der Messsequenz</a></li>
-                <li><a href="#ch5_3">5.3 🔄 Ermittlung des Eigenverbrauchs</a></li>
+                <li><a href="#ch5_3">5.3 🔄 Ermittlung des Eigenverbrauchs (Offset)</a></li>
                 <li><a href="#ch5_4">5.4 📉 Messung unter Last</a></li>
                 <li><a href="#ch5_5">5.5 ✅ Analyse und Finalisierung</a></li>
             </ul>
@@ -134,7 +139,7 @@ GUIDANCE_HTML = """
 <hr style="border: 0; border-top: 1px solid #444;">
 
 <h2 id="ch1">🔬 1. Technischer Hintergrund: Warum "Cal"-Befehle?</h2>
-<p>In Tasmota gibt es zwei Wege zur Kalibrierung: Die <code>Set</code>-Befehle (z.B. <code>VoltSet</code>) und die <code>Cal</code>-Befehle (z.B. <code>VoltageCal</code>).</p>
+<p>In Tasmota gibt es zwei Wege zur Kalibrierung: Die <code>Set</code>-Befehle (z.B. <code>VoltSet</code>) und die <code>Cal</code>-Befehle (z.B. <code>VoltageCal</code>). Dieses Programm nutzt ausschließlich die <code>Cal</code>-Befehle.</p>
 
 <h3 id="ch1_1">1.1 Der Vorteil gegenüber Set-Befehlen</h3>
 <p>Bei der herkömmlichen Methode mit <code>Set</code>-Befehlen muss der Benutzer einen Wert ablesen und manuell eingeben. In dieser Zeitspanne kann sich die Netzspannung oder die Last bereits leicht verändert haben, was zu einer ungenauen Kalibrierung führt.</p>
@@ -148,22 +153,38 @@ GUIDANCE_HTML = """
 <h2 id="ch2">🔌 2. Hardware-Vorbereitung & Messaufbau</h2>
 
 <h3 id="ch2_1">2.1 Der physikalische Messaufbau (WICHTIG!)</h3>
-<p>Die korrekte Reihenfolge ist zwingend erforderlich, damit das Referenzmessgerät genau das misst, was der Prüfling verbraucht:</p>
+<p>Der korrekte Aufbau unterscheidet sich je nachdem, welches Referenzgerät Sie verwenden.</p>
+
+<h4>A) Aufbau mit Tasmota-Referenzdose (HOME-Modus)</h4>
+<p>In diesem Modus misst die Referenzdose den Eigenverbrauch des Prüflings mit, der später automatisch abgezogen wird.</p>
+<ol>
+    <li><b>🏠 Wandsteckdose:</b> Stromquelle.</li>
+    <li><b>📏 Referenz-Dose:</b> Ihre bereits kalibrierte Tasmota-Dose.</li>
+    <li><b>🔌 Prüfling (DUT):</b> Die neu zu kalibrierende Tasmota-Dose.</li>
+    <li><b>💡 Last:</b> Ein stabiler Verbraucher (z.B. Glühbirne).</li>
+</ol>
+
+<h4>B) Aufbau mit Fluke 45 (PRO-Modus)</h4>
+<p>Hier wird das Fluke mit einem Messadapter direkt hinter den Prüfling geschaltet, um dessen Ausgangswerte präzise zu erfassen.</p>
 <ol>
     <li><b>🏠 Wandsteckdose:</b> Stromquelle.</li>
     <li><b>🔌 Prüfling (DUT):</b> Die zu kalibrierende Tasmota-Dose.</li>
-    <li><b>📏 Referenz-Messgerät:</b> Das Fluke 45 oder eine Tasmota-Referenzdose (muss <b>zwischen</b> DUT und Last gesteckt werden).</li>
-    <li><b>💡 Last:</b> Ein stabiler Verbraucher (z.B. eine Glühbirne oder ein Heizwiderstand).</li>
+    <li><b>📏 Fluke 45:</b> Anschluss über Messadapter (zwischen Prüfling und Last).</li>
+    <li><b>💡 Last:</b> Ein stabiler Verbraucher (z.B. Glühbirne).</li>
 </ol>
 
 <div class="warning">
-    ⚠️ <b>Wichtiger Hinweis:</b> Achte auf möglichst <b>kurze Verbindungsleitungen</b> zwischen dem Prüfling (DUT) und dem Referenz-Messgerät, um Messfehler durch Leitungsverluste zu minimieren.
+    ⚠️ <b>Wichtiger Hinweis:</b> Achte in beiden Fällen auf möglichst <b>kurze Verbindungsleitungen</b> zwischen dem Prüfling (DUT) und dem Messgerät/Adapter, um Messfehler durch Leitungsverluste zu minimieren.
+</div>
+
+<div class="tip">
+    💡 <b>Tipp:</b> Verwende eine ohmsche Last (Glühfaden), keine Schaltnetzteile.
 </div>
 
 <h3 id="ch2_2">2.2 Fluke 45 Einstellungen</h3>
 <ul>
     <li>Verbinde das Gerät via RS232 mit dem PC.</li>
-    <li>Stelle sicher, dass die Baudrate im Gerät mit der Software übereinstimmt.</li>
+    <li>Stelle sicher, dass die Baudrate im Gerät (Standard: 9600) mit der Software übereinstimmt.</li>
     <li>Das Programm setzt das Gerät automatisch in den Dual-Display-Modus.</li>
 </ul>
 
@@ -187,11 +208,11 @@ GUIDANCE_HTML = """
     <li><b>📄 Protokolle:</b> Zusammenfassender Bericht mit As-Found/As-Left Vergleich.</li>
 </ul>
 
-<h2 id="ch5">🚀 5. Der Kalibrierungsprozess (Schritt-für-Schritt)</h2>
+<h2 id="ch5">🚀 5. Der Kalibrierungsprozess (Schritt für Schritt)</h2>
 
 <h3 id="ch5_1">5.1 🛠️ Vorbereitung & Initialisierung</h3>
 <div class="action-box"><b>⌨️ Aktion:</b> Geben Sie die <b>IP-Adresse des Prüflings</b> ein und klicken Sie auf <b>"Online Check"</b>.</div>
-<span class="background-info">Hintergrund: Die Software prüft Erreichbarkeit und liest die MAC-Adresse aus.</span>
+<span class="background-info">Hintergrund: Die Software prüft Erreichbarkeit und liest die MAC-Adresse aus. <b>Wichtig:</b> Falls die Dose passwortgeschützt ist, geben Sie hier einmalig die Zugangsdaten ein. Diese werden für die gesamte Sitzung gespeichert.</span>
 
 <h3 id="ch5_2">5.2 ▶️ Start der Messsequenz</h3>
 <div class="action-box"><b>🖱️ Aktion:</b> Klicken Sie auf den Button <b>"Kalibrierung Starten"</b>.</div>
@@ -209,6 +230,15 @@ GUIDANCE_HTML = """
 <span class="background-info">Hintergrund: Die Werte werden übertragen und sofort verifiziert.</span>
 
 <h2 id="ch6">🛠️ 6. Troubleshooting & Expertentipps</h2>
+<div class="warning">
+    ⚠️ <b>Problem:</b> "HTTP 401 Unauthorized" (Login fehlgeschlagen).<br>
+    <b>Lösung:</b> Die Dose ist passwortgeschützt. Geben Sie die Daten im Popup ein. Der Standardbenutzer ist "admin".
+</div>
+
+<div class="tip">
+    🔐 <b>Tipp zu Zugangsdaten:</b> Die App speichert eingegebene Passwörter im Arbeitsspeicher, bis das Programm geschlossen wird. Nutzen Sie den <b>"Online Check"</b> vor der Messung, um die Daten einmalig zu hinterlegen.
+</div>
+
 <div class="tip">
     🌡️ <b>Tipp für Experten:</b> Lassen Sie die Messanordnung ca. 5 Minuten "warmlaufen". Eine Kalibrierung im warmen Betriebszustand ist präziser.
 </div>

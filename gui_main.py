@@ -607,6 +607,7 @@ class CredentialDialog(QDialog):
         # Deutsch: Benutzername-Feld
         self.user_label = QLabel("Benutzername:")
         self.user_input = QLineEdit(self)
+        self.user_input.setText("admin") # English: Default Tasmota user. / Deutsch: Standard Tasmota-User.
         self.layout.addWidget(self.user_label)
         self.layout.addWidget(self.user_input)
 
@@ -615,13 +616,13 @@ class CredentialDialog(QDialog):
         self.pass_label = QLabel("Passwort:")
         self.pass_input = QLineEdit(self)
         self.pass_input.setEchoMode(QLineEdit.Password)
+        self.pass_input.setFocus() # English: Focus on password field for faster typing. / Deutsch: Fokus auf Passwortfeld.
         self.layout.addWidget(self.pass_label)
         self.layout.addWidget(self.pass_input)
         
-        # English: Add a disclaimer that the credentials are not stored permanently.
-        # Deutsch: Füge einen Hinweis hinzu, dass die Zugangsdaten nicht dauerhaft gespeichert werden.
+        # Deutsch: Hinweis zur Speicherung der Zugangsdaten.
         self.disclaimer_label = QLabel(
-            "<i>Die Zugangsdaten werden nicht dauerhaft gespeichert und nur für diesen Kalibrierprozess verwendet.</i>"
+            "<i>Die Zugangsdaten werden für die Dauer dieser Programmsitzung sicher im Arbeitsspeicher gehalten und beim Beenden der Anwendung automatisch gelöscht.</i>"
         )
         self.disclaimer_label.setWordWrap(True)
         self.layout.addWidget(self.disclaimer_label)
@@ -1175,7 +1176,6 @@ class MainWindow(QMainWindow):
         # Bereitet den Messprozess vor und startet ihn. Validiert Eingaben,
         # prüft die Geräteverfügbarkeit und startet den MeasurementWorker-Thread.
         """
-        self.credentials_manager.clear_all_credentials()
         is_pro = self.ui.check_ref_pro.isChecked()
         is_home = self.ui.check_ref_home.isChecked()
         if not is_pro and not is_home:
@@ -1311,7 +1311,6 @@ class MainWindow(QMainWindow):
         # English: Slot that is called when the measurement worker is finished or has been aborted.
         # Deutsch: Slot, der aufgerufen wird, wenn der Mess-Worker fertig oder abgebrochen wurde.
         """
-        self.credentials_manager.clear_all_credentials()
         if message: 
             self.ui.log_output.appendPlainText(message)
         self.ui.btn_start.setText("Kalibrierung Starten")

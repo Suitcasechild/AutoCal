@@ -200,3 +200,18 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     - [x] Fortschrittsbalken (`progress_scan`) implementiert und mit dem Scan-Status verknüpft.
     - [x] Automatische Übernahme der gefundenen Werte in die Eingabefelder bei Erfolg.
     - [x] Benutzer-Feedback via `QMessageBox` (Erfolg/Fehlgeschlagen).
+    
+    ---
+    
+    ### Feature: Optimierung des Credential-Managements (Session-Persistence)
+    
+    - [x] **Sitzungsbasierte Speicherung:**
+        - [x] Entfernen der automatischen Löschbefehle (`clear_all_credentials`) am Ende von Messvorgängen oder beim Start neuer Kalibrierungen.
+        - [x] Ziel: Einmal eingegebene Zugangsdaten (z.B. beim "Online Check") bleiben für die gesamte Dauer der Programmausführung erhalten.
+    - [x] **Verbesserung des Eingabedialogs (`CredentialDialog`):**
+        - [x] Vorbefüllung des Benutzernamens mit dem Standardwert `"admin"`.
+        - [x] Automatischer Fokus auf das Passwort-Feld beim Öffnen des Dialogs für schnelleren Arbeitsfluss.
+        - [x] Hinweistext auf Deutsch angepasst (Sitzungsspeicherung im RAM).
+    - [x] **Prozess-Integration:**
+        - [x] Sicherstellen, dass der Haupt-Kalibrierprozess die bereits im Arbeitsspeicher vorhandenen Daten des Prüflings und der Referenzdose nahtlos übernimmt, ohne erneut nachzufragen.
+    

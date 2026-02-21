@@ -52,13 +52,23 @@ Bei der herkömmlichen Methode mit `Set`-Befehlen muss der Benutzer einen Wert a
 
 <a name="ch2_1"></a>
 ### 2.1 Der physikalische Messaufbau (WICHTIG!)
-Die korrekte Reihenfolge ist zwingend erforderlich, damit das Referenzmessgerät genau das misst, was der Prüfling verbraucht:
+Der korrekte Aufbau unterscheidet sich je nachdem, welches Referenzgerät Sie verwenden.
+
+#### **A) Aufbau mit Tasmota-Referenzdose (HOME-Modus)**
+In diesem Modus misst die Referenzdose den Eigenverbrauch des Prüflings mit, der später automatisch abgezogen wird.
+1.  **🏠 Wandsteckdose:** Stromquelle.
+2.  **📏 Referenz-Dose:** Ihre bereits kalibrierte Tasmota-Dose.
+3.  **🔌 Prüfling (DUT):** Die neu zu kalibrierende Tasmota-Dose.
+4.  **💡 Last:** Ein stabiler Verbraucher (z.B. Glühbirne).
+
+#### **B) Aufbau mit Fluke 45 (PRO-Modus)**
+Hier wird das Fluke mit einem Messadapter direkt hinter den Prüfling geschaltet, um dessen Ausgangswerte präzise zu erfassen.
 1.  **🏠 Wandsteckdose:** Stromquelle.
 2.  **🔌 Prüfling (DUT):** Die zu kalibrierende Tasmota-Dose.
-3.  **📏 Referenz-Messgerät:** Das Fluke 45 oder eine Tasmota-Referenzdose (muss **zwischen** DUT und Last gesteckt werden).
-4.  **💡 Last:** Ein stabiler Verbraucher (z.B. eine Glühbirne oder ein Heizwiderstand).
+3.  **📏 Fluke 45:** Anschluss über Messadapter (zwischen Prüfling und Last).
+4.  **💡 Last:** Ein stabiler Verbraucher (z.B. Glühbirne).
 
-⚠️ **Wichtiger Hinweis:** Achte auf möglichst **kurze Verbindungsleitungen** zwischen dem Prüfling (DUT) und dem Referenz-Messgerät, um Messfehler durch Leitungsverluste zu minimieren.
+⚠️ **Wichtiger Hinweis:** Achte in beiden Fällen auf möglichst **kurze Verbindungsleitungen** zwischen dem Prüfling (DUT) und dem Messgerät/Adapter, um Messfehler durch Leitungsverluste zu minimieren.
 
 💡 **Tipp:** Verwende keine Schaltnetzteile oder Motoren als Last, da diese instabile Werte liefern. Eine ohmsche Last (Glühfaden) ist ideal.
 
@@ -121,6 +131,7 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
 1.  **⌨️ Aktion:** Geben Sie die **IP-Adresse des Prüflings (DUT)** im Hauptfenster ein.
 2.  **🌐 Aktion:** Klicken Sie auf **"Online Check"**.
     *   *Hintergrund:* Die Software prüft die Erreichbarkeit, liest die MAC-Adresse aus und erstellt automatisch das passende Unterverzeichnis im Reports-Ordner. Die Geräte-Infos (Version, Name, MAC) werden im rechten Panel eingeblendet.
+    *   *Hinweis zu Zugangsdaten:* Falls das Gerät passwortgeschützt ist, erscheint hier die Abfrage. Die Daten werden für die gesamte Sitzung gespeichert und müssen beim Start der Kalibrierung nicht erneut eingegeben werden.
 3.  **🖱️ Aktion:** Wählen Sie die **Referenz-Quelle** (Fluke 45 oder Tasmota-Referenz).
     *   *Hintergrund:* Hiermit wird festgelegt, über welchen Kommunikationsweg (RS232 oder HTTP) die Vergleichswerte bezogen werden.
 4.  **⚙️ Aktion:** Stellen Sie die **Messparameter** ein (Stufen & Messungen pro Stufe).
@@ -161,7 +172,8 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
 *   **❌ Problem:** "Keine serielle Antwort vom Fluke"
     *   **Lösung:** Kabel prüfen oder "Fluke finden" im Setup erneut ausführen. Oft liegt es an einem falschen COM-Port.
 *   **⚠️ Problem:** "HTTP 401 Unauthorized"
-    *   **Lösung:** Die Dose ist passwortgeschützt. Geben Sie die Daten im erscheinenden Popup ein.
+    *   **Lösung:** Die Dose ist passwortgeschützt. Geben Sie die Daten im erscheinenden Popup ein. Als Standardbenutzer ist "admin" bereits voreingestellt.
+*   **🔐 Tipp zu Zugangsdaten:** Die App speichert eingegebene Passwörter sicher im Arbeitsspeicher, bis das Programm geschlossen wird. Nutzen Sie den **"Online Check"** vor der Messung, um die Zugangsdaten einmalig zu hinterlegen. So läuft der eigentliche Kalibrierprozess ohne Unterbrechung durch Popups durch.
 *   **🌡️ Tipp für Experten:** Lassen Sie die Messanordnung ca. 5 Minuten "warmlaufen". Elektronische Bauteile driften leicht, bis sie ihre Betriebstemperatur erreicht haben. Eine Kalibrierung im warmen Zustand ist präziser.
 
 ---
