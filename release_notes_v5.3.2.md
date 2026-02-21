@@ -1,17 +1,24 @@
 # 🚀 Tasmota Precision Calibrator v5.3.2
 
-Diese Version fasst die umfangreichen Verbesserungen bei der Geräte-Erkennung, dem Bedienkomfort und der Dokumentation zusammen.
+Diese Version markiert einen Meilenstein in der Benutzerführung und Prozesssicherheit des Tasmota Precision Calibrators. Sie bündelt bahnbrechende Automatisierungen und eine chirurgisch präzise Kalibrierungs-Logik.
 
-### 🌟 Highlights dieser Version
+### 🌟 Top-Features dieser Version
 
-1.  **Automatischer Fluke-Scan:** Das System findet Ihr Fluke 45 Multimeter nun vollautomatisch an allen COM-Ports und mit allen unterstützten Baudraten.
-2.  **Integrierte HTML-Anleitung:** Eine detaillierte, interaktive Bedienungsanleitung ist nun direkt in die Software eingebettet – inklusive Dark Mode und schneller Navigation.
-3.  **Sitzungsbasierte Passwörter:** Einmal eingegebene Zugangsdaten werden nun für die gesamte Dauer der Programmsitzung sicher im RAM behalten.
-4.  **Optimierter Login:** Das Passwort-Popup ist mit dem Standard-User "admin" vorbefüllt und setzt den Fokus sofort auf das Passwortfeld.
+1.  **Chirurgische Kalibrierung (Selektives Senden):**
+    Der neue Ergebnis-Dialog erlaubt die gezielte Auswahl einzelner Faktoren (`VoltageCal`, `CurrentCal`, `PowerCal`). Sie entscheiden, welche Werte an die Dose gesendet werden.
+2.  **Intelligente Toleranz-Analyse:**
+    Das System bewertet Abweichungen automatisch gegen konfigurierbare Limits (abs %). Ein Farbschema (Grün/Orange) gibt sofortige Sicherheit, ob eine Kalibrierung technisch notwendig ist.
+3.  **Automatischer Fluke-Scan (Auto-Discovery):**
+    Kein Suchen nach COM-Ports mehr. Das System scannt alle Schnittstellen und Baudraten (9600-300) und identifiziert Ihr Fluke 45 vollautomatisch.
+4.  **Integrierte Interaktive Hilfe:**
+    Eine professionelle HTML-Bedienungsanleitung im Dark-Theme ist nun direkt in die Software eingebettet – inklusive Navigation per Inhaltsverzeichnis.
+5.  **Optimiertes Credential-Management:**
+    Zugangsdaten werden nun pro Sitzung sicher im RAM behalten. Der Login-Dialog wurde für maximale Geschwindigkeit optimiert (Standard-User "admin" und Auto-Fokus).
 
-### 🛠️ Technische Verbesserungen
-*   **Strenge Geräte-Identifikation:** Verhindert Verbindungsfehler durch automatische Prüfung der Geräte-ID ("FLUKE").
-*   **Robuste Kommunikation:** Optimierte Timeouts für langsame Baudraten (bis zu 300 Baud).
-*   **Verbesserte UI-Stabilität:** Sperrung kritischer Bedienelemente während aktiver Messungen.
+### 🛠️ Technische & Administrative Verbesserungen
+*   **Zentrale Dokumentation:** Alle Anforderungen und Roadmaps wurden im konsolidierten **Pflichtenheft v1.1** zusammengeführt.
+*   **Config-Erweiterung:** Einführung der Sektion `[TOLERANCE abs%]` für benutzerdefinierte Grenzwerte.
+*   **Robuste Kommunikation:** Strenge Identitätsprüfung ("FLUKE"-Check) und optimierte Timeouts für langsame Baudraten.
+*   **Datenintegrität:** Automatischer Ausschluss von Min/Max-Werten und Filterung von Nullwert-Artefakten.
 
 **Hinweis für Anwender:** Bestehende Kalibrier-Reports bleiben kompatibel. Die neue Version synchronisiert alle internen Versionsangaben konsistent auf v5.3.2.

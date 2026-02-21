@@ -1,0 +1,51 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-1
+  Hostname:    tasmota-D5E4B4-1204
+  MAC Address: 2C:BC:BB:D5:E4:B4
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260221_143211
+  Report erstellt:    20260221_143211
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  233.47V | DUT  233.80V | Err:  +0.33V ( +0.14%) -> Cal-Vorschlag: 1539
+  Strom:    Ref   0.270A | DUT   0.265A | Err: -0.005A ( -1.73%) -> Cal-Vorschlag: 3169
+  Leistung: Ref   64.52W | DUT   63.93W | Err:  -0.59W ( -0.91%) -> Cal-Vorschlag: 9488
+
+STUFE 2:
+  Spannung: Ref  233.30V | DUT  233.53V | Err:  +0.23V ( +0.10%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.269A | DUT   0.265A | Err: -0.004A ( -1.49%) -> Cal-Vorschlag: 3162
+  Leistung: Ref   64.69W | DUT   64.10W | Err:  -0.59W ( -0.91%) -> Cal-Vorschlag: 9488
+
+STUFE 3:
+  Spannung: Ref  231.47V | DUT  231.70V | Err:  +0.23V ( +0.10%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.267A | DUT   0.264A | Err: -0.004A ( -1.37%) -> Cal-Vorschlag: 3158
+  Leistung: Ref   63.62W | DUT   63.03W | Err:  -0.59W ( -0.92%) -> Cal-Vorschlag: 9489
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 1.009945 | Bestimmtheitsmaß R2 = 0.919488
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1539 (Mittelwert der Stufen)
+    CurrentCal 3115                     CurrentCal 3163 (Mittelwert der Stufen)
+      PowerCal 9402                       PowerCal 9495 (aus Regression, empfohlen)
+                                          └─ Alternative: 9488 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

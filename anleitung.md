@@ -91,9 +91,11 @@ Hier wird das Fluke mit einem Messadapter direkt hinter den Prüfling geschaltet
 
 <a name="ch3_2"></a>
 ### 3.2 ⚙️ Menü: Setup
-*   **🌐 Allgemein:** Hier definieren Sie das Hauptverzeichnis für alle Berichte (`Reports`).
-*   **📟 Fluke 45:** Öffnet das Setup für die serielle Schnittstelle. Nutzen Sie hier den Button **"Fluke finden"**, um automatisch den richtigen COM-Port und die Baudrate zu ermitteln.
-*   **🔌 Tasmota-Referenz:** Falls Sie kein Fluke nutzen, geben Sie hier die IP-Adresse Ihrer bereits kalibrierten Referenzdose ein.
+*   **🌐 Allgemein:** 
+    *   **Report-Pfad:** Festlegen, wo die Protokolle gespeichert werden.
+    *   **Toleranzgrenzen (abs%):** Hier können Sie definieren, ab welcher Abweichung (in Prozent) die Software eine Kalibrierung für Spannung, Strom und Leistung empfehlen soll.
+*   **📟 Fluke 45:** RS232-Schnittstelle konfigurieren (inkl. "Fluke finden").
+*   **🔌 Tasmota-Referenz:** IP-Adresse der Referenzdose eingeben.
 
 <a name="ch3_3"></a>
 ### 3.3 ❓ Menü: Hilfe
@@ -158,11 +160,16 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
 
 <a name="ch5_5"></a>
 ### 5.5 ✅ Analyse und Finalisierung
-1.  **📋 Aktion:** Nach Abschluss der letzten Stufe öffnet sich automatisch das Fenster **"Kalibrierungs-Ergebnis"**.
-2.  **🔍 Aktion:** Prüfen Sie die vorgeschlagenen Werte für VoltageCal, CurrentCal und PowerCal.
-    *   *Hintergrund:* Die `PowerCal`-Werte werden auf zwei Arten berechnet (Mittelwert und lineare Regression). Die Regression (Standardwahl) ist über den gesamten Messbereich meist präziser.
-3.  **📤 Aktion:** Klicken Sie auf den Button **"Werte an Dose senden"**.
-    *   *Hintergrund:* Die Software sendet die Befehle via HTTP-Backlog an den Prüfling. Danach erfolgt eine sofortige Verifizierung ("As-Left" Prüfung), um sicherzustellen, dass die Werte korrekt gespeichert wurden. Das Ergebnis wird im Log dokumentiert.
+1.  **📋 Aktion:** Nach Abschluss der letzten Stufe öffnet sich automatisch das Fenster **"Kalibrierungsprotokoll & Auswahl"**.
+2.  **🔍 Aktion:** Prüfen Sie die farbigen Info-Labels im unteren Bereich.
+    *   *Hintergrund:* Die Software vergleicht die neuen Werte mit den aktuell in der Dose gespeicherten Faktoren.
+    *   🟢 **Grün:** Die Abweichung liegt innerhalb der Toleranz (Standard: V/A < 0,5%, W < 5,0%). Eine Kalibrierung ist optional. Die Checkbox wird automatisch deaktiviert.
+    *   🟠 **Orange:** Die Abweichung ist zu hoch. Eine Kalibrierung wird dringend empfohlen. Die Checkbox wird automatisch aktiviert.
+3.  **☑️ Aktion:** Passen Sie die Auswahl über die Checkboxen bei Bedarf manuell an.
+    *   *Hinweis:* Sie können `VoltageCal`, `CurrentCal` und `PowerCal` einzeln wählen.
+    *   *Wichtig:* Bei der Leistungsmessung müssen Sie sich zwischen **Mean (Mittelwert)** und **Regression** entscheiden. Beides gleichzeitig ist nicht möglich.
+4.  **📤 Aktion:** Klicken Sie auf den Button **"Auswahl Kalibrieren"**.
+    *   *Hintergrund:* Nur die markierten Faktoren werden an den Prüfling gesendet. Die Software verifiziert die Übertragung sofort ("As-Left" Prüfung) und dokumentiert das Ergebnis im Log.
 
 ---
 

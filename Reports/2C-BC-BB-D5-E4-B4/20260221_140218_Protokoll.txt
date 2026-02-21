@@ -1,0 +1,47 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-1
+  Hostname:    tasmota-D5E4B4-1204
+  MAC Address: 2C:BC:BB:D5:E4:B4
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260221_140218
+  Report erstellt:    20260221_140218
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  229.91V | DUT  230.11V | Err:  +0.20V ( +0.09%) -> Cal-Vorschlag: 1540
+  Strom:    Ref   0.263A | DUT   0.271A | Err: +0.009A ( +3.28%) -> Cal-Vorschlag: 3115
+  Leistung: Ref   62.82W | DUT   62.49W | Err:  -0.33W ( -0.53%) -> Cal-Vorschlag: 9451
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 1.005227 | Bestimmtheitsmaß R2 = 0.025634
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1540 (Mittelwert der Stufen)
+    CurrentCal 3218                     CurrentCal 3115 (Mittelwert der Stufen)
+      PowerCal 9402                       PowerCal 9451 (aus Regression, empfohlen)
+                                          └─ Alternative: 9451 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+[14:04:20] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE
+[14:04:20] CurrentCal: 3218 -> 3115 | [OK]
+[14:04:20] Gesamtstatus: ERFOLGREICH
+=====================================================================================

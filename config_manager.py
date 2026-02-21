@@ -43,6 +43,7 @@ class ConfigManager:
             # English: ip_address for TARGET is intentionally left empty for privacy/security.
             # Deutsch: ip_address für TARGET bleibt aus Datenschutzgründen absichtlich leer.
             self.config['TARGET'] = {'ip_address': '', 'measurement_steps': '1', 'measurements_per_step': '15'}
+            self.config['TOLERANCE abs%'] = {'voltage_limit': '0.5', 'current_limit': '0.5', 'power_limit': '5.0'}
             
             try:
                 with open(self.config_path, 'w') as f:

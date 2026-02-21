@@ -12,7 +12,7 @@ from collections import deque
 import pyqtgraph as pg
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QMessageBox, 
                                QDialog, QTextEdit, QHBoxLayout, QPushButton, QFileDialog,
-                               QLabel, QLineEdit, QTextBrowser)
+                               QLabel, QLineEdit, QTextBrowser, QCheckBox, QFrame)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QThread, Signal, QObject, Qt
 
@@ -346,60 +346,80 @@ class MeasurementWorker(QThread):
 class CalibrationReportDialog(QDialog):
     """
     # English:
-    # A custom dialog to display the calibration report. It allows the user
-    # to view the results, show a regression graph, and decide whether to
-    # apply the new calibration values to the device.
+    # A custom dialog to display the calibration report. It allows selective 
+    # application of calibration factors via checkboxes.
     # Deutsch:
-    # Ein benutzerdefinierter Dialog zur Anzeige des Kalibrierungsprotokolls. Er ermöglicht
-    # dem Benutzer, die Ergebnisse anzusehen, einen Regressionsgraphen anzuzeigen und
-    # zu entscheiden, ob die neuen Kalibrierwerte auf das Gerät angewendet werden sollen.
+    # Ein benutzerdefinierter Dialog zur Anzeige des Kalibrierungsprotokolls. 
+    # Erlaubt die selektive Anwendung von Kalibrierfaktoren über Checkboxen.
     """
-    def __init__(self, parent, target_ip, final_values, is_reapply, report_info, credentials_manager):
-        """
-        # English: Initializes the CalibrationReportDialog.
-        # Deutsch: Initialisiert den CalibrationReportDialog.
-
-        :param parent: The parent widget.
-        :param target_ip: (str) IP address of the target device.
-        :param final_values: (dict) Dictionary with the calculated final calibration values.
-        :param is_reapply: (bool) True if this is a re-apply action on an old report.
-        :param report_info: (dict) A dictionary containing metadata about the report.
-        :param credentials_manager: The manager for handling device credentials.
-        """
+    def __init__(self, parent, target_ip, final_values, old_factors, is_reapply, report_info, credentials_manager, config):
         super().__init__(parent)
         self.target_ip = target_ip
         self.final_values = final_values
+        self.old_factors = old_factors
         self.is_reapply = is_reapply
         self.report_info = report_info 
         self.credentials_manager = credentials_manager
+        self.config = config
         self.log_callback = parent.ui.log_output.appendPlainText
-        self.chosen_pcal = 0
         self.current_report_path = report_info['original_path']
 
-        self.setWindowTitle("Kalibrierungsprotokoll & Anwendung")
-        self.resize(850, 700) 
+        self.setWindowTitle("Kalibrierungsprotokoll & Auswahl")
+        self.resize(900, 800) 
         self.layout = QVBoxLayout(self)
 
+        # English: Report display (Text Area)
+        # Deutsch: Protokoll-Anzeige (Textbereich)
         self.text_edit = QTextEdit(self)
         self.text_edit.setReadOnly(True)
         self.text_edit.setStyleSheet("font-family: Consolas, 'Courier New', monospace; font-size: 12px; background-color: #1e1e1e; color: #d4d4d4;")
         self.layout.addWidget(self.text_edit)
-
         self.load_report_text()
 
+        # --- INFO AREA (Deviations) ---
+        self.info_frame = QFrame(self)
+        self.info_frame.setFrameShape(QFrame.StyledPanel)
+        self.info_frame.setStyleSheet("background-color: #252525; border-radius: 5px; padding: 5px;")
+        self.info_layout = QVBoxLayout(self.info_frame)
+        self.layout.addWidget(self.info_frame)
+
+        self.lbl_v_info = QLabel(self)
+        self.lbl_a_info = QLabel(self)
+        self.lbl_w_info = QLabel(self)
+        for lbl in [self.lbl_v_info, self.lbl_a_info, self.lbl_w_info]:
+            lbl.setStyleSheet("font-weight: bold;")
+            self.info_layout.addWidget(lbl)
+
+        # --- CHECKBOX AREA ---
+        self.check_layout = QHBoxLayout()
+        self.check_v = QCheckBox("VoltageCal")
+        self.check_a = QCheckBox("CurrentCal")
+        self.check_w_mean = QCheckBox("PowerCal (Mean)")
+        self.check_w_regr = QCheckBox("PowerCal (Regression)")
+        
+        for cb in [self.check_v, self.check_a, self.check_w_mean, self.check_w_regr]:
+            self.check_layout.addWidget(cb)
+        self.layout.addLayout(self.check_layout)
+
+        # English: Exclusive logic for PowerCal.
+        # Deutsch: Exklusive Logik für PowerCal.
+        self.check_w_mean.toggled.connect(lambda c: self.check_w_regr.setChecked(False) if c else None)
+        self.check_w_regr.toggled.connect(lambda c: self.check_w_mean.setChecked(False) if c else None)
+
+        # --- Calculate Deviations and Init UI ---
+        self.init_selection_logic()
+
+        # --- BUTTON AREA ---
         self.btn_layout = QHBoxLayout()
         self.btn_graph = QPushButton("📊 REGRESSIONS-GRAPH")
         self.btn_graph.setStyleSheet("background-color: #0055a4; color: white; font-weight: bold; padding: 10px;")
         self.btn_graph.clicked.connect(self.show_regression_graph)
-        if self.is_reapply:
-            self.btn_graph.setEnabled(False)
-            self.btn_graph.setToolTip("Grafik ist nur bei einer neuen Messung verfügbar.")
-
-        self.btn_cancel = QPushButton("NICHT KALIBRIEREN")
-        self.btn_cancel.setStyleSheet("background-color: darkred; color: white; font-weight: bold; padding: 10px;")
+        
+        self.btn_cancel = QPushButton("ABBRECHEN")
+        self.btn_cancel.setStyleSheet("background-color: #444; color: white; font-weight: bold; padding: 10px;")
         self.btn_cancel.clicked.connect(self.reject) 
 
-        self.btn_calibrate = QPushButton("KALIBRIEREN")
+        self.btn_calibrate = QPushButton("AUSWAHL KALIBRIEREN")
         self.btn_calibrate.setStyleSheet("background-color: darkgreen; color: white; font-weight: bold; padding: 10px;")
         self.btn_calibrate.clicked.connect(self.apply_calibration_action)
 
@@ -414,11 +434,56 @@ class CalibrationReportDialog(QDialog):
         self.btn_layout.addWidget(self.btn_close)
         self.layout.addLayout(self.btn_layout)
 
+    def init_selection_logic(self):
+        """
+        # English: Calculates deviations and sets checkboxes/labels accordingly.
+        # Deutsch: Berechnet Abweichungen und setzt Checkboxen/Labels entsprechend.
+        """
+        def get_dev(new, old):
+            if not old or old == 0: return 0.0
+            return ((new / old) - 1) * 100
+
+        dev_v = get_dev(self.final_values['vcal'], self.old_factors.get('VCal', 20230))
+        dev_a = get_dev(self.final_values['acal'], self.old_factors.get('ACal', 2500))
+        dev_w = get_dev(self.final_values['pcal_avg'], self.old_factors.get('WCal', 12500))
+
+        # English: Read limits from config with fallbacks.
+        # Deutsch: Lese Limits aus der Konfiguration mit Fallbacks.
+        limit_v = self.config.getfloat('TOLERANCE abs%', 'voltage_limit', fallback=0.5)
+        limit_a = self.config.getfloat('TOLERANCE abs%', 'current_limit', fallback=0.5)
+        limit_w = self.config.getfloat('TOLERANCE abs%', 'power_limit', fallback=5.0)
+
+        # --- Voltage ---
+        if abs(dev_v) <= limit_v:
+            self.lbl_v_info.setText(f"✅ Spannungsmessung: Abweichung {dev_v:+.2f}% im Toleranzbereich ({limit_v}%). Kalibrierung optional.")
+            self.lbl_v_info.setStyleSheet("color: #4caf50;")
+            self.check_v.setChecked(False)
+        else:
+            self.lbl_v_info.setText(f"⚠️ Spannungsmessung: Abweichung {dev_v:+.2f}% außerhalb Toleranz ({limit_v}%). Kalibrierung empfohlen!")
+            self.lbl_v_info.setStyleSheet("color: #ff9800;")
+            self.check_v.setChecked(True)
+
+        # --- Current ---
+        if abs(dev_a) <= limit_a:
+            self.lbl_a_info.setText(f"✅ Strommessung: Abweichung {dev_a:+.2f}% im Toleranzbereich ({limit_a}%). Kalibrierung optional.")
+            self.lbl_a_info.setStyleSheet("color: #4caf50;")
+            self.check_a.setChecked(False)
+        else:
+            self.lbl_a_info.setText(f"⚠️ Strommessung: Abweichung {dev_a:+.2f}% außerhalb Toleranz ({limit_a}%). Kalibrierung empfohlen!")
+            self.lbl_a_info.setStyleSheet("color: #ff9800;")
+            self.check_a.setChecked(True)
+
+        # --- Power ---
+        if abs(dev_w) <= limit_w:
+            self.lbl_w_info.setText(f"✅ Leistungsmessung: Abweichung {dev_w:+.2f}% im Toleranzbereich ({limit_w}%). Kalibrierung optional.")
+            self.lbl_w_info.setStyleSheet("color: #4caf50;")
+            self.check_w_mean.setChecked(False)
+        else:
+            self.lbl_w_info.setText(f"⚠️ Leistungsmessung: Abweichung {dev_w:+.2f}% außerhalb Toleranz ({limit_w}%). Kalibrierung empfohlen!")
+            self.lbl_w_info.setStyleSheet("color: #ff9800;")
+            self.check_w_mean.setChecked(True)
+
     def load_report_text(self):
-        """
-        # English: Loads the content of the report file into the text edit widget.
-        # Deutsch: Lädt den Inhalt der Protokolldatei in das Text-Edit-Widget.
-        """
         try:
             with open(self.current_report_path, 'r', encoding='utf-8', errors='replace') as f:
                 content = f.read()
@@ -428,82 +493,48 @@ class CalibrationReportDialog(QDialog):
             self.text_edit.setPlainText(f"Fehler beim Laden des Berichts:\n{e}")
 
     def show_regression_graph(self):
-        """
-        # English:
-        # Reads all CSV data for the session and displays a regression plot for power values.
-        # Deutsch:
-        # Liest alle CSV-Daten der Sitzung und zeigt einen Regressions-Plot für die Leistungswerte an.
-        """
         if self.is_reapply:
             QMessageBox.warning(self, "Keine Daten", "Die Regressions-Grafik ist nur bei einer neuen Messung verfügbar.")
             return
-
         search_path = os.path.join(self.report_info['device_path'], f"{self.report_info['session_ts']}_Stufe_*.csv")
         files = glob.glob(search_path)
-        if not files:
-            QMessageBox.warning(self, "Keine Daten", "Es konnten keine CSV-Dateien für den Graphen gefunden werden.")
-            return
-
+        if not files: return
         df_list = [pd.read_csv(f) for f in files]
         full_df = pd.concat(df_list, ignore_index=True)
         x, y = full_df['Target_Watt'].values, full_df['Ref_Watt'].values
         if len(x) == 0: return
-
         m, _, _, _ = np.linalg.lstsq(x[:, np.newaxis], y, rcond=None)
         slope = float(m[0])
-        
         graph_dialog = QDialog(self)
         graph_dialog.setWindowTitle(f"Regressions-Analyse (Leistung) | Steigung m = {slope:.5f}")
         graph_dialog.resize(800, 600)
         layout = QVBoxLayout(graph_dialog)
         plot_widget = pg.PlotWidget(background='#1e1e1e')
-        plot_widget.setLabel('left', 'Referenz Leistung (Soll)', units='W')
-        plot_widget.setLabel('bottom', 'Dose Leistung (Ist)', units='W')
-        plot_widget.showGrid(x=True, y=True, alpha=0.3)
-        plot_widget.addLegend(offset=(30, 30))
         layout.addWidget(plot_widget)
-
-        plot_widget.plot(x, y, pen=None, symbol='o', symbolSize=7, symbolBrush=(255, 255, 255, 150), name="Messpunkte (Vorher)")
-        max_val = max(max(x), max(y)) * 1.05 if len(x) > 0 and len(y) > 0 else 1
+        plot_widget.plot(x, y, pen=None, symbol='o', symbolSize=7, symbolBrush=(255, 255, 255, 150))
+        max_val = max(max(x), max(y)) * 1.05
         x_line = np.array([0, max_val])
-        plot_widget.plot(x_line, x_line, pen=pg.mkPen('y', width=2, style=Qt.DashLine), name="Idealzustand (1:1)")
-        plot_widget.plot(x_line, x_line * slope, pen=pg.mkPen('g', width=3), name=f"Ausgleichsgerade (m={slope:.5f})")
+        plot_widget.plot(x_line, x_line, pen=pg.mkPen('y', width=2, style=Qt.DashLine))
+        plot_widget.plot(x_line, x_line * slope, pen=pg.mkPen('g', width=3))
         graph_dialog.exec()
 
     def apply_calibration_action(self):
         """
-        # English:
-        # Handles the user's decision to apply the calibration. It asks for the PowerCal method,
-        # then calls the function to send the data to the device.
-        # Deutsch:
-        # Behandelt die Entscheidung des Benutzers, die Kalibrierung anzuwenden. Fragt nach der
-        # PowerCal-Methode und ruft dann die Funktion zum Senden der Daten an das Gerät auf.
+        # English: Reads checkbox states and applies the selected values.
+        # Deutsch: Liest Checkbox-Zustände aus und wendet die gewählten Werte an.
         """
-        # English: Show a dialog to choose the PowerCal method.
-        # Deutsch: Zeige einen Dialog zur Auswahl der PowerCal-Methode an.
-        msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("PowerCal-Methode wählen")
-        msg_box.setText("Welcher Wert soll für <b>PowerCal</b> verwendet werden?")
-        msg_box.setIcon(QMessageBox.Question)
-        btn_regression = msg_box.addButton(f"Regression ({self.final_values['pcal_regression']})", QMessageBox.AcceptRole)
-        btn_mittelwert = msg_box.addButton(f"Mittelwert ({self.final_values['pcal_avg']})", QMessageBox.AcceptRole)
-        msg_box.addButton("Abbrechen", QMessageBox.RejectRole)
-        msg_box.setDefaultButton(btn_regression)
-        msg_box.exec()
+        v_val = self.final_values['vcal'] if self.check_v.isChecked() else None
+        a_val = self.final_values['acal'] if self.check_a.isChecked() else None
+        
+        w_val = None
+        if self.check_w_mean.isChecked():
+            w_val = self.final_values['pcal_avg']
+        elif self.check_w_regr.isChecked():
+            w_val = self.final_values['pcal_regression']
 
-        clicked_button = msg_box.clickedButton()
-        if clicked_button == btn_regression:
-            self.chosen_pcal = self.final_values['pcal_regression']
-            self.log_callback("ℹ️ PowerCal-Methode: Regression ausgewählt.")
-        elif clicked_button == btn_mittelwert:
-            self.chosen_pcal = self.final_values['pcal_avg']
-            self.log_callback("ℹ️ PowerCal-Methode: Mittelwert ausgewählt.")
-        else:
-            self.log_callback("ℹ️ Kalibrierung im Auswahl-Dialog abgebrochen.")
-            return
+        if v_val is None and a_val is None and w_val is None:
+            return QMessageBox.warning(self, "Keine Auswahl", "Bitte wählen Sie mindestens einen Wert zur Kalibrierung aus.")
 
-        # English: Toggle buttons to prevent multiple clicks.
-        # Deutsch: Schalte die Buttons um, um Mehrfachklicks zu verhindern.
         self.btn_calibrate.hide()
         self.btn_cancel.hide()
         QApplication.processEvents()
@@ -511,43 +542,34 @@ class CalibrationReportDialog(QDialog):
         from send_cal import apply_calibration
         from calibration_engine import CalibrationEngine
 
-        self.log_callback("\n🚀 Starte Übertragung an die Dose...")
+        self.log_callback("\n🚀 Starte selektive Übertragung an die Dose...")
         
-        # English: Get auth tuple from manager.
-        # Deutsch: Hole Auth-Tupel aus dem Manager.
         auth = None
         creds = self.credentials_manager.get_credentials(self.target_ip)
-        if creds:
-            auth = (creds['user'], creds['password'])
+        if creds: auth = (creds['user'], creds['password'])
             
-        as_found_left_string = apply_calibration(self.target_ip, self.final_values['vcal'], self.final_values['acal'], self.chosen_pcal, auth=auth)
+        as_found_left_string = apply_calibration(self.target_ip, v_val, a_val, w_val, auth=auth)
 
         if as_found_left_string:
             self.log_callback("✅ Übertragung abgeschlossen.")
-            
             report_to_update = self.report_info['original_path']
             engine = CalibrationEngine(self.report_info['device_path'])
 
-            # English: If re-applying, create a new, short report.
-            # Deutsch: Bei einer Wiederanwendung, erstelle ein neues, kurzes Protokoll.
             if self.is_reapply:
                 new_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
                 new_report_path = os.path.join(self.report_info['device_path'], f"{new_ts}_ReApply_Protokoll.txt")
                 engine.write_reapply_summary(new_report_path, self.report_info['original_path'], self.report_info['dut_info'], self.report_info['ref_info'])
                 report_to_update = new_report_path
             
-            # English: Append the "As Found/Left" block to the correct report.
-            # Deutsch: Hänge den "As Found/Left"-Block an das korrekte Protokoll an.
             try:
                 with open(report_to_update, "a", encoding="utf-8") as f:
                     f.write(as_found_left_string)
-                self.log_callback(f"✅ Report '{os.path.basename(report_to_update)}' aktualisiert.")
                 self.current_report_path = report_to_update
                 self.load_report_text()
             except Exception as e:
                 self.log_callback(f"❌ Fehler beim Aktualisieren des Reports: {e}")
         else:
-            self.log_callback("❌ Übertragung fehlgeschlagen. Siehe Log für Details.")
+            self.log_callback("❌ Übertragung fehlgeschlagen.")
         
         self.btn_close.show()
 
@@ -972,11 +994,32 @@ class MainWindow(QMainWindow):
 
             if hasattr(dialog, 'btn_browse_dir'):
                 dialog.btn_browse_dir.clicked.connect(open_directory_browser)
+
+        # English: Load tolerance limits into the new fields.
+        # Deutsch: Lade Toleranzgrenzen in die neuen Felder.
+        if hasattr(dialog, 'edit_devV'):
+            dialog.edit_devV.setText(self.cm.config.get('TOLERANCE abs%', 'voltage_limit', fallback='0.5'))
+        if hasattr(dialog, 'edit_devI'):
+            dialog.edit_devI.setText(self.cm.config.get('TOLERANCE abs%', 'current_limit', fallback='0.5'))
+        if hasattr(dialog, 'edit_devP'):
+            dialog.edit_devP.setText(self.cm.config.get('TOLERANCE abs%', 'power_limit', fallback='5.0'))
             
         def save_and_close():
             if hasattr(dialog, 'edit_report_dir'):
                 self.cm.config['GENERAL']['root_report_dir'] = dialog.edit_report_dir.text().strip()
                 self.cm.root_dir = self.cm.config['GENERAL']['root_report_dir'] 
+            
+            # English: Save updated tolerance limits.
+            # Deutsch: Speichere aktualisierte Toleranzgrenzen.
+            if 'TOLERANCE abs%' not in self.cm.config:
+                self.cm.config['TOLERANCE abs%'] = {}
+            
+            if hasattr(dialog, 'edit_devV'):
+                self.cm.config['TOLERANCE abs%']['voltage_limit'] = dialog.edit_devV.text().strip().replace(',', '.')
+            if hasattr(dialog, 'edit_devI'):
+                self.cm.config['TOLERANCE abs%']['current_limit'] = dialog.edit_devI.text().strip().replace(',', '.')
+            if hasattr(dialog, 'edit_devP'):
+                self.cm.config['TOLERANCE abs%']['power_limit'] = dialog.edit_devP.text().strip().replace(',', '.')
             
             with open(self.cm.config_path, 'w') as f: self.cm.config.write(f)
             self.ui.log_output.appendPlainText("✅ Allgemeines Setup in config.ini gespeichert.")
@@ -1326,28 +1369,40 @@ class MainWindow(QMainWindow):
 
     def _parse_report_for_values(self, report_path):
         """
-        # English: Parses a report file to extract the final suggested calibration values.
-        # Deutsch: Parst eine Protokolldatei, um die finalen vorgeschlagenen Kalibrierwerte zu extrahieren.
+        # English: Parses a report file to extract both the old and suggested new calibration values.
+        # Deutsch: Parst eine Protokolldatei, um sowohl die alten als auch die vorgeschlagenen neuen Kalibrierwerte zu extrahieren.
         """
         try:
             with open(report_path, 'r', encoding='utf-8') as f:
                 content = f.read()
 
+            # English: Matches for NEW values
             vcal_match = re.search(r"VoltageCal \d+\s+VoltageCal (\d+)", content)
             acal_match = re.search(r"CurrentCal \d+\s+CurrentCal (\d+)", content)
             pcal_reg_match = re.search(r"PowerCal \d+\s+PowerCal (\d+)", content)
             pcal_avg_match = re.search(r"Alternative: (\d+)", content)
 
+            # English: Matches for OLD values (from the first step's 'Alt_Cal' info in report)
+            vold_match = re.search(r"VoltageCal (\d+)\s+VoltageCal \d+", content)
+            aold_match = re.search(r"CurrentCal (\d+)\s+CurrentCal \d+", content)
+            wold_match = re.search(r"PowerCal (\d+)\s+PowerCal \d+", content)
+
             if vcal_match and acal_match and pcal_reg_match and pcal_avg_match:
-                return {
+                final = {
                     "vcal": int(vcal_match.group(1)),
                     "acal": int(acal_match.group(1)),
                     "pcal_regression": int(pcal_reg_match.group(1)),
                     "pcal_avg": int(pcal_avg_match.group(1))
                 }
+                old = {
+                    "VCal": int(vold_match.group(1)) if vold_match else 20230,
+                    "ACal": int(aold_match.group(1)) if aold_match else 2500,
+                    "WCal": int(wold_match.group(1)) if wold_match else 12500
+                }
+                return final, old
         except Exception as e:
             self.ui.log_output.appendPlainText(f"❌ Fehler beim Parsen des Reports: {e}")
-        return None
+        return None, None
 
     def prompt_apply_calibration(self, original_report_path, target_ip, all_results, dut_info_str, ref_info_str):
         """
@@ -1360,6 +1415,7 @@ class MainWindow(QMainWindow):
         """
         is_reapply = not all_results
         final_values = None
+        old_factors = None
         
         device_path = os.path.dirname(original_report_path)
         try:
@@ -1372,7 +1428,7 @@ class MainWindow(QMainWindow):
 
         if is_reapply:
             self.ui.log_output.appendPlainText("-> Kalibrierung auf Basis eines alten Reports (Re-Apply).")
-            final_values = self._parse_report_for_values(original_report_path)
+            final_values, old_factors = self._parse_report_for_values(original_report_path)
             if not final_values:
                 QMessageBox.critical(self, "Fehler", f"Die Kalibrierwerte konnten nicht aus dem Report '{os.path.basename(original_report_path)}' gelesen werden.")
                 self.measurement_finished("")
@@ -1384,11 +1440,12 @@ class MainWindow(QMainWindow):
             pcal_avg = int(sum(r['Stufen_Cal']['WCal'] for r in all_results) / len(all_results))
             pcal_regression = 0
             
+            old_factors = all_results[0].get('Alt_Cal', {"VCal": 20230, "ACal": 2500, "WCal": 12500})
+
             reg_data = DataAnalyzer.calculate_regression(device_path, session_ts)
             if reg_data and all_results:
-                old_cal = all_results[0].get('Alt_Cal', {})
                 p_reg = reg_data['Power']
-                pcal_regression = int(old_cal.get('WCal', 12500) * p_reg['slope'])
+                pcal_regression = int(old_factors.get('WCal', 12500) * p_reg['slope'])
                 
             final_values = { "vcal": vcal, "acal": acal, "pcal_avg": pcal_avg, "pcal_regression": pcal_regression }
         
@@ -1400,7 +1457,7 @@ class MainWindow(QMainWindow):
             'ref_info': ref_info
         }
 
-        dialog = CalibrationReportDialog(self, target_ip, final_values, is_reapply, report_info, self.credentials_manager)
+        dialog = CalibrationReportDialog(self, target_ip, final_values, old_factors, is_reapply, report_info, self.credentials_manager, self.cm.config)
         dialog.exec()
         
         self.measurement_finished("🏁 Der gesamte Kalibrierprozess ist beendet.")

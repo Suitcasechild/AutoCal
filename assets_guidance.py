@@ -123,7 +123,7 @@ GUIDANCE_HTML = """
         </li>
         <li><a href="#ch3">🖥️ 3. Menü-Referenz & Funktionen</a></li>
         <li><a href="#ch4">📂 4. Das Report-Verzeichnis & Messdaten</a></li>
-        <li><a href="#ch5">🚀 5. Der Kalibrierungsprozess (Schritt-für-Schritt)</a>
+        <li><a href="#ch5">🚀 5. Der Kalibrierungsprozess (Schritt für Schritt)</a>
             <ul>
                 <li><a href="#ch5_1">5.1 🛠️ Vorbereitung & Initialisierung</a></li>
                 <li><a href="#ch5_2">5.2 ▶️ Start der Messsequenz</a></li>
@@ -196,7 +196,7 @@ GUIDANCE_HTML = """
 </ul>
 <h3>⚙️ Menü: Setup</h3>
 <ul>
-    <li><b>🌐 Allgemein:</b> Definition des Hauptverzeichnisses (<code>Reports</code>).</li>
+    <li><b>🌐 Allgemein:</b> Festlegen des Report-Pfads und Definition der <b>Toleranzgrenzen</b> (ab welcher Abweichung eine Kalibrierung empfohlen wird).</li>
     <li><b>📟 Fluke 45:</b> RS232-Konfiguration (inkl. "Fluke finden" Auto-Scan).</li>
     <li><b>🔌 Tasmota-Referenz:</b> IP-Adresse Ihrer kalibrierten Referenzdose.</li>
 </ul>
@@ -226,8 +226,14 @@ GUIDANCE_HTML = """
 <span class="background-info">Hintergrund: Die Software wartet 7 Sek. (Inrush-Filter) und sammelt dann die validen Messdaten.</span>
 
 <h3 id="ch5_5">5.5 ✅ Analyse und Finalisierung</h3>
-<div class="action-box"><b>📤 Aktion:</b> Klicken Sie auf <b>"Werte an Dose senden"</b> im Ergebnis-Dialog.</div>
-<span class="background-info">Hintergrund: Die Werte werden übertragen und sofort verifiziert.</span>
+<div class="action-box"><b>📋 Aktion:</b> Prüfen Sie die farbigen Info-Labels im Abschluss-Dialog.</div>
+<span class="background-info">Hintergrund: Die Software vergleicht die neuen Werte mit den alten. 🟢 Grün bedeutet innerhalb der Toleranz, 🟠 Orange bedeutet Kalibrierung empfohlen.</span>
+
+<div class="action-box"><b>☑️ Aktion:</b> Wählen Sie die gewünschten Faktoren über die Checkboxen aus.</div>
+<span class="background-info">Hinweis: Sie können VoltageCal, CurrentCal und PowerCal (Mean oder Regression) selektiv wählen.</span>
+
+<div class="action-box"><b>📤 Aktion:</b> Klicken Sie auf <b>"Auswahl Kalibrieren"</b>.</div>
+<span class="background-info">Hintergrund: Die ausgewählten Werte werden übertragen und sofort verifiziert.</span>
 
 <h2 id="ch6">🛠️ 6. Troubleshooting & Expertentipps</h2>
 <div class="warning">
