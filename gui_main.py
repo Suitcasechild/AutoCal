@@ -12,7 +12,7 @@ from collections import deque
 import pyqtgraph as pg
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QMessageBox, 
                                QDialog, QTextEdit, QHBoxLayout, QPushButton, QFileDialog,
-                               QLabel, QLineEdit)
+                               QLabel, QLineEdit, QTextBrowser)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QThread, Signal, QObject, Qt
 
@@ -22,6 +22,7 @@ from reference_manager import ReferenceManager
 from data_analyzer import DataAnalyzer
 from credential_manager import CredentialsManager
 from fluke_scan import find_fluke
+from assets_guidance import GUIDANCE_HTML
 
 # ---------------------------------------------------------
 # 1. DER LOG-SPION (Log Spy)
@@ -645,7 +646,45 @@ class CredentialDialog(QDialog):
 
 
 # ---------------------------------------------------------
-# 5. DAS HAUPTFENSTER (GUI)
+# 5. DAS HILFE-FENSTER (Anleitung)
+# ---------------------------------------------------------
+class GuidanceWindow(QDialog):
+    """
+    # English: A separate window for displaying the instructional manual in HTML format.
+    # Deutsch: Ein separates Fenster zur Anzeige der Bedienungsanleitung im HTML-Format.
+    """
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Bedienungsanleitung")
+        self.resize(800, 700)
+        
+        # English: Non-modal, so main window stays interactive.
+        # Deutsch: Nicht-modal, damit das Hauptfenster interaktiv bleibt.
+        self.setModal(False)
+        
+        self.layout = QVBoxLayout(self)
+        
+        # English: Create a QTextBrowser to render HTML content.
+        # Deutsch: Erstelle einen QTextBrowser zum Rendern von HTML-Inhalten.
+        self.browser = QTextBrowser(self)
+        self.browser.setHtml(GUIDANCE_HTML)
+        
+        # English: Enable internal link navigation (anchors).
+        # Deutsch: Aktiviere die Navigation für interne Links (Anker).
+        self.browser.setOpenLinks(False)
+        self.browser.anchorClicked.connect(self.browser.setSource)
+        
+        self.layout.addWidget(self.browser)
+        
+        # English: Add a close button.
+        # Deutsch: Füge einen Schließen-Button hinzu.
+        self.btn_close = QPushButton("Schließen", self)
+        self.btn_close.clicked.connect(self.close)
+        self.layout.addWidget(self.btn_close)
+
+
+# ---------------------------------------------------------
+# 6. DAS HAUPTFENSTER (GUI)
 # ---------------------------------------------------------
 class MainWindow(QMainWindow):
     """
@@ -665,6 +704,7 @@ class MainWindow(QMainWindow):
         self.cm = ConfigManager()
         self.credentials_manager = CredentialsManager()
         self.wait_msgbox = None   
+        self.guidance_window = None # English: Stores the help window instance. / Deutsch: Speichert die Instanz des Hilfefensters.
         
         # English: Load the UI from the .ui file created with Qt Designer.
         # Deutsch: Lade die Benutzeroberfläche aus der .ui-Datei, die mit dem Qt Designer erstellt wurde.
@@ -890,6 +930,9 @@ class MainWindow(QMainWindow):
 
         if hasattr(self.ui, 'action_show_license'):
             self.ui.action_show_license.triggered.connect(self.show_license_info)
+
+        if hasattr(self.ui, 'action_guide'):
+            self.ui.action_guide.triggered.connect(self.open_guidance)
 
     def load_values_from_config(self):
         """
@@ -1388,6 +1431,22 @@ class MainWindow(QMainWindow):
             "Gemini sowie dem Author erstellt und optimiert."
         )
         QMessageBox.about(self, "Lizenz & Info", license_text)
+
+    def open_guidance(self):
+        """
+        # English: Opens the instructional manual in a separate window.
+        # Deutsch: Öffnet die Bedienungsanleitung in einem separaten Fenster.
+        """
+        if self.guidance_window is None:
+            # English: Create the window instance if it doesn't exist yet.
+            # Deutsch: Erstelle die Fenster-Instanz, falls sie noch nicht existiert.
+            self.guidance_window = GuidanceWindow(self)
+        
+        # English: Show and bring to front.
+        # Deutsch: Anzeigen und nach vorne bringen.
+        self.guidance_window.show()
+        self.guidance_window.raise_()
+        self.guidance_window.activateWindow()
 
     def on_online_check_clicked(self):
         """

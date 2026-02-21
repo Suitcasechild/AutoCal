@@ -803,7 +803,10 @@
     <property name="title">
      <string>Hilfe</string>
     </property>
+    <addaction name="action_guide"/>
+    <addaction name="separator"/>
     <addaction name="action_show_license"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuSetup"/>
@@ -853,6 +856,16 @@
   <action name="action_show_license">
    <property name="text">
     <string>Lizenz</string>
+   </property>
+  </action>
+  <action name="action_toggle_dark_mode">
+   <property name="text">
+    <string>Dark Mode</string>
+   </property>
+  </action>
+  <action name="action_guide">
+   <property name="text">
+    <string>Anleitung</string>
    </property>
   </action>
  </widget>

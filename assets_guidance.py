@@ -1,0 +1,222 @@
+# -*- coding: utf-8 -*-
+"""
+# English: Contains the instructional content for the application in HTML format (Dark Mode).
+# Deutsch: Enthält den Anleitungstext für die Anwendung im HTML-Format (Dark Mode).
+"""
+
+GUIDANCE_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    body { 
+        font-family: sans-serif; 
+        line-height: 1.6; 
+        color: #e0e0e0; 
+        padding: 25px; 
+        background-color: #1e1e1e; 
+    }
+    h1 { 
+        color: #4a9eff; 
+        border-bottom: 2px solid #4a9eff; 
+        padding-bottom: 10px; 
+    }
+    h2 { 
+        color: #4a9eff; 
+        margin-top: 40px; 
+        background-color: #2d2d2d; 
+        padding: 8px 15px; 
+        border-left: 5px solid #4a9eff; 
+        border-radius: 0 4px 4px 0;
+    }
+    h3 { 
+        color: #ffffff; 
+        margin-top: 25px; 
+        border-bottom: 1px solid #444;
+        padding-bottom: 5px;
+    }
+    .index { 
+        background-color: #252525; 
+        padding: 20px; 
+        border-radius: 8px; 
+        border: 1px solid #444; 
+        margin-bottom: 30px;
+    }
+    .index ul { list-style-type: none; padding-left: 0; }
+    .index li { margin-bottom: 10px; }
+    .index a { text-decoration: none; color: #4a9eff; font-weight: bold; }
+    .index a:hover { text-decoration: underline; color: #82c0ff; }
+    
+    .action-box { 
+        background-color: #3a321a; 
+        border-left: 5px solid #d4a017; 
+        padding: 12px; 
+        margin: 15px 0; 
+        color: #ffffff;
+        border-radius: 0 4px 4px 0;
+    }
+    .background-info { 
+        font-style: italic; 
+        color: #aaaaaa; 
+        margin-left: 25px; 
+        margin-bottom: 20px; 
+        display: block; 
+        font-size: 0.95em;
+    }
+    .tip { 
+        background-color: #1b3a22; 
+        border-left: 5px solid #28a745; 
+        padding: 12px; 
+        margin: 15px 0; 
+        border-radius: 0 4px 4px 0;
+    }
+    .warning { 
+        background-color: #3d1a1d; 
+        border-left: 5px solid #dc3545; 
+        padding: 12px; 
+        margin: 15px 0; 
+        border-radius: 0 4px 4px 0;
+    }
+    code { 
+        background-color: #333; 
+        padding: 2px 5px; 
+        border-radius: 3px; 
+        color: #ff7b72;
+        font-family: monospace;
+    }
+    .footer { 
+        margin-top: 60px; 
+        text-align: center; 
+        font-size: 0.9em; 
+        color: #777; 
+        border-top: 1px solid #444; 
+        padding-top: 25px; 
+    }
+    a { color: #4a9eff; }
+</style>
+</head>
+<body>
+
+<h1 id="top">📘 Bedienungsanleitung: Tasmota Precision Calibrator</h1>
+
+<p>Willkommen beim <b>Tasmota Precision Calibrator</b>. Dieses Werkzeug wurde entwickelt, um die Kalibrierung von Tasmota-Energiemessgeräten auf ein professionelles Niveau zu heben.</p>
+
+<div class="index">
+    <h2>📌 Inhaltsverzeichnis</h2>
+    <ul>
+        <li><a href="#ch1">🔬 1. Technischer Hintergrund: Warum "Cal"-Befehle?</a>
+            <ul>
+                <li><a href="#ch1_1">1.1 Der Vorteil gegenüber Set-Befehlen</a></li>
+                <li><a href="#ch1_2">1.2 Messunsicherheit und zeitlicher Ablauf</a></li>
+            </ul>
+        </li>
+        <li><a href="#ch2">🔌 2. Hardware-Vorbereitung & Messaufbau</a>
+            <ul>
+                <li><a href="#ch2_1">2.1 Der physikalische Messaufbau (WICHTIG!)</a></li>
+                <li><a href="#ch2_2">2.2 Fluke 45 Einstellungen</a></li>
+            </ul>
+        </li>
+        <li><a href="#ch3">🖥️ 3. Menü-Referenz & Funktionen</a></li>
+        <li><a href="#ch4">📂 4. Das Report-Verzeichnis & Messdaten</a></li>
+        <li><a href="#ch5">🚀 5. Der Kalibrierungsprozess (Schritt-für-Schritt)</a>
+            <ul>
+                <li><a href="#ch5_1">5.1 🛠️ Vorbereitung & Initialisierung</a></li>
+                <li><a href="#ch5_2">5.2 ▶️ Start der Messsequenz</a></li>
+                <li><a href="#ch5_3">5.3 🔄 Ermittlung des Eigenverbrauchs</a></li>
+                <li><a href="#ch5_4">5.4 📉 Messung unter Last</a></li>
+                <li><a href="#ch5_5">5.5 ✅ Analyse und Finalisierung</a></li>
+            </ul>
+        </li>
+        <li><a href="#ch6">🛠️ 6. Troubleshooting & Expertentipps</a></li>
+    </ul>
+</div>
+
+<hr style="border: 0; border-top: 1px solid #444;">
+
+<h2 id="ch1">🔬 1. Technischer Hintergrund: Warum "Cal"-Befehle?</h2>
+<p>In Tasmota gibt es zwei Wege zur Kalibrierung: Die <code>Set</code>-Befehle (z.B. <code>VoltSet</code>) und die <code>Cal</code>-Befehle (z.B. <code>VoltageCal</code>).</p>
+
+<h3 id="ch1_1">1.1 Der Vorteil gegenüber Set-Befehlen</h3>
+<p>Bei der herkömmlichen Methode mit <code>Set</code>-Befehlen muss der Benutzer einen Wert ablesen und manuell eingeben. In dieser Zeitspanne kann sich die Netzspannung oder die Last bereits leicht verändert haben, was zu einer ungenauen Kalibrierung führt.</p>
+
+<h3 id="ch1_2">1.2 Messunsicherheit und zeitlicher Ablauf</h3>
+<ul>
+    <li><b>⚖️ Statistische Sicherheit:</b> Die Software erfasst viele Datenpunkte gleichzeitig von der Referenz und dem Prüfling.</li>
+    <li><b>📈 Regression:</b> Statt einer einfachen Punkt-Kalibrierung wird eine lineare Regression durchgeführt. Dies gleicht Schwankungen im Stromnetz mathematisch aus und minimiert die Messunsicherheit drastisch.</li>
+</ul>
+
+<h2 id="ch2">🔌 2. Hardware-Vorbereitung & Messaufbau</h2>
+
+<h3 id="ch2_1">2.1 Der physikalische Messaufbau (WICHTIG!)</h3>
+<p>Die korrekte Reihenfolge ist zwingend erforderlich, damit das Referenzmessgerät genau das misst, was der Prüfling verbraucht:</p>
+<ol>
+    <li><b>🏠 Wandsteckdose:</b> Stromquelle.</li>
+    <li><b>🔌 Prüfling (DUT):</b> Die zu kalibrierende Tasmota-Dose.</li>
+    <li><b>📏 Referenz-Messgerät:</b> Das Fluke 45 oder eine Tasmota-Referenzdose (muss <b>zwischen</b> DUT und Last gesteckt werden).</li>
+    <li><b>💡 Last:</b> Ein stabiler Verbraucher (z.B. eine Glühbirne oder ein Heizwiderstand).</li>
+</ol>
+
+<div class="warning">
+    ⚠️ <b>Wichtiger Hinweis:</b> Achte auf möglichst <b>kurze Verbindungsleitungen</b> zwischen dem Prüfling (DUT) und dem Referenz-Messgerät, um Messfehler durch Leitungsverluste zu minimieren.
+</div>
+
+<h3 id="ch2_2">2.2 Fluke 45 Einstellungen</h3>
+<ul>
+    <li>Verbinde das Gerät via RS232 mit dem PC.</li>
+    <li>Stelle sicher, dass die Baudrate im Gerät mit der Software übereinstimmt.</li>
+    <li>Das Programm setzt das Gerät automatisch in den Dual-Display-Modus.</li>
+</ul>
+
+<h2 id="ch3">🖥️ 3. Menü-Referenz & Funktionen</h2>
+<h3>📁 Menü: Datei</h3>
+<ul>
+    <li><b>💾 Log Speichern:</b> Sichert den kompletten Textverlauf des Log-Fensters.</li>
+    <li><b>📂 Report-Ordner öffnen:</b> Öffnet den Explorer direkt im Verzeichnis der Messberichte.</li>
+</ul>
+<h3>⚙️ Menü: Setup</h3>
+<ul>
+    <li><b>🌐 Allgemein:</b> Definition des Hauptverzeichnisses (<code>Reports</code>).</li>
+    <li><b>📟 Fluke 45:</b> RS232-Konfiguration (inkl. "Fluke finden" Auto-Scan).</li>
+    <li><b>🔌 Tasmota-Referenz:</b> IP-Adresse Ihrer kalibrierten Referenzdose.</li>
+</ul>
+
+<h2 id="ch4">📂 4. Das Report-Verzeichnis & Messdaten</h2>
+<p>Jedes Gerät erhält einen Unterordner benannt nach der MAC-Adresse.</p>
+<ul>
+    <li><b>📊 CSV-Dateien:</b> Tabellarische Messwerte jeder einzelnen Sekunde.</li>
+    <li><b>📄 Protokolle:</b> Zusammenfassender Bericht mit As-Found/As-Left Vergleich.</li>
+</ul>
+
+<h2 id="ch5">🚀 5. Der Kalibrierungsprozess (Schritt-für-Schritt)</h2>
+
+<h3 id="ch5_1">5.1 🛠️ Vorbereitung & Initialisierung</h3>
+<div class="action-box"><b>⌨️ Aktion:</b> Geben Sie die <b>IP-Adresse des Prüflings</b> ein und klicken Sie auf <b>"Online Check"</b>.</div>
+<span class="background-info">Hintergrund: Die Software prüft Erreichbarkeit und liest die MAC-Adresse aus.</span>
+
+<h3 id="ch5_2">5.2 ▶️ Start der Messsequenz</h3>
+<div class="action-box"><b>🖱️ Aktion:</b> Klicken Sie auf den Button <b>"Kalibrierung Starten"</b>.</div>
+
+<h3 id="ch5_3">5.3 🔄 Ermittlung des Eigenverbrauchs — [Nur Tasmota-Referenz]</h3>
+<div class="action-box"><b>🔌 Aktion:</b> Warten Sie auf die automatische Abschaltung des Prüflings.</div>
+<span class="background-info">Hintergrund: Das Programm schaltet den DUT AUS, um dessen Eigenverbrauch (Offset) zu messen.</span>
+
+<h3 id="ch5_4">5.4 📉 Messung unter Last</h3>
+<div class="action-box"><b>📢 Aktion:</b> Popup erscheint: Schalten Sie den Prüfling nun EIN. Beobachten Sie die <b>Live-Graphen</b>.</div>
+<span class="background-info">Hintergrund: Die Software wartet 7 Sek. (Inrush-Filter) und sammelt dann die validen Messdaten.</span>
+
+<h3 id="ch5_5">5.5 ✅ Analyse und Finalisierung</h3>
+<div class="action-box"><b>📤 Aktion:</b> Klicken Sie auf <b>"Werte an Dose senden"</b> im Ergebnis-Dialog.</div>
+<span class="background-info">Hintergrund: Die Werte werden übertragen und sofort verifiziert.</span>
+
+<h2 id="ch6">🛠️ 6. Troubleshooting & Expertentipps</h2>
+<div class="tip">
+    🌡️ <b>Tipp für Experten:</b> Lassen Sie die Messanordnung ca. 5 Minuten "warmlaufen". Eine Kalibrierung im warmen Betriebszustand ist präziser.
+</div>
+
+<div class="footer">
+    <a href="#top">🏠 Zurück zum Index</a>
+</div>
+
+</body>
+</html>
+"""
