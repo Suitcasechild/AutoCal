@@ -340,19 +340,16 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>41</x>
+       <x>30</x>
        <y>200</y>
-       <width>151</width>
-       <height>121</height>
+       <width>171</width>
+       <height>98</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
-      <property name="verticalSpacing">
-       <number>10</number>
-      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
@@ -369,7 +366,7 @@
          </font>
         </property>
         <property name="text">
-         <string>000.00</string>
+         <string>251.99V</string>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -395,7 +392,7 @@
          </font>
         </property>
         <property name="text">
-         <string>0.000</string>
+         <string>10.123A</string>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -421,7 +418,7 @@
          </font>
         </property>
         <property name="text">
-         <string>0000.0</string>
+         <string>2500.00W</string>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -678,19 +675,16 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="layoutWidget_2">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>41</x>
+       <x>30</x>
        <y>200</y>
-       <width>151</width>
-       <height>121</height>
+       <width>171</width>
+       <height>98</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout_3">
-      <property name="verticalSpacing">
-       <number>10</number>
-      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
@@ -707,7 +701,7 @@
          </font>
         </property>
         <property name="text">
-         <string>000.00</string>
+         <string>251.99V</string>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -733,7 +727,7 @@
          </font>
         </property>
         <property name="text">
-         <string>0.000</string>
+         <string>10.123A</string>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -759,7 +753,7 @@
          </font>
         </property>
         <property name="text">
-         <string>0000.0</string>
+         <string>2050.00W</string>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -773,11 +767,11 @@
     </widget>
    </widget>
    <zorder>frame_fluke</zorder>
-   <zorder>frame_tasref</zorder>
    <zorder>log_output</zorder>
    <zorder>frame</zorder>
    <zorder>frame_charts</zorder>
    <zorder>frame_info</zorder>
+   <zorder>frame_tasref</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
