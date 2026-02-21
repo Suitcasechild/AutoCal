@@ -154,8 +154,9 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
 <a name="ch5_4"></a>
 ### 5.4 📉 Messung unter Last
 1.  **📢 Aktion:** Ein Popup-Fenster erscheint: **"Bitte Ziel-Dose jetzt EINSCHALTEN!"**. Schalten Sie den Prüfling nun über das Webinterface oder den Taster am Gerät ein.
-2.  **📊 Aktion:** Beobachten Sie die **Live-Graphen**.
+2.  **📊 Aktion:** Beobachten Sie die **Live-Graphen** und den **Fortschrittsbalken**.
     *   *Hintergrund:* Die Software wartet nach dem Einschalten 7 Sekunden (Inrush-Filter), bis sich der Stromfluss stabilisiert hat. Erst dann beginnt die Aufzeichnung der Datenpunkte.
+    *   *Fortschritt:* Ein neuer Balken unterhalb der Messparameter zeigt Ihnen in Echtzeit an, wie viele der geforderten Messungen für die aktuelle Stufe bereits abgeschlossen sind.
     *   *Hintergrund:* Jede Sekunde wird ein Datenpaar (Referenz & DUT) abgefragt. Ungültige Werte (0-Werte durch Netzwerkfehler) werden automatisch erkannt, verworfen und die Messung wird wiederholt, bis die geforderte Anzahl erreicht ist.
 
 <a name="ch5_5"></a>

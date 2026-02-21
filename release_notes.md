@@ -11,10 +11,12 @@ This update focuses on surgical precision during the calibration process and imp
 ### 🌟 Top Features of this Version
 1.  **Selective Calibration:** Targeted updates for V, A, or W via checkboxes.
 2.  **Configurable Tolerance Limits:** Set absolute limits (abs %) in **Setup -> General**.
-3.  **Robust Device Preparation:** Commands sent individually with URL encoding.
+3.  **Visual Step Progress:** Real-time feedback for the current measurement step.
+4.  **Robust Device Preparation:** Commands sent individually with URL encoding.
 
 ### 🛠️ Technical Improvements
 *   **Deviation Analysis:** Visual indicators (Green/Orange) for recommendations.
+*   **Dynamic UI:** Intelligent visibility control for progress indicators.
 *   **Backlog Stability:** Enhanced reliability during the initialization phase.
 
 ---
@@ -26,10 +28,12 @@ Dieses Update konzentriert sich auf chirurgische Präzision beim Kalibriervorgan
 ### 🌟 Top-Features dieser Version
 1.  **Selektive Kalibrierung:** Gezielte Auswahl von V, A oder W über Checkboxen.
 2.  **Konfigurierbare Toleranzgrenzen:** Eigene Limits (abs %) in **Setup -> Allgemein** festlegbar.
-3.  **Robuste Gerätevorbereitung:** Befehle werden einzeln mit URL-Kodierung gesendet.
+3.  **Visueller Messfortschritt:** Echtzeit-Rückmeldung über den Status der aktuellen Stufe.
+4.  **Robuste Gerätevorbereitung:** Befehle werden einzeln mit URL-Kodierung gesendet.
 
 ### 🛠️ Technische Verbesserungen
 *   **Abweichungs-Analyse:** Visuelle Empfehlungen (Grün/Orange) im Ergebnis-Dialog.
+*   **Dynamische UI:** Fortschrittsanzeigen werden nur bei Bedarf eingeblendet.
 *   **Backlog-Stabilität:** Erhöhte Zuverlässigkeit bei der Initialisierung.
 
 ---

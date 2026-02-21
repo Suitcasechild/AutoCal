@@ -222,8 +222,8 @@ GUIDANCE_HTML = """
 <span class="background-info">Hintergrund: Das Programm schaltet den DUT AUS, um dessen Eigenverbrauch (Offset) zu messen.</span>
 
 <h3 id="ch5_4">5.4 📉 Messung unter Last</h3>
-<div class="action-box"><b>📢 Aktion:</b> Popup erscheint: Schalten Sie den Prüfling nun EIN. Beobachten Sie die <b>Live-Graphen</b>.</div>
-<span class="background-info">Hintergrund: Die Software wartet 7 Sek. (Inrush-Filter) und sammelt dann die validen Messdaten.</span>
+<div class="action-box"><b>📢 Aktion:</b> Popup erscheint: Schalten Sie den Prüfling nun EIN. Beobachten Sie die <b>Live-Graphen</b> und den neuen <b>Fortschrittsbalken</b>.</div>
+<span class="background-info">Hintergrund: Die Software wartet 7 Sek. (Inrush-Filter) und sammelt dann die validen Messdaten. Der Fortschrittsbalken zeigt den Status der aktuellen Stufe in Echtzeit an.</span>
 
 <h3 id="ch5_5">5.5 ✅ Analyse und Finalisierung</h3>
 <div class="action-box"><b>📋 Aktion:</b> Prüfen Sie die farbigen Info-Labels im Abschluss-Dialog.</div>
