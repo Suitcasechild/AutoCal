@@ -812,12 +812,12 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_setup_fluke">
    <property name="text">
-    <string>Fluke 45</string>
+    <string>Ref. Fluke 45</string>
    </property>
   </action>
   <action name="action_setup_tasmota">
    <property name="text">
-    <string>Tasmota</string>
+    <string>Ref. Tasmota</string>
    </property>
   </action>
   <action name="action_setup_general">

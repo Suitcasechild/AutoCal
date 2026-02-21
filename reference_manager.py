@@ -80,13 +80,19 @@ class ReferenceManager:
             # English: Perform a hardware ping to see if a device is actually responding.
             # Deutsch: Führe einen Hardware-Ping durch, um zu sehen, ob ein Gerät tatsächlich antwortet.
             self.ser.write(b"*IDN?\r")
-            time.sleep(0.5)
+            time.sleep(1.0) # Etwas mehr Zeit für die Antwort / A bit more time for response
             test_resp = self.ser.read_all().decode('utf-8', errors='replace').strip()
             
-            if not test_resp:
-                raise Exception("Keine serielle Antwort (Gerät stromlos oder Kabel nicht verbunden?)")
+            if not test_resp or "FLUKE" not in test_resp.upper():
+                error_msg = "Keine gültige Antwort vom Fluke."
+                if test_resp:
+                    error_msg += f" (Empfangen: {repr(test_resp)})"
+                else:
+                    error_msg += " (Gerät antwortet nicht)"
+                raise Exception(error_msg)
             
-            print("Verbindung bestätigt. Setze Modus (VAC Fix-Range + AAC2)...")
+            print(f"Verbindung bestätigt: {test_resp}")
+            print("Setze Modus (VAC Fix-Range + AAC2)...")
             
             # English: Send reset command, set to VAC, fix range to 300V, set secondary to AAC.
             # Deutsch: Sende Reset-Befehl, setze auf VAC, fixiere Bereich auf 300V, setze Sekundäranzeige auf AAC.
@@ -106,6 +112,11 @@ class ReferenceManager:
             return True
         except Exception as e:
             print(f"[FEHLER] Fluke 45 Initialisierung fehlgeschlagen: {e}")
+            if self.ser and self.ser.is_open:
+                try:
+                    self.ser.close()
+                except:
+                    pass
             return False
 
     def get_reference_data(self, auth=None):

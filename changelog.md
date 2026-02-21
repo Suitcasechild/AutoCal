@@ -3,6 +3,9 @@
 ## v5.3.0 (2026-02-20)
 
 ### ✨ Features
+*   **Verbesserter Fluke 45 Verbindungscheck (Baudrate):**
+    Der Verbindungscheck für das Fluke 45 Multimeter wurde robuster gestaltet. Das Programm prüft nun explizit, ob die Antwort auf den Identifikationsbefehl (`*IDN?`) die Zeichenfolge "FLUKE" enthält. Dies verhindert, dass bei einer falsch eingestellten Baudrate (z.B. 4800 statt 9600) empfangener "Zeichensalat" fälschlicherweise als erfolgreiche Verbindung gewertet wird. Im Fehlerfall wird der serielle Port nun sofort wieder geschlossen, und eine detaillierte Fehlermeldung (inkl. der empfangenen Daten) wird im Log ausgegeben.
+    *   **English:** Improved Fluke 45 Connection Check (Baud Rate): The connection check for the Fluke 45 multimeter has been made more robust. The program now explicitly verifies that the response to the identification command (`*IDN?`) contains the string "FLUKE". This prevents "garbage data" received due to an incorrectly set baud rate (e.g., 4800 instead of 9600) from being falsely interpreted as a successful connection. In case of an error, the serial port is now immediately closed, and a detailed error message (including the received data) is displayed in the log.
 *   **Fehlerbehebung MAC-Abruf:** Ein Problem wurde behoben, bei dem der automatische Abruf der MAC-Adresse fehlschlug, wenn die IP-Adresse ohne Protokoll-Präfix (`http://`) eingegeben wurde. Zudem wird die IP-Adresse des Prüflings nun korrekt in der Konfiguration gespeichert.
     *   **English:** MAC Retrieval Bugfix: Fixed an issue where the automatic retrieval of the MAC address failed if the IP address was entered without a protocol prefix (`http://`). Additionally, the DUT's IP address is now correctly saved in the configuration.
 *   **Detaillierte Anzeige der Tasmota-Referenz:**
