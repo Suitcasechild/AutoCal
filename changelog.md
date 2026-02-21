@@ -1,6 +1,6 @@
 # Changelog
 
-## v5.3.0 (2026-02-20)
+## v5.3.2 (2026-02-21)
 
 ### ✨ Features
 *   **Verbesserter Fluke 45 Verbindungscheck (Baudrate):**

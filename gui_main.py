@@ -718,7 +718,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.ui)
         self.resize(self.ui.size())
-        self.setWindowTitle("Tasmota Precision Calibrator v5.3.0") # Will be updated later
+        self.setWindowTitle("Tasmota Precision Calibrator v5.3.2") # Will be updated later
 
         # English: Redirect stdout to the log widget in the GUI.
         # Deutsch: Leite stdout an das Log-Widget in der GUI um.
@@ -1411,7 +1411,7 @@ class MainWindow(QMainWindow):
         # Deutsch: Zeigt eine Message-Box mit Lizenz- und Autoreninformationen an.
         """
         license_text = (
-            "Tasmota Precision Calibrator v5.3.0\n"
+            "Tasmota Precision Calibrator v5.3.2\n"
             "Erstellt von: Arnulf Greilberger\n\n"
             "----------------------------------------------------------\n"
             "LIZENZ:\n"
