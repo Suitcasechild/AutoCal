@@ -1,0 +1,39 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Miri_Power
+  Hostname:    Miri-Power-D5E4B4-1204
+  MAC Address: 2C:BC:BB:D5:E4:B4
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260221_180705
+  Report erstellt:    20260221_180705
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  225.95V | DUT  225.93V | Err:  -0.02V ( -0.01%) -> Cal-Vorschlag: 1537
+  Strom:    Ref   3.618A | DUT   3.621A | Err: +0.003A ( +0.09%) -> Cal-Vorschlag: 3214
+  Leistung: Ref  817.45W | DUT  818.34W | Err:  +0.88W ( +0.11%) -> Cal-Vorschlag: 9362
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.998905 | Bestimmtheitsmaß R2 = 0.798090
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1537                     VoltageCal 1537 (Mittelwert der Stufen)
+    CurrentCal 3218                     CurrentCal 3214 (Mittelwert der Stufen)
+      PowerCal 9373                       PowerCal 9362 (aus Regression, empfohlen)
+                                          └─ Alternative: 9362 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

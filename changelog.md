@@ -6,6 +6,9 @@
 *   **Visueller Messfortschritt:**
     In der Haupt-Benutzeroberfläche wurde ein Fortschrittsbalken (`progress_status`) integriert. Dieser zeigt während einer Kalibrierung in Echtzeit an, wie viele der geforderten Messungen für die aktuelle Laststufe bereits erfolgreich durchgeführt wurden. Der Balken ist intelligent gesteuert: Er wird nur bei aktiver Messung eingeblendet und ansonsten automatisch verborgen.
     *   **English:** Visual Measurement Progress: Integrated a progress bar in the main UI with dynamic visibility (only shown during active calibration).
+*   **Performance-Optimierung Fluke-Kommunikation:**
+    Die Abfrage der Messwerte vom Fluke 45 wurde grundlegend überarbeitet. Statt einer starren Wartezeit nutzt das Programm nun eine ereignisbasierte Logik (`readline`) mit automatischem Puffer-Reset (`reset_input_buffer`) vor jedem Lesezyklus. Dies verhindert Fehlmessungen ("Referenzdaten unvollständig"), beschleunigt den gesamten Kalibrierprozess massiv und sorgt für eine deutlich verbesserte zeitliche Synchronität zwischen den Messdaten der Referenz und des Prüflings.
+    *   **English:** High-Speed Fluke Communication: Implemented event-based reading with automatic buffer resets, eliminating incomplete data errors and improving temporal synchronization.
 *   **Selektive Kalibrierung & Toleranz-Analyse:**
     *   **Neuer Ergebnis-Dialog:** Der Dialog nach der Messung zeigt nun die Abweichung pro Messgröße (V, A, W) im Vergleich zum Ist-Zustand der Dose an.
     *   **Farb-Kodierung:** Abweichungen innerhalb der Toleranz werden Grün, außerhalb Orange (Empfehlung) markiert.

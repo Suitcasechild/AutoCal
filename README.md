@@ -46,6 +46,7 @@ It supports two main modes for reference measurements:
 *   **🗺️ Guided Calibration Process:** The UI walks you through every step, from device setup to applying the final calibration.
 *   **🔌 Dual Reference Support:** Choose between a professional multimeter (Fluke 45) or a consumer-grade, pre-calibrated Tasmota plug.
 *   **🔍 Fluke Auto-Discovery (New):** No more manual COM port hunting. The tool automatically scans all ports and baud rates to find your Fluke 45.
+*   **⚡ High-Speed Fluke Communication (New):** Optimized data reading via `read_until` eliminates unnecessary wait times and improves temporal synchronization.
 *   **🎯 Selective Calibration (New):** Choose exactly which factors (Voltage, Current, Power) to apply. Includes an intelligent tolerance analysis with visual feedback (Green/Orange).
 *   **⚖️ Configurable Tolerances (New):** Set your own absolute deviation limits in the setup. The app will recommend calibration only if these limits are exceeded.
 *   **📊 Advanced Mathematical Analysis:** Utilizes linear regression (`numpy`) to calculate the most accurate `PowerCal` value across the entire measurement range.
@@ -113,6 +114,7 @@ After the measurement, a dialog displays the detailed protocol:
 *   **🗺️ Geführter Kalibrierprozess:** Intuitive Benutzeroberfläche von der Konfiguration bis zum finalen Flash.
 *   **🔌 Duale Referenz-Unterstützung:** Wahlweise Fluke 45 (Profi) oder eine kalibrierte Tasmota-Dose (Heimanwender).
 *   **🔍 Fluke Auto-Scan (Neu):** Das Programm findet das Fluke 45 vollautomatisch an allen COM-Ports und Baudraten.
+*   **⚡ High-Speed Kommunikation (Neu):** Optimierte Datenabfrage via `read_until` eliminiert unnötige Wartezeiten und verbessert die Synchronität.
 *   **🎯 Selektive Kalibrierung (Neu):** Wählen Sie präzise, welche Faktoren (V, A, W) gesendet werden sollen.
 *   **⚖️ Konfigurierbare Toleranzen (Neu):** Eigene Limits im Setup festlegbar. Die App bewertet die Abweichung automatisch (Grün/Orange).
 *   **📊 Fortgeschrittene Analyse:** Lineare Regression (`numpy`) für höchste Präzision über den gesamten Messbereich.

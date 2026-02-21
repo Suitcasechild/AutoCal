@@ -142,19 +142,26 @@ class ReferenceManager:
                  (tuple) Ein Tupel mit (Spannung, Strom, Leistung) oder (None, None, None) bei einem Fehler.
         """
         try:
+            # English: Clear the input buffer to ensure we don't read stale data or prompts.
+            # Deutsch: Leere den Eingangspuffer, um keine alten Daten oder Prompts zu lesen.
+            self.ser.reset_input_buffer()
+            
             # English: Request values from both displays.
             # Deutsch: Fordere die Werte von beiden Anzeigen an.
             self.ser.write(b"VAL?\r")
-            time.sleep(1.5) 
             
-            raw = self.ser.read_all().decode('utf-8', errors='replace').strip()
+            # English: Read the line. Using readline is robust as it waits for the termination character.
+            # Deutsch: Lese die Zeile. Readline ist robust, da es auf das Abschlusszeichen wartet.
+            raw_bytes = self.ser.readline()
+            raw = raw_bytes.decode('utf-8', errors='replace').strip()
+            
             if raw:
+                # English: Remove prompt and split by comma.
+                # Deutsch: Entferne Prompt und teile am Komma.
                 parts = raw.replace("=>", "").strip().split(",")
                 if len(parts) >= 2:
                     v = float(parts[0].strip())
                     a = float(parts[1].strip())
-                    # English: Power is calculated, not read directly.
-                    # Deutsch: Leistung wird berechnet, nicht direkt ausgelesen.
                     return v, a, v * a
             return None, None, None
         except:

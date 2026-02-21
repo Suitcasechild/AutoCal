@@ -1,0 +1,39 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260221_181334
+  Report erstellt:    20260221_181334
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  225.42V | DUT  225.80V | Err:  +0.38V ( +0.17%) -> Cal-Vorschlag: 1533
+  Strom:    Ref   5.081A | DUT   5.095A | Err: +0.014A ( +0.28%) -> Cal-Vorschlag: 3244
+  Leistung: Ref 1145.25W | DUT 1150.07W | Err:  +4.82W ( +0.42%) -> Cal-Vorschlag: 9401
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.995760 | Bestimmtheitsmaß R2 = 0.224518
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1536                     VoltageCal 1533 (Mittelwert der Stufen)
+    CurrentCal 3254                     CurrentCal 3244 (Mittelwert der Stufen)
+      PowerCal 9441                       PowerCal 9400 (aus Regression, empfohlen)
+                                          └─ Alternative: 9401 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
