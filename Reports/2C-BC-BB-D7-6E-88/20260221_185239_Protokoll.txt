@@ -1,0 +1,39 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-3
+  Hostname:    NOUS-3-D76E88-3720
+  MAC Address: 2C:BC:BB:D7:6E:88
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260221_185239
+  Report erstellt:    20260221_185239
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  225.07V | DUT  224.89V | Err:  -0.18V ( -0.08%) -> Cal-Vorschlag: 1523
+  Strom:    Ref   5.077A | DUT   5.078A | Err: +0.002A ( +0.03%) -> Cal-Vorschlag: 3239
+  Leistung: Ref 1142.60W | DUT 1143.88W | Err:  +1.28W ( +0.11%) -> Cal-Vorschlag: 9402
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.999014 | Bestimmtheitsmaß R2 = 0.093810
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1522                     VoltageCal 1523 (Mittelwert der Stufen)
+    CurrentCal 3241                     CurrentCal 3239 (Mittelwert der Stufen)
+      PowerCal 9413                       PowerCal 9403 (aus Regression, empfohlen)
+                                          └─ Alternative: 9402 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

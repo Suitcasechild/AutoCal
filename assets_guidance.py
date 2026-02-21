@@ -184,8 +184,28 @@ GUIDANCE_HTML = """
 <h3 id="ch2_2">2.2 Fluke 45 Einstellungen</h3>
 <ul>
     <li>Verbinde das Gerät via RS232 mit dem PC.</li>
-    <li>Stelle sicher, dass die Baudrate im Gerät (Standard: 9600) mit der Software übereinstimmt.</li>
-    <li>Das Programm setzt das Gerät automatisch in den Dual-Display-Modus.</li>
+    <li><b>Menü-Bedienung am Gerät:</b>
+        <ul>
+            <li>Drücken Sie nacheinander <b>"2nd"</b> und <b>"RATE"</b> (BAUD), um in das Setup zu gelangen.</li>
+            <li>Nutzen Sie die <b>Pfeiltasten</b> zur Wertänderung.</li>
+            <li>Bestätigen Sie mit der Taste <b>"AUTO"</b>.</li>
+        </ul>
+    </li>
+    <li><b>Wichtig: PRINT-Modus ausschalten:</b>
+        <ul>
+            <li>Drücken Sie nacheinander <b>"2nd"</b> und <b>"MIN MAX"</b> (ADDR).</li>
+            <li>Stellen Sie den Wert unter "PRINT" auf <b>"0"</b> (Aus).</li>
+            <li>Bestätigen Sie mit <b>"AUTO"</b>.</li>
+        </ul>
+    </li>
+    <li><b>Optimale Parameter:</b>
+        <ul>
+            <li>Baudrate: <b>9600</b> (empfohlen)</li>
+            <li>Parität: <b>None</b> (Keine)</li>
+            <li>Echo: <b>Off</b> (Aus)</li>
+        </ul>
+    </li>
+    <li>Das Programm setzt das Gerät automatisch in den Dual-Display-Modus (Primär-Anzeige: <b>VAC</b>, Sekundär-Anzeige: <b>AAC</b>).</li>
 </ul>
 
 <h2 id="ch3">🖥️ 3. Menü-Referenz & Funktionen</h2>

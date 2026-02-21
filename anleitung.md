@@ -75,8 +75,19 @@ Hier wird das Fluke mit einem Messadapter direkt hinter den Prüfling geschaltet
 <a name="ch2_2"></a>
 ### 2.2 Fluke 45 Einstellungen
 *   Verbinde das Gerät via RS232 mit dem PC.
-*   Stelle sicher, dass die Baudrate im Gerät (Standard: 9600) mit der Software übereinstimmt.
-*   Das Programm setzt das Gerät automatisch in den Dual-Display-Modus (`VAC` und `AAC`).
+*   **Menü-Bedienung am Gerät:** 
+    *   Drücken Sie nacheinander die Tasten **"2nd"** und **"RATE"** (BAUD), um in das Setup-Menü zu gelangen.
+    *   Nutzen Sie die **Pfeiltasten** (neben der Anzeige), um die Werte zu ändern.
+    *   Bestätigen Sie jede Einstellung mit der Taste **"AUTO"**.
+*   **Wichtig: PRINT-Modus ausschalten:**
+    *   Drücken Sie nacheinander **"2nd"** und **"MIN MAX"** (ADDR).
+    *   Stellen Sie den Wert unter "PRINT" mit den **Pfeiltasten** auf **"0"** (Aus).
+    *   Bestätigen Sie mit **"AUTO"**.
+*   **Optimale Parameter:**
+    *   **Baudrate:** 9600 (empfohlen)
+    *   **Parität:** None (Keine)
+    *   **Echo:** Off (Aus)
+*   **Automatisierung:** Das Programm setzt das Gerät automatisch in den Dual-Display-Modus (Primär-Anzeige: **VAC**, Sekundär-Anzeige: **AAC**).
 
 ---
 
