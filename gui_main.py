@@ -21,6 +21,7 @@ from config_manager import ConfigManager
 from reference_manager import ReferenceManager
 from data_analyzer import DataAnalyzer
 from credential_manager import CredentialsManager
+from fluke_scan import find_fluke
 
 # ---------------------------------------------------------
 # 1. DER LOG-SPION (Log Spy)
@@ -551,6 +552,37 @@ class CalibrationReportDialog(QDialog):
 
 
 # ---------------------------------------------------------
+# 3. DER FLUKE-SUCHER (Hintergrund-Thread)
+# ---------------------------------------------------------
+class FlukeScanWorker(QThread):
+    """
+    # English:
+    # A QThread worker that scans all serial ports for a Fluke 45 multimeter
+    # in the background to keep the GUI responsive.
+    # Deutsch:
+    # Ein QThread-Worker, der im Hintergrund alle seriellen Ports nach einem
+    # Fluke 45 Multimeter scannt, um die GUI reaktionsfähig zu halten.
+    """
+    progress_signal = Signal(int)
+    finished_signal = Signal(dict) # Returns result dict or None
+
+    def __init__(self, current_port=None, current_baud=None):
+        super().__init__()
+        self.current_port = current_port
+        self.current_baud = current_baud
+
+    def run(self):
+        # English: Call the scan logic from fluke_scan.py.
+        # Deutsch: Rufe die Scan-Logik aus fluke_scan.py auf.
+        result = find_fluke(
+            current_port=self.current_port, 
+            current_baud=self.current_baud, 
+            progress_callback=self.progress_signal.emit
+        )
+        self.finished_signal.emit(result if result else {})
+
+
+# ---------------------------------------------------------
 # 4. DAS CREDENTIAL-POPUP (Custom Dialog)
 # ---------------------------------------------------------
 class CredentialDialog(QDialog):
@@ -928,6 +960,41 @@ class MainWindow(QMainWindow):
             dialog.edit_com_port.setText(self.cm.config.get('REFERENCE_PRO', 'com_port', fallback='COM3'))
         if hasattr(dialog, 'edit_baudrate'):
             dialog.edit_baudrate.setText(self.cm.config.get('REFERENCE_PRO', 'baudrate', fallback='9600'))
+        
+        # --- Auto-Scan Logic ---
+        def start_fluke_scan():
+            current_port = dialog.edit_com_port.text().strip() if hasattr(dialog, 'edit_com_port') else None
+            current_baud = dialog.edit_baudrate.text().strip() if hasattr(dialog, 'edit_baudrate') else None
+            
+            # English: Disable buttons and show progress bar during scan.
+            # Deutsch: Buttons deaktivieren und Fortschrittsbalken während des Scans anzeigen.
+            dialog.btn_search_fluke.setEnabled(False)
+            dialog.btn_save.setEnabled(False)
+            if hasattr(dialog, 'progress_scan'):
+                dialog.progress_scan.setVisible(True)
+                dialog.progress_scan.setValue(0)
+            
+            self.scan_worker = FlukeScanWorker(current_port, current_baud)
+            
+            def on_scan_finished(result):
+                dialog.btn_search_fluke.setEnabled(True)
+                dialog.btn_save.setEnabled(True)
+                if hasattr(dialog, 'progress_scan'):
+                    dialog.progress_scan.setVisible(False)
+                
+                if result and 'port' in result:
+                    if hasattr(dialog, 'edit_com_port'): dialog.edit_com_port.setText(result['port'])
+                    if hasattr(dialog, 'edit_baudrate'): dialog.edit_baudrate.setText(result['baud'])
+                    QMessageBox.information(dialog, "Erfolg", f"Fluke 45 erfolgreich gefunden!\n\nPort: {result['port']}\nBaudrate: {result['baud']}\n\nInfo: {result.get('info', '')}")
+                else:
+                    QMessageBox.warning(dialog, "Fehlgeschlagen", "Es konnte kein Fluke 45 Multimeter an den verfügbaren Schnittstellen gefunden werden.\n\nBitte prüfe die Kabelverbindung und ob das Gerät eingeschaltet ist.")
+            
+            self.scan_worker.progress_signal.connect(dialog.progress_scan.setValue if hasattr(dialog, 'progress_scan') else lambda x: None)
+            self.scan_worker.finished_signal.connect(on_scan_finished)
+            self.scan_worker.start()
+
+        if hasattr(dialog, 'btn_search_fluke'):
+            dialog.btn_search_fluke.clicked.connect(start_fluke_scan)
         
         def save_and_close():
             if hasattr(dialog, 'edit_com_port'):

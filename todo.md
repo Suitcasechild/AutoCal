@@ -185,3 +185,18 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
 
 - [x] **Automatische Konfigurations-Erstellung:** Falls die `config.ini` fehlt, wird sie automatisch mit Standardwerten (COM1, 1 Stufe, 15 Messungen) erstellt.
 - [x] **Datenschutz (DUT IP):** Die IP-Adresse des Prüflings wird aus Sicherheitsgründen **nicht** mehr dauerhaft in der `config.ini` gespeichert.
+
+---
+
+### Feature: Fluke 45 Auto-Scan (Auto-Discovery)
+
+- [x] **Scan-Logik ausgelagert (`fluke_scan.py`):**
+    - [x] Implementierung der systematischen Suche über alle verfügbaren COM-Ports.
+    - [x] Abfrage der Baudraten in der Reihenfolge: 9600, 4800, 2400, 1200, 600, 300.
+    - [x] **Priorisierung:** Aktuelle Konfiguration wird zuerst geprüft.
+    - [x] **Robustheit:** Wartezeit auf 1,5s erhöht (für langsame Baudraten) und Puffer-Reset vor jeder Abfrage.
+- [x] **UI-Integration (`setup_fluke.ui` & `gui_main.py`):**
+    - [x] Button `btn_search_fluke` mit Hintergrund-Worker (`FlukeScanWorker`) verbunden.
+    - [x] Fortschrittsbalken (`progress_scan`) implementiert und mit dem Scan-Status verknüpft.
+    - [x] Automatische Übernahme der gefundenen Werte in die Eingabefelder bei Erfolg.
+    - [x] Benutzer-Feedback via `QMessageBox` (Erfolg/Fehlgeschlagen).
