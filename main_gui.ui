@@ -356,7 +356,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Spannung(V):</string>
+         <string>Spannung:</string>
         </property>
        </widget>
       </item>
@@ -382,7 +382,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
-         <string>Strom(A):</string>
+         <string>Strom:</string>
         </property>
        </widget>
       </item>
@@ -408,7 +408,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
-         <string>Leistung(W):</string>
+         <string>Leistung:</string>
         </property>
        </widget>
       </item>
@@ -694,7 +694,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>Spannung(V):</string>
+         <string>Spannung:</string>
         </property>
        </widget>
       </item>
@@ -720,7 +720,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_12">
         <property name="text">
-         <string>Strom(A):</string>
+         <string>Strom:</string>
         </property>
        </widget>
       </item>
@@ -746,7 +746,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_13">
         <property name="text">
-         <string>Leistung(W):</string>
+         <string>Leistung:</string>
         </property>
        </widget>
       </item>
@@ -772,12 +772,12 @@
      </layout>
     </widget>
    </widget>
+   <zorder>frame_fluke</zorder>
    <zorder>frame_tasref</zorder>
    <zorder>log_output</zorder>
    <zorder>frame</zorder>
    <zorder>frame_charts</zorder>
    <zorder>frame_info</zorder>
-   <zorder>frame_fluke</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
