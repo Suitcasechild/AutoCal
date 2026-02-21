@@ -3,6 +3,9 @@
 ## v5.3.3 (2026-02-21)
 
 ### ✨ Features
+*   **Visueller Messfortschritt:**
+    In der Haupt-Benutzeroberfläche wurde ein Fortschrittsbalken (`progress_status`) integriert. Dieser zeigt während einer Kalibrierung in Echtzeit an, wie viele der geforderten Messungen für die aktuelle Laststufe bereits erfolgreich durchgeführt wurden. Der Balken ist intelligent gesteuert: Er wird nur bei aktiver Messung eingeblendet und ansonsten automatisch verborgen.
+    *   **English:** Visual Measurement Progress: Integrated a progress bar in the main UI with dynamic visibility (only shown during active calibration).
 *   **Selektive Kalibrierung & Toleranz-Analyse:**
     *   **Neuer Ergebnis-Dialog:** Der Dialog nach der Messung zeigt nun die Abweichung pro Messgröße (V, A, W) im Vergleich zum Ist-Zustand der Dose an.
     *   **Farb-Kodierung:** Abweichungen innerhalb der Toleranz werden Grün, außerhalb Orange (Empfehlung) markiert.

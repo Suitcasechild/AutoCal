@@ -1,0 +1,45 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-1
+  Hostname:    tasmota-D5E4B4-1204
+  MAC Address: 2C:BC:BB:D5:E4:B4
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260221_174154
+  Report erstellt:    20260221_174154
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  224.41V | DUT  225.03V | Err:  +0.62V ( +0.28%) -> Cal-Vorschlag: 1537
+  Strom:    Ref   3.594A | DUT   3.598A | Err: +0.003A ( +0.09%) -> Cal-Vorschlag: 3215
+  Leistung: Ref  806.64W | DUT  806.62W | Err:  -0.03W ( -0.00%) -> Cal-Vorschlag: 9373
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.999981 | Bestimmtheitsmaß R2 = 0.854540
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1537 (Mittelwert der Stufen)
+    CurrentCal 3218                     CurrentCal 3215 (Mittelwert der Stufen)
+      PowerCal 9373                       PowerCal 9372 (aus Regression, empfohlen)
+                                          └─ Alternative: 9373 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+[17:44:16] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE
+[17:44:16] VoltageCal: 1542 -> 1537 | [OK]
+[17:44:16] Gesamtstatus: ERFOLGREICH
+=====================================================================================

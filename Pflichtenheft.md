@@ -71,6 +71,7 @@ Die Anwendung bietet eine klare Menüführung zur administrativen Steuerung und 
 *   [x] **Auto-Scan Fluke:** Implementierung der automatischen Port-Suche mit robuster Baudraten-Erkennung.
 *   [x] **Selektive Kalibrierung:** Einführung von Checkboxen und Toleranz-Analyse (Grün/Orange) im Report-Fenster.
 *   [x] **Konfigurierbare Toleranzen:** Limits für V, A und P über das Setup einstellbar (`[TOLERANCE abs%]`).
+*   [x] **Visueller Messfortschritt:** Implementierung eines Fortschrittsbalkens (`progress_status`) in der Haupt-GUI, der den Status der aktuellen Messstufe in Echtzeit anzeigt. Der Balken wird nur während einer aktiven Messung eingeblendet und bleibt ansonsten unsichtbar.
 
 ### 6.2 Offene Punkte & Geplante Features (Roadmap)
 *   [ ] **Manuelle Kalibrierung:**

@@ -49,6 +49,7 @@ It supports two main modes for reference measurements:
 *   **🎯 Selective Calibration (New):** Choose exactly which factors (Voltage, Current, Power) to apply. Includes an intelligent tolerance analysis with visual feedback (Green/Orange).
 *   **⚖️ Configurable Tolerances (New):** Set your own absolute deviation limits in the setup. The app will recommend calibration only if these limits are exceeded.
 *   **📊 Advanced Mathematical Analysis:** Utilizes linear regression (`numpy`) to calculate the most accurate `PowerCal` value across the entire measurement range.
+*   **📊 Visual Step Progress (New):** Real-time progress bar for the current measurement step, intelligently shown only during active calibration.
 *   **📘 Embedded Interactive Manual (New):** A professional HTML guide is now built directly into the app, featuring anchor navigation and step-by-step instructions.
 *   **🔐 Session-Based Credentials (New):** Enter passwords once (e.g., during Online Check) and keep them for the entire session. Pre-filled "admin" user for faster workflow.
 *   **💾 Automated Reporting:** Detailed `.csv` files with raw measurement data and a comprehensive `.txt` protocol are generated and stored automatically (MAC-address based folder structure).
@@ -106,97 +107,39 @@ After the measurement, a dialog displays the detailed protocol:
 
 ---
 
-## Inhaltsverzeichnis
-1. [🚀 Das Vibecoding-Experiment](#-das-vibecoding-experiment-99-ki-generiert)
-2. [📖 Über das Programm](#-über-das-programm-de)
-3. [✨ Hauptmerkmale](#-hauptmerkmale-de)
-4. [📘 Bedienungsanleitung](#-bedienungsanleitung-de)
-5. [💻 Technischer Überblick](#-technischer-überblick-de)
-
----
-
-## 🚀 Das Vibecoding-Experiment: 99% KI-generiert
-
-*Willkommen hinter den Kulissen! Dieses Projekt ist nicht nur eine Software, sondern das Ergebnis eines faszinierenden Experiments in der modernen Anwendungsentwicklung.*
-
-**Der Code in diesem Repository wurde zu 99% ausschließlich durch Prompts im Gemini-CLI erstellt.** Und das Spannendste daran? Das gesamte Projekt wurde aus der Perspektive eines absoluten Anfängers gestartet – **ohne jegliche Vorkenntnisse in Python oder der Einrichtung von Entwicklungsumgebungen.** Das Ziel war herauszufinden, ob es möglich ist, eine funktionierende Anwendung zu bauen, indem man sich einfach in die Logik "hineinfühlt" (Vibecoding) und geschickt mit einer KI kommuniziert.
-
-### 🏛️ Die Säulen: Struktur als Fundament
-Vibecoding bedeutet nicht, ziellos Befehle abzufeuern. Damit ein KI-gesteuertes Projekt dieser Größenordnung ohne Vorkenntnisse gelingt, ist eine starke Organisation erforderlich. Die KI übernahm die Programmierung, aber die Steuerung erfolgte über einen strengen dokumentarischen Rahmen:
-* **Das Pflichtenheft:** Eine glasklare Vision dessen, was die Software können muss.
-* **Pläne & To-Dos:** Detaillierte Roadmaps, um den Entwicklungsprozess in logische Phasen zu unterteilen.
-* **Das Changelog:** Lückenlose Dokumentation aller Schritte und Änderungen als "Gedächtnis" des Projekts.
-* **Die Gemini-Regeln:** Spezifische Regeln, die genau vorschreiben, wie die KI an Aufgaben herangehen, Code formatieren und kommunizieren soll.
-* **Git & Versionskontrolle:** Das ultimative Sicherheitsnetz. Da vieles durch Ausprobieren (Trial and Error) entstand, war KI-geführte Git-Unterstützung unerlässlich, um funktionierende Meilensteine zu speichern und gescheiterte Experimente sicher rückgängig zu machen.
-
----
-
-<a name="über-das-programm-de"></a>
-## 📖 Über das Programm
-
-Ein GUI-basiertes Werkzeug zur hochpräzisen Kalibrierung und Validierung von Tasmota-basierten Energiemessgeräten (z.B. Smart Plugs). Die Anwendung automatisiert den Prozess des Messens, Berechnens und Anwendens neuer Kalibrierwerte, um die Genauigkeit von Leistungs-, Spannungs- und Strommessungen zu verbessern.
-
-Es unterstützt zwei Hauptmodi für die Referenzmessung:
-1.  **🔬 Professioneller Modus:** Nutzt ein Fluke 45 Multimeter via RS232 als hochpräzise Referenz.
-2.  **🏠 Heimanwender-Modus:** Nutzt ein bereits kalibriertes Tasmota-Gerät als "Master-Referenz" via HTTP.
-
----
-
-<a name="hauptmerkmale-de"></a>
+<a name="tasmota-precision-calibrator-de"></a>
 ## ✨ Hauptmerkmale
 
-*   **🗺️ Geführter Kalibrierprozess:** Die Benutzeroberfläche führt Sie durch jeden Schritt, von der Gerätekonfiguration bis zur Anwendung der finalen Kalibrierung.
-*   **🔌 Duale Referenz-Unterstützung:** Wählen Sie zwischen einem professionellen Multimeter (Fluke 45) oder einem bereits kalibrierten Tasmota-Stecker.
-*   **🔍 Fluke Auto-Scan (Neu):** Kein Suchen nach COM-Ports mehr. Das Programm findet das Fluke 45 vollautomatisch an allen COM-Ports und Baudraten.
-*   **🎯 Selektive Kalibrierung (Neu):** Wählen Sie präzise, welche Faktoren (Spannung, Strom, Leistung) gesendet werden sollen. Inklusive intelligenter Toleranz-Analyse und visuellem Feedback (Grün/Orange).
-*   **⚖️ Konfigurierbare Toleranzen (Neu):** Eigene absolute Limits im Setup festlegbar. Die App empfiehlt eine Kalibrierung nur bei Grenzwertüberschreitung.
-*   **📊 Fortgeschrittene mathematische Analyse:** Verwendet lineare Regression (`numpy`), um den genauesten `PowerCal`-Wert über den gesamten Messbereich zu berechnen.
-*   **📘 Integrierte interaktive Anleitung (Neu):** Ein professionelles HTML-Handbuch ist nun direkt in die Software eingebettet – inklusive Navigation und detaillierten Anweisungen.
-*   **🔐 Sitzungsbasierte Passwörter (Neu):** Zugangsdaten einmalig eingeben (z.B. beim Online-Check) und für die gesamte Sitzung behalten. Vorbefüllter "admin"-User für schnelles Arbeiten.
-*   **💾 Automatisierte Protokollierung:** Detaillierte `.csv`-Dateien mit Rohdaten und ein umfassendes `.txt`-Protokoll werden automatisch erstellt (MAC-basierte Ordnerstruktur).
-*   **📈 Sicherheit & Stabilität:** Automatisches Ausschalten des Prüflings bei Abbruch, Sperrung der Eingabefelder während der Messung und robuster Umgang mit instabilen Netzwerkdaten durch Min/Max-Filterung.
+*   **🗺️ Geführter Kalibrierprozess:** Intuitive Benutzeroberfläche von der Konfiguration bis zum finalen Flash.
+*   **🔌 Duale Referenz-Unterstützung:** Wahlweise Fluke 45 (Profi) oder eine kalibrierte Tasmota-Dose (Heimanwender).
+*   **🔍 Fluke Auto-Scan (Neu):** Das Programm findet das Fluke 45 vollautomatisch an allen COM-Ports und Baudraten.
+*   **🎯 Selektive Kalibrierung (Neu):** Wählen Sie präzise, welche Faktoren (V, A, W) gesendet werden sollen.
+*   **⚖️ Konfigurierbare Toleranzen (Neu):** Eigene Limits im Setup festlegbar. Die App bewertet die Abweichung automatisch (Grün/Orange).
+*   **📊 Fortgeschrittene Analyse:** Lineare Regression (`numpy`) für höchste Präzision über den gesamten Messbereich.
+*   **📊 Visueller Messfortschritt (Neu):** Echtzeit-Fortschrittsbalken für die aktuelle Messstufe, der nur während einer Kalibrierung eingeblendet wird.
+*   **📘 Integrierte Anleitung (Neu):** Ein interaktives HTML-Handbuch ist nun direkt in die Software eingebettet.
+*   **🔐 Sitzungsbasierte Passwörter (Neu):** Einmalige Passworteingabe genügt für die gesamte Programmsitzung.
+*   **💾 Automatisierte Protokollierung:** Speicherung in MAC-basierten Ordnern als `.csv` und `.txt` (inkl. As-Found/As-Left Vergleich).
 
 ---
 
-<a name="bedienungsanleitung-de"></a>
-## 📘 Bedienungsanleitung
+## 📘 Kurzanleitung (DE)
 
-### 1. ⚙️ Vorbereitung & Installation
+### 1. ⚙️ Vorbereitung
+*   Nutzen Sie den **Setup-Dialog**, um Speicherpfade und Referenzgeräte zu konfigurieren.
+*   Im Menü **Allgemein** können Sie die Toleranzgrenzen (Standard: 0,5%) für die Empfehlungslogik anpassen.
 
-#### Option A: Vorkompilierte Version (Empfohlen für Anwender)
-Laden Sie einfach die neueste `TasmotaCalibrator.exe` aus den [Releases](https://github.com/Suitcasechild/AutoCal/releases) herunter. Einfach unter Windows starten.
-
-#### Option B: Aus dem Quellcode (Für Entwickler)
-1.  **Klonen:** `git clone https://github.com/Suitcasechild/AutoCal.git`.
-2.  **Installieren:** `pip install -r requirements.txt`.
-3.  **Starten:** `python gui_main.py`.
-
-#### 📄 Konfiguration
-Passen Sie die `config.ini` an oder nutzen Sie das **Setup-Menü** in der App, um Pfade, COM-Ports oder Ihre Referenz-IP festzulegen. Die Anwendung erlaubt nun auch die Konfiguration der **[TOLERANCE abs%]** Limits über die GUI.
+### 2. 🚀 Durchführung
+1.  **Online-Check:** IP eingeben und `🌐` klicken. MAC und Version werden automatisch geladen.
+2.  **Referenz finden:** Nutzen Sie bei Fluke-Betrieb den Button **"Fluke finden"**, um die Schnittstelle automatisch zu konfigurieren.
+3.  **Kalibrieren:** Starten Sie den Prozess. Das Programm führt Sie durch die Schritte (Offset-Messung, Lastzuschaltung).
+4.  **Anwenden:** Wählen Sie im Ergebnisdialog die gewünschten Faktoren über die Checkboxen aus und senden Sie diese an die Dose.
 
 ---
 
-### 2. 🚀 Durchführung einer Kalibrierung
-
-#### 3.1 🔐 Online-Check & Authentifizierung
-Geben Sie die IP des Prüflings ein. Klicken Sie auf `🌐`. Hier eingegebene Zugangsdaten werden sicher im Arbeitsspeicher für die gesamte Sitzung behalten.
-
-#### 3.2 🎯 Wahl der Referenz
-*   **🔬 PRO (Fluke 45):** Nutzen Sie den **"Fluke finden"** Button in **Setup -> Fluke 45**, um Ihr Gerät automatisch zu identifizieren.
-*   **🏠 HOME (Tasmota):** Das Programm ermittelt vorab automatisch den Eigenverbrauch des Prüflings (Offset) und zieht diesen ab.
-
-#### 3.3 🏁 Auswertung & Anwendung
-Nach der Messung zeigt ein Dialog das detaillierte Protokoll:
-*   **☑️ Selektiver Modus:** Nutzen Sie die Checkboxen, um nur gewünschte Faktoren zu aktualisieren.
-*   **💡 Abweichungs-Analyse:** Labels werden 🟢 (OK) oder 🟠 (Kalibrierung empfohlen), basierend auf Ihren konfigurierten Limits.
-*   **📤 Anwenden:** Klicken Sie auf **"KALIBRIEREN"**, um die Werte zu senden und eine sofortige "As-Found/As-Left" Verifizierung durchzuführen.
-
----
-
-<a name="technischer-überblick-de"></a>
 ## 💻 Technischer Überblick
 
 *   **Sprache:** Python 3.12+
 *   **GUI:** PySide6 (Qt)
-*   **Diagramme:** pyqtgraph
-*   **Datenanalyse:** `pandas` & `numpy`
+*   **Echtzeit-Diagramme:** pyqtgraph
+*   **Datenverarbeitung:** `pandas` & `numpy`

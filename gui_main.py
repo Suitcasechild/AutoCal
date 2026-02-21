@@ -73,6 +73,7 @@ class MeasurementWorker(QThread):
     data_signal = Signal(dict)
     finished_signal = Signal(str)
     apply_request_signal = Signal(str, str, list, str, str) 
+    step_progress_signal = Signal(int) # English: New signal for the progress bar / Deutsch: Signal für den Fortschrittsbalken.
     
     show_popup_signal = Signal(str)
     hide_popup_signal = Signal()
@@ -273,6 +274,12 @@ class MeasurementWorker(QThread):
                     if not self.is_running: break
                     self.data_signal.emit({'volt_ref': ref_v, 'volt_dut': dut_v, 'amp_ref': ref_a, 'amp_dut': dut_a, 'watt_ref': ref_w, 'watt_dut': dut_w, 'dut_off': (dut_w <= 0) })
                     step_data_list.append({'Ref_Volt': ref_v, 'Ref_Amp': ref_a, 'Ref_Watt': ref_w, 'Target_Volt': dut_v, 'Target_Amp': dut_a, 'Target_Watt': dut_w})
+                    
+                    # English: Emit progress signal for the UI progress bar.
+                    # Deutsch: Sende Fortschritts-Signal für den UI-Fortschrittsbalken.
+                    progress_val = int((len(step_data_list) / num_measurements_compensated) * 100)
+                    self.step_progress_signal.emit(progress_val)
+
                     # English: Removed logging of individual measurement values as requested by the user.
                     # Deutsch: Protokollierung der einzelnen Messwerte wurde auf Benutzerwunsch entfernt.
                     # self.log_signal.emit(f"[{len(step_data_list):>3}/{num_measurements_compensated}] Ref: {ref_w:.2f}W | DUT: {dut_w:.2f}W")
@@ -763,6 +770,9 @@ class MainWindow(QMainWindow):
 
         if hasattr(self.ui, 'split_info'):
             self.ui.split_info.setVisible(False)
+        
+        if hasattr(self.ui, 'progress_status'):
+            self.ui.progress_status.setVisible(False)
         
         # English: Initialize visibility of reference frames based on checkbox state.
         # Deutsch: Initialisiere Sichtbarkeit der Referenz-Frames basierend auf dem Checkbox-Status.
@@ -1339,6 +1349,13 @@ class MainWindow(QMainWindow):
         self.worker.show_popup_signal.connect(self.show_power_popup)
         self.worker.hide_popup_signal.connect(self.hide_power_popup)
         
+        # English: Connect step progress to the new progress bar widget.
+        # Deutsch: Verbinde den Stufen-Fortschritt mit dem neuen Progress-Bar Widget.
+        if hasattr(self.ui, 'progress_status'):
+            self.ui.progress_status.setValue(0)
+            self.ui.progress_status.setVisible(True)
+            self.worker.step_progress_signal.connect(self.ui.progress_status.setValue)
+        
         # English: Lock relevant UI frames and the setup menu during measurement.
         # Deutsch: Sperre relevante UI-Frames und das Setup-Menü während der Messung.
         self.set_ui_locked(True)
@@ -1363,6 +1380,10 @@ class MainWindow(QMainWindow):
         # English: Re-enable UI frames and menu after measurement.
         # Deutsch: Gebe UI-Frames und Menü nach der Messung wieder frei.
         self.set_ui_locked(False)
+
+        if hasattr(self.ui, 'progress_status'):
+            self.ui.progress_status.setValue(0)
+            self.ui.progress_status.setVisible(False)
 
         self.hide_power_popup()
         self.reset_lcd_displays()
