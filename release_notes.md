@@ -1,10 +1,28 @@
 # 🚀 Tasmota Precision Calibrator - Release Notes
 
-In diesem Dokument finden Sie eine Übersicht der wichtigsten Änderungen und Neuerungen pro Version.
+This document provides an overview of the most important changes and innovations per version. / In diesem Dokument finden Sie eine Übersicht der wichtigsten Änderungen und Neuerungen pro Version.
 
 ---
 
 ## [v5.3.2] - 2026-02-21
+
+This version marks a milestone in user guidance and process reliability for the Tasmota Precision Calibrator. It bundles groundbreaking automations and surgical calibration logic.
+
+### 🌟 Top Features of this Version
+1.  **Surgical Calibration (Selective Sending):** Target specific factors (`VoltageCal`, `CurrentCal`, `PowerCal`). You decide which values are sent to the device.
+2.  **Intelligent Tolerance Analysis:** Evaluation of deviations against configurable limits (abs %). A color scheme (Green/Orange) provides immediate certainty whether calibration is technically necessary.
+3.  **Automatic Fluke Scan (Auto-Discovery):** System scans all ports and baud rates (9600-300) to identify your Fluke 45 automatically.
+4.  **Integrated Interactive Help:** Professional HTML guide built directly into the app – including Dark Mode and navigation.
+5.  **Optimized Credential Management:** Session-based RAM storage and UI optimization (admin pre-filled, auto-focus).
+
+### 🛠️ Technical Improvements
+*   **Strict Device ID:** Prevents connection errors via "FLUKE" ID check.
+*   **Data Integrity:** Automatic exclusion of Min/Max values and filtering of zero-value artifacts.
+*   **Central Documentation:** Consolidation of all requirements in the **Pflichtenheft v1.1**.
+
+---
+
+## [v5.3.2] - 2026-02-21 (DE)
 
 Diese Version markiert einen Meilenstein in der Benutzerführung und Prozesssicherheit des Tasmota Precision Calibrators. Sie bündelt bahnbrechende Automatisierungen und eine chirurgisch präzise Kalibrierungs-Logik.
 
@@ -17,12 +35,29 @@ Diese Version markiert einen Meilenstein in der Benutzerführung und Prozesssich
 
 ### 🛠️ Technische Verbesserungen
 *   **Strenge Geräte-Identifikation:** Verhindert Verbindungsfehler durch Prüfung der Geräte-ID ("FLUKE").
-*   **Datenintegrität:** Automatischer Ausschluss von Min/Max-Werten und Filterung von Nullwert-Artefakten.
+*   **Datenintegrität:** Automatisches Ausschluss von Min/Max-Werten und Filterung von Nullwert-Artefakten.
 *   **Zentrale Dokumentation:** Zusammenführung aller Anforderungen im Pflichtenheft v1.1.
 
 ---
 
 ## [v5.3.0] - 2026-02-20
+
+This release marks a significant milestone in the development of the AutoCal tool. In addition to expanded visualizations, this update focuses on massive stability, data security, and a significantly improved user experience.
+
+### ✨ New Features
+*   **📑 Detailed Reference Display:** New dedicated area (`frame_tasref`) showing device information and live values of the Tasmota reference plug – analogous to the DUT.
+*   **🚫 UI Input Locking:** Automatic locking of input fields during active measurements to prevent errors.
+*   **🔌 Automatic Power-Off on Abort:** Immediate power-off command upon manual measurement cancellation.
+*   **📄 Auto-Config Creation:** Automatic creation of a default `config.ini` upon program start.
+
+### 🛠️ Robustness & Code Quality
+*   **🧮 Intelligent Mean Calculation:** Validation of CSV headers and fallback mode for small datasets.
+*   **📂 Centralized Path Management:** Configuration management via absolute paths.
+*   **🐞 Stability:** Fixed memory leaks in graphs and improved type safety.
+
+---
+
+## [v5.3.0] - 2026-02-20 (DE)
 
 Dieses Release markiert einen bedeutenden Meilenstein in der Entwicklung des AutoCal-Tools. Neben erweiterten Visualisierungen liegt der Fokus dieses Updates auf massiver Stabilität, Datensicherheit und einer deutlich verbesserten Benutzerführung.
 
