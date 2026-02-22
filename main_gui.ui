@@ -817,10 +817,17 @@
     <property name="title">
      <string>Hilfe</string>
     </property>
+    <widget class="QMenu" name="menuModus">
+     <property name="title">
+      <string>Modus</string>
+     </property>
+     <addaction name="action_ui_mode_home_only"/>
+     <addaction name="action_ui_mode_pro_home"/>
+    </widget>
     <addaction name="action_guide"/>
     <addaction name="separator"/>
     <addaction name="action_show_license"/>
-    <addaction name="separator"/>
+    <addaction name="menuModus"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuSetup"/>
@@ -880,6 +887,33 @@
   <action name="action_guide">
    <property name="text">
     <string>Anleitung</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Modus</string>
+   </property>
+  </action>
+  <action name="action_ui_mode_home_only">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Einfacher Modus</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_ui_mode_pro_home">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Professioneller Modus</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

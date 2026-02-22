@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QMessageB
                                QLabel, QLineEdit, QTextBrowser, QCheckBox, QFrame)
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QThread, Signal, QObject, Qt
+from PySide6.QtGui import QActionGroup # Corrected import for QActionGroup
 
 # Internationalisierung / Internationalization
 from i18n_manager import setup_translation
@@ -759,7 +760,7 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.ui)
         self.resize(self.ui.size())
-        self.setWindowTitle("Tasmota Precision Calibrator v5.3.3") # Will be updated later
+        self.setWindowTitle(_("Tasmota Precision Calibrator")) # No version here, i18n friendly
 
         # English: Redirect stdout to the log widget in the GUI.
         # Deutsch: Leite stdout an das Log-Widget in der GUI um.
@@ -780,6 +781,33 @@ class MainWindow(QMainWindow):
         self.load_values_from_config()
         self.reset_lcd_displays() 
 
+        # English: UI Mode Switching Setup
+        # Deutsch: UI Modus Umschaltung Setup
+        self.ui_mode_group = QActionGroup(self)
+        self.ui_mode_group.setExclusive(True) # Ensure only one action can be checked at a time
+
+        if hasattr(self.ui, 'action_ui_mode_home_only'):
+            self.ui_mode_group.addAction(self.ui.action_ui_mode_home_only)
+            self.ui.action_ui_mode_home_only.triggered.connect(lambda: self._set_ui_mode('home_only'))
+            
+        if hasattr(self.ui, 'action_ui_mode_pro_home'):
+            self.ui_mode_group.addAction(self.ui.action_ui_mode_pro_home)
+            self.ui.action_ui_mode_pro_home.triggered.connect(lambda: self._set_ui_mode('pro_home'))
+
+        # English: Set initial checked state and apply settings from config
+        # Deutsch: Setze initialen aktivierten Zustand und wende Einstellungen aus der Konfig an
+        current_ui_mode = self.cm.config.get('GENERAL', 'ui_mode', fallback='home_only')
+        if current_ui_mode == 'home_only' and hasattr(self.ui, 'action_ui_mode_home_only'):
+            self.ui.action_ui_mode_home_only.setChecked(True)
+        elif current_ui_mode == 'pro_home' and hasattr(self.ui, 'action_ui_mode_pro_home'):
+            self.ui.action_ui_mode_pro_home.setChecked(True)
+        else: # Fallback to default if config value is invalid
+            if hasattr(self.ui, 'action_ui_mode_home_only'):
+                self.ui.action_ui_mode_home_only.setChecked(True)
+                self._set_ui_mode('home_only') # Save to config
+        
+        self._apply_ui_mode_settings() # Apply initial settings
+
         if hasattr(self.ui, 'split_info'):
             self.ui.split_info.setVisible(False)
         
@@ -796,6 +824,18 @@ class MainWindow(QMainWindow):
         if hasattr(self.ui, 'btn_onlinechk'):
             self.ui.btn_onlinechk.clicked.connect(self.on_online_check_clicked)
             
+        # English: QButtonGroup for exclusive reference selection (Fluke, Tasmota, Manual)
+        # Deutsch: QButtonGroup für exklusive Referenzauswahl (Fluke, Tasmota, Manuell)
+        from PySide6.QtWidgets import QButtonGroup
+        self.ref_selection_group = QButtonGroup(self)
+        self.ref_selection_group.setExclusive(True)
+        if hasattr(self.ui, 'check_ref_pro'):
+            self.ref_selection_group.addButton(self.ui.check_ref_pro)
+        if hasattr(self.ui, 'check_ref_home'):
+            self.ref_selection_group.addButton(self.ui.check_ref_home)
+        if hasattr(self.ui, 'check_ref_manual'):
+            self.ref_selection_group.addButton(self.ui.check_ref_manual)
+
         lcd_style = """
             QLCDNumber { 
                 background-color: black; 
@@ -807,6 +847,58 @@ class MainWindow(QMainWindow):
             if hasattr(self.ui, lcd):
                 getattr(self.ui, lcd).setStyleSheet(lcd_style)
                 getattr(self.ui, lcd).setSegmentStyle(pg.QtWidgets.QLCDNumber.Flat)
+
+    def _set_ui_mode(self, mode):
+        """
+        # English: Sets the UI mode in config and applies the settings.
+        # Deutsch: Setzt den UI-Modus in der Konfig und wendet die Einstellungen an.
+        """
+        self.cm.config['GENERAL']['ui_mode'] = mode
+        with open(self.cm.config_path, 'w') as configfile: self.cm.config.write(configfile)
+        self._apply_ui_mode_settings()
+
+    def _apply_ui_mode_settings(self):
+        """
+        # English: Applies UI settings based on the current ui_mode from config.
+        # Deutsch: Wendet UI-Einstellungen basierend auf dem aktuellen ui_mode aus der Konfig an.
+        """
+        current_ui_mode = self.cm.config.get('GENERAL', 'ui_mode', fallback='home_only')
+        
+        
+        # Elements to manage: check_ref_pro, spin_steps, check_ref_manual, check_ref_home, frame_reference_selection
+        # Note: check_ref_pro, check_ref_home, check_ref_manual are now exclusive via QButtonGroup
+
+        if current_ui_mode == 'home_only':
+            # 1. Hide Fluke checkbox
+            if hasattr(self.ui, 'check_ref_pro'): self.ui.check_ref_pro.setVisible(False)
+            
+            # 2. Hide Steps spinner and its corresponding label
+            if hasattr(self.ui, 'spin_steps'): self.ui.spin_steps.setVisible(False)
+            if hasattr(self.ui, 'label_3'): self.ui.label_3.setVisible(False) # Hide "Anzahl der Messstufen" label
+            
+            # 3. Checkbox "Manuell" (check_ref_manual) must be visible and pre-selected.
+            if hasattr(self.ui, 'check_ref_manual'): 
+                self.ui.check_ref_manual.setVisible(True) # Ensure visibility
+                self.ui.check_ref_manual.setChecked(True) # Pre-select, this will uncheck others in the exclusive group
+            
+            # 4. Checkbox for Tasmota (check_ref_home) must be visible.
+            if hasattr(self.ui, 'check_ref_home'): 
+                self.ui.check_ref_home.setVisible(True) # Ensure visibility
+                # It will be unchecked by QButtonGroup due to check_ref_manual being checked
+            
+            # The frame containing reference selections should remain visible as check_ref_home and check_ref_manual are visible
+            if hasattr(self.ui, 'frame_reference_selection'): self.ui.frame_reference_selection.setVisible(True)
+
+        elif current_ui_mode == 'pro_home':
+            # All elements should be visible and in their default behavior.
+            if hasattr(self.ui, 'check_ref_pro'): self.ui.check_ref_pro.setVisible(True)
+            if hasattr(self.ui, 'spin_steps'): self.ui.spin_steps.setVisible(True)
+            if hasattr(self.ui, 'label_3'): self.ui.label_3.setVisible(True) # Show "Anzahl der Messstufen" label
+            if hasattr(self.ui, 'check_ref_manual'): 
+                self.ui.check_ref_manual.setVisible(True) # Ensure visibility
+                self.ui.check_ref_manual.setChecked(False) # Default to unselected
+            if hasattr(self.ui, 'check_ref_home'): self.ui.check_ref_home.setVisible(True)
+            if hasattr(self.ui, 'frame_reference_selection'): self.ui.frame_reference_selection.setVisible(True)
 
     def setup_graphs(self):
         """
@@ -948,8 +1040,7 @@ class MainWindow(QMainWindow):
         # Deutsch: Verbindet alle Signale der UI-Elemente (wie Button-Klicks) mit den zugehörigen Slots (Methoden).
         """
         self.ui.btn_start.clicked.connect(self.toggle_measurement)
-        self.ui.check_ref_pro.toggled.connect(lambda c: self.ui.check_ref_home.setChecked(False) if c else None)
-        self.ui.check_ref_home.toggled.connect(lambda c: self.ui.check_ref_pro.setChecked(False) if c else None)
+        # Old exclusivity logic removed, QButtonGroup will handle this for check_ref_pro, check_ref_home, check_ref_manual
         
         # English: Connect HOME-mode to steps restriction logic.
         # Deutsch: HOME-Modus mit der Logik zur Stufenbeschränkung verbinden.
@@ -984,6 +1075,15 @@ class MainWindow(QMainWindow):
 
         if hasattr(self.ui, 'action_guide'):
             self.ui.action_guide.triggered.connect(self.open_guidance)
+        
+        # English: Update the menu text for UI mode selection
+        # Deutsch: Aktualisiere den Menütext für die UI-Modus-Auswahl
+        if hasattr(self.ui, 'menu_mode_selection'): # Use the correct objectName
+            self.ui.menu_mode_selection.setTitle(_("Modus")) # Translate the menu title
+        if hasattr(self.ui, 'action_ui_mode_home_only'):
+            self.ui.action_ui_mode_home_only.setText(_("Einfacher Modus")) # Translate the action text
+        if hasattr(self.ui, 'action_ui_mode_pro_home'):
+            self.ui.action_ui_mode_pro_home.setText(_("Professioneller Modus")) # Translate the action text
 
     def load_values_from_config(self):
         """

@@ -264,3 +264,37 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     - [x] Übergabe des aktuellen Kalibrierungsmodus ("PRO" oder "HOME") an den Dialog.
     - [x] Im HOME-Modus wird der Button `📊 REGRESSIONS-GRAPH` ausgeblendet, da er bei nur einer Messstufe nicht relevant ist.
     - [x] Ausblenden der Checkbox `PowerCal (Regression)` im HOME-Modus, um Verwirrung zu vermeiden.
+
+---
+
+### Feature: UI-Modus Umschaltung (Home/Pro)
+
+**Ziel:** Dem Benutzer ermöglichen, die Sichtbarkeit von UI-Elementen basierend auf dem Kalibrierungs-Modus (Home-only vs. Pro/Home) umzuschalten.
+
+#### 1. Qt Designer (`main_gui.ui`) Anpassungen (MANUELL DURCH DEN BENUTZER)
+*   [x] **Öffne `main_gui.ui` im Qt Designer.**
+*   [x] **Menü "Hilfe" (`menuHelp`) anpassen:**
+    *   Füge ein neues **Untermenü** hinzu (z.B. "UI-Modus").
+    *   Innerhalb dieses Untermenüs füge **zwei Aktionen** (`QAction`) hinzu:
+        *   **Aktion 1:** `objectName: action_ui_mode_home_only`, `text: Home-Modus erzwingen`, `checkable: true`
+        *   **Aktion 2:** `objectName: action_ui_mode_pro_home`, `text: Pro/Home Modus (Standard)`, `checkable: true`
+        *   **Wichtig:** Gruppiere diese beiden Aktionen als `Exclusive` (`actionGroup`), sodass immer nur eine davon ausgewählt sein kann.
+*   [x] **Speichere die `main_gui.ui` Datei.**
+
+#### 2. `config_manager.py` Anpassungen (DURCH DEN ASSISTENTEN)
+*   [x] Füge dem `[GENERAL]`-Abschnitt in der Default-Konfiguration den Eintrag `ui_mode = home_only` hinzu.
+
+#### 3. `gui_main.py` Logik-Anpassungen (DURCH DEN ASSISTENTEN)
+*   [x] **Initialisierung:** Lade den `ui_mode` aus der Konfiguration.
+*   [x] **Neue Methode `_apply_ui_mode_settings(self)`:**
+    *   Lese den aktuellen `ui_mode` aus `self.cm.config`.
+    *   Basierend auf dem `ui_mode`:
+        *   Setze die Sichtbarkeit von `self.ui.check_ref_pro` (Checkbox für Fluke).
+        *   Setze die Sichtbarkeit von `self.ui.spin_steps` (Spinner für Anzahl der Stufen).
+        *   Setze den `checked`-Status von `self.ui.check_ref_manual` (Checkbox für Manuelle Kalibrierung).
+*   [x] **Aufruf der Methode:** Rufe `_apply_ui_mode_settings()` nach dem Laden der Konfiguration und Initialisierung der UI auf.
+*   [x] **Menü-Verbindungen:** Verbinde `action_ui_mode_home_only` und `action_ui_mode_pro_home` mit entsprechenden Slots, die:
+    *   Den `ui_mode` in `config.ini` aktualisieren.
+    *   Die Konfiguration dauerhaft speichern.
+    *   Anschließend `_apply_ui_mode_settings()` aufrufen, um die UI-Änderungen sofort anzuwenden.
+*   [x] **Texte markieren:** Markiere alle neuen sichtbaren Texte mit `_()` für die Übersetzung.
