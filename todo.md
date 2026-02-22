@@ -74,6 +74,49 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
 
 ---
 
+### Feature: Internationalisierung (i18n) & UI-Sprachsteuerung
+
+**Ziel:** Die Anwendung zweisprachig (DE/EN) machen und dem Benutzer die Kontrolle über die Sprache geben.
+
+---
+#### **Vorbereitende Schritte (für beide Varianten identisch):**
+
+*   [ ] **1. Konfiguration für Sprachauswahl (`config_manager.py`)**
+    *   [ ] Sicherstellen, dass beim Erstellen einer neuen `config.ini` in der Sektion `[GENERAL]` der Eintrag `language = auto` hinzugefügt wird.
+    *   [ ] Die Benutzer-Dokumentation (z.B. `anleitung.md`) um einen Hinweis ergänzen, dass die Sprache manuell auf `de`, `en` oder `auto` gesetzt werden kann.
+
+*   [ ] **2. Implementierung des Übersetzungs-Backends (`i18n_manager.py`)**
+    *   [ ] Eine neue Datei `i18n_manager.py` erstellen, die die `gettext`-Logik kapselt.
+    *   [ ] Diese Datei soll eine `setup_translation()`-Funktion enthalten, die den `language`-Eintrag auswertet, die korrekte `.mo`-Datei lädt und die Übersetzungsfunktion `_` global verfügbar macht.
+
+*   [ ] **3. Vorbereitung der Code-Basis (Texte markieren)**
+    *   [ ] Die `setup_translation()`-Funktion ganz am Anfang von `gui_main.py` aufrufen.
+    *   [ ] Alle für den Benutzer sichtbaren Zeichenketten in den `.py`-Dateien mit `_()` markieren.
+
+---
+#### **Variante A: Workflow mit Babel (Kommandozeile)**
+
+*   [ ] **4. Erstellen und Verwalten der Übersetzungsdateien**
+    *   [ ] Das Paket `Babel` zur `requirements.txt` hinzufügen.
+    *   [ ] Eine `babel.cfg`-Datei erstellen, die `pybabel` anweist, alle `.py`-Dateien zu durchsuchen.
+    *   [ ] Den `pybabel`-Workflow durchführen, um die Sprachdateien zu generieren:
+        1.  `extract`: Erstellt die `messages.pot`-Vorlage.
+        2.  `init`: Erstellt die `de/messages.po` und `en/messages.po` Dateien.
+        3.  **Manuelle Arbeit:** Die `msgstr`-Einträge in den `.po`-Dateien mit den Übersetzungen füllen.
+        4.  `compile`: Erstellt die finalen `.mo`-Dateien.
+
+---
+#### **Variante B: Workflow mit Poedit (Grafische Oberfläche)**
+
+*   [ ] **4. Erstellen und Verwalten der Übersetzungsdateien mit Poedit**
+    *   [ ] **Neues Projekt in Poedit:** Ein neues Übersetzungsprojekt erstellen.
+    *   [ ] **Quellpfade konfigurieren:** Poedit so einrichten, dass es den Projektordner nach `.py`-Dateien durchsucht.
+    *   [ ] **Schlüsselwörter festlegen:** Poedit mitteilen, dass es nach dem Schlüsselwort `_` suchen soll.
+    *   [ ] **Kataloge erstellen & Übersetzen:** Poedit scannt den Code, erstellt die Kataloge für `de` und `en` und bietet eine grafische Oberfläche zum Übersetzen.
+    *   [ ] **Speichern:** Beim Speichern in Poedit werden die `.po`- und die für das Programm notwendigen `.mo`-Dateien automatisch generiert und aktualisiert.
+
+---
+
 ### Feature: Dynamisches Credential-Management (Pro Gerät)
 
 *   [x] **1. Zentrale Fehlerbehandlung (Trigger)**
@@ -172,12 +215,6 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     - [x] Integration der "----" Anzeige bei Inaktivität oder `dut_off`.
 - [x] **Erweiterung Reset-Logik (`reset_lcd_displays`):**
     - [x] Hinzufügen der neuen Referenz-Labels (`lbl_v_ref`, `lbl_a_ref`, `lbl_w_ref` sowie Info-Labels) zum Reset-Vorgang.
-
----
-
-### UI-Zukunft & Internationalisierung
-
-- [ ] **Automatische Sprachumschaltung:** Implementierung eines Lokalisierungs-Systems (i18n), das die App-Oberfläche automatisch auf Basis der Systemeinstellungen zwischen Deutsch und Englisch umschaltet oder eine manuelle Wahl ermöglicht.
 
 ---
 
