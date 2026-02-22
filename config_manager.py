@@ -37,7 +37,7 @@ class ConfigManager:
         # Deutsch: Wenn die Konfigurationsdatei fehlt, erstelle sie mit Standardwerten.
         if not os.path.exists(self.config_path):
             print(f"ℹ️ {config_file} fehlt. Erstelle Standard-Konfiguration...")
-            self.config['GENERAL'] = {'root_report_dir': './Reports'}
+            self.config['GENERAL'] = {'root_report_dir': './Reports', 'language': 'auto'}
             self.config['REFERENCE_PRO'] = {'com_port': 'COM1', 'baudrate': '9600'}
             self.config['REFERENCE_HOME'] = {'ip_address': ''}
             # English: ip_address for TARGET is intentionally left empty for privacy/security.

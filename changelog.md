@@ -1,5 +1,13 @@
 # Changelog
 
+## v5.4.0-dev (2026-02-22)
+
+### 🌍 Internationalisierung (i18n)
+*   **Vorbereitung:** Die grundlegende Infrastruktur für die Mehrsprachigkeit wurde implementiert (`i18n_manager.py`).
+*   **Konfiguration:** Die `config.ini` unterstützt nun die Einstellung `language = auto` (bzw. `de`, `en`).
+*   **UI-Anpassung:** Erste Texte im Hauptfenster, in Dialogen und Fehlermeldungen wurden für die Übersetzung markiert (`_()`).
+*   **Dokumentation:** Die Anleitung wurde um einen Hinweis zur Spracheinstellung ergänzt.
+
 ## v5.3.3 (2026-02-21)
 
 ### ✨ Features

@@ -104,6 +104,7 @@ Hier wird das Fluke mit einem Messadapter direkt hinter den Prüfling geschaltet
 ### 3.2 ⚙️ Menü: Setup
 *   **🌐 Allgemein:** 
     *   **Report-Pfad:** Festlegen, wo die Protokolle gespeichert werden.
+    *   **Sprache:** Die Spracheinstellung (`language = auto`) wird beim ersten Start in der `config.ini` angelegt. Sie kann dort manuell auf `de` oder `en` geändert werden.
     *   **Toleranzgrenzen (abs%):** Hier können Sie definieren, ab welcher Abweichung (in Prozent) die Software eine Kalibrierung für Spannung, Strom und Leistung empfehlen soll.
 *   **📟 Fluke 45:** RS232-Schnittstelle konfigurieren (inkl. "Fluke finden").
 *   **🔌 Tasmota-Referenz:** IP-Adresse der Referenzdose eingeben.

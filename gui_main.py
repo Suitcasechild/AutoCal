@@ -16,6 +16,11 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QMessageB
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QThread, Signal, QObject, Qt
 
+# Internationalisierung / Internationalization
+from i18n_manager import setup_translation
+# Set up translation as early as possible
+_ = setup_translation()
+
 # Import deiner bestehenden Konfigurations-Logik
 from config_manager import ConfigManager
 from reference_manager import ReferenceManager
@@ -371,7 +376,7 @@ class CalibrationReportDialog(QDialog):
         self.log_callback = parent.ui.log_output.appendPlainText
         self.current_report_path = report_info['original_path']
 
-        self.setWindowTitle("Kalibrierungsprotokoll & Auswahl")
+        self.setWindowTitle(_("Kalibrierungsprotokoll & Auswahl"))
         self.resize(900, 800) 
         self.layout = QVBoxLayout(self)
 
@@ -418,19 +423,19 @@ class CalibrationReportDialog(QDialog):
 
         # --- BUTTON AREA ---
         self.btn_layout = QHBoxLayout()
-        self.btn_graph = QPushButton("📊 REGRESSIONS-GRAPH")
+        self.btn_graph = QPushButton(_("📊 REGRESSIONS-GRAPH"))
         self.btn_graph.setStyleSheet("background-color: #0055a4; color: white; font-weight: bold; padding: 10px;")
         self.btn_graph.clicked.connect(self.show_regression_graph)
         
-        self.btn_cancel = QPushButton("ABBRECHEN")
+        self.btn_cancel = QPushButton(_("ABBRECHEN"))
         self.btn_cancel.setStyleSheet("background-color: #444; color: white; font-weight: bold; padding: 10px;")
         self.btn_cancel.clicked.connect(self.reject) 
 
-        self.btn_calibrate = QPushButton("AUSWAHL KALIBRIEREN")
+        self.btn_calibrate = QPushButton(_("AUSWAHL KALIBRIEREN"))
         self.btn_calibrate.setStyleSheet("background-color: darkgreen; color: white; font-weight: bold; padding: 10px;")
         self.btn_calibrate.clicked.connect(self.apply_calibration_action)
 
-        self.btn_close = QPushButton("SCHLIESSEN")
+        self.btn_close = QPushButton(_("SCHLIESSEN"))
         self.btn_close.setStyleSheet("background-color: #444; color: white; font-weight: bold; padding: 10px;")
         self.btn_close.clicked.connect(self.accept)
         self.btn_close.hide()
@@ -469,31 +474,31 @@ class CalibrationReportDialog(QDialog):
 
         # --- Voltage ---
         if abs(dev_v) <= limit_v:
-            self.lbl_v_info.setText(f"✅ Spannungsmessung: Abweichung {dev_v:+.2f}% im Toleranzbereich ({limit_v}%). Kalibrierung optional.")
+            self.lbl_v_info.setText(_("✅ Spannungsmessung: Abweichung {dev_v:+.2f}% im Toleranzbereich ({limit_v}%). Kalibrierung optional.").format(dev_v=dev_v, limit_v=limit_v))
             self.lbl_v_info.setStyleSheet("color: #4caf50;")
             self.check_v.setChecked(False)
         else:
-            self.lbl_v_info.setText(f"⚠️ Spannungsmessung: Abweichung {dev_v:+.2f}% außerhalb Toleranz ({limit_v}%). Kalibrierung empfohlen!")
+            self.lbl_v_info.setText(_("⚠️ Spannungsmessung: Abweichung {dev_v:+.2f}% außerhalb Toleranz ({limit_v}%). Kalibrierung empfohlen!").format(dev_v=dev_v, limit_v=limit_v))
             self.lbl_v_info.setStyleSheet("color: #ff9800;")
             self.check_v.setChecked(True)
 
         # --- Current ---
         if abs(dev_a) <= limit_a:
-            self.lbl_a_info.setText(f"✅ Strommessung: Abweichung {dev_a:+.2f}% im Toleranzbereich ({limit_a}%). Kalibrierung optional.")
+            self.lbl_a_info.setText(_("✅ Strommessung: Abweichung {dev_a:+.2f}% im Toleranzbereich ({limit_a}%). Kalibrierung optional.").format(dev_a=dev_a, limit_a=limit_a))
             self.lbl_a_info.setStyleSheet("color: #4caf50;")
             self.check_a.setChecked(False)
         else:
-            self.lbl_a_info.setText(f"⚠️ Strommessung: Abweichung {dev_a:+.2f}% außerhalb Toleranz ({limit_a}%). Kalibrierung empfohlen!")
+            self.lbl_a_info.setText(_("⚠️ Strommessung: Abweichung {dev_a:+.2f}% außerhalb Toleranz ({limit_a}%). Kalibrierung empfohlen!").format(dev_a=dev_a, limit_a=limit_a))
             self.lbl_a_info.setStyleSheet("color: #ff9800;")
             self.check_a.setChecked(True)
 
         # --- Power ---
         if abs(dev_w) <= limit_w:
-            self.lbl_w_info.setText(f"✅ Leistungsmessung: Abweichung {dev_w:+.2f}% im Toleranzbereich ({limit_w}%). Kalibrierung optional.")
+            self.lbl_w_info.setText(_("✅ Leistungsmessung: Abweichung {dev_w:+.2f}% im Toleranzbereich ({limit_w}%). Kalibrierung optional.").format(dev_w=dev_w, limit_w=limit_w))
             self.lbl_w_info.setStyleSheet("color: #4caf50;")
             self.check_w_mean.setChecked(False)
         else:
-            self.lbl_w_info.setText(f"⚠️ Leistungsmessung: Abweichung {dev_w:+.2f}% außerhalb Toleranz ({limit_w}%). Kalibrierung empfohlen!")
+            self.lbl_w_info.setText(_("⚠️ Leistungsmessung: Abweichung {dev_w:+.2f}% außerhalb Toleranz ({limit_w}%). Kalibrierung empfohlen!").format(dev_w=dev_w, limit_w=limit_w))
             self.lbl_w_info.setStyleSheet("color: #ff9800;")
             self.check_w_mean.setChecked(True)
 
@@ -508,7 +513,7 @@ class CalibrationReportDialog(QDialog):
 
     def show_regression_graph(self):
         if self.is_reapply:
-            QMessageBox.warning(self, "Keine Daten", "Die Regressions-Grafik ist nur bei einer neuen Messung verfügbar.")
+            QMessageBox.warning(self, _("Keine Daten"), _("Die Regressions-Grafik ist nur bei einer neuen Messung verfügbar."))
             return
         search_path = os.path.join(self.report_info['device_path'], f"{self.report_info['session_ts']}_Stufe_*.csv")
         files = glob.glob(search_path)
@@ -520,7 +525,7 @@ class CalibrationReportDialog(QDialog):
         m, _, _, _ = np.linalg.lstsq(x[:, np.newaxis], y, rcond=None)
         slope = float(m[0])
         graph_dialog = QDialog(self)
-        graph_dialog.setWindowTitle(f"Regressions-Analyse (Leistung) | Steigung m = {slope:.5f}")
+        graph_dialog.setWindowTitle(_("Regressions-Analyse (Leistung) | Steigung m = {slope:.5f}").format(slope=slope))
         graph_dialog.resize(800, 600)
         layout = QVBoxLayout(graph_dialog)
         plot_widget = pg.PlotWidget(background='#1e1e1e')
@@ -547,7 +552,7 @@ class CalibrationReportDialog(QDialog):
             w_val = self.final_values['pcal_regression']
 
         if v_val is None and a_val is None and w_val is None:
-            return QMessageBox.warning(self, "Keine Auswahl", "Bitte wählen Sie mindestens einen Wert zur Kalibrierung aus.")
+            return QMessageBox.warning(self, _("Keine Auswahl"), _("Bitte wählen Sie mindestens einen Wert zur Kalibrierung aus."))
 
         self.btn_calibrate.hide()
         self.btn_cancel.hide()
@@ -556,7 +561,7 @@ class CalibrationReportDialog(QDialog):
         from send_cal import apply_calibration
         from calibration_engine import CalibrationEngine
 
-        self.log_callback("\n🚀 Starte selektive Übertragung an die Dose...")
+        self.log_callback(_("\n🚀 Starte selektive Übertragung an die Dose..."))
         
         auth = None
         creds = self.credentials_manager.get_credentials(self.target_ip)
@@ -629,19 +634,19 @@ class CredentialDialog(QDialog):
     """
     def __init__(self, device_name, attempt=1, parent=None):
         super().__init__(parent)
-        self.setWindowTitle(f"Zugangsdaten für {device_name}")
+        self.setWindowTitle(_("Zugangsdaten für {device_name}").format(device_name=device_name))
         self.setModal(True)
 
         self.layout = QVBoxLayout(self)
 
         # English: Add a descriptive label
         # Deutsch: Füge ein beschreibendes Label hinzu
-        self.info_label = QLabel(f"Zugangsdaten für '{device_name}' erforderlich (Versuch {attempt}/3).")
+        self.info_label = QLabel(_("Zugangsdaten für '{device_name}' erforderlich (Versuch {attempt}/3).").format(device_name=device_name, attempt=attempt))
         self.layout.addWidget(self.info_label)
 
         # English: Username field
         # Deutsch: Benutzername-Feld
-        self.user_label = QLabel("Benutzername:")
+        self.user_label = QLabel(_("Benutzername:"))
         self.user_input = QLineEdit(self)
         self.user_input.setText("admin") # English: Default Tasmota user. / Deutsch: Standard Tasmota-User.
         self.layout.addWidget(self.user_label)
@@ -649,7 +654,7 @@ class CredentialDialog(QDialog):
 
         # English: Password field
         # Deutsch: Passwort-Feld
-        self.pass_label = QLabel("Passwort:")
+        self.pass_label = QLabel(_("Passwort:"))
         self.pass_input = QLineEdit(self)
         self.pass_input.setEchoMode(QLineEdit.Password)
         self.pass_input.setFocus() # English: Focus on password field for faster typing. / Deutsch: Fokus auf Passwortfeld.
@@ -658,7 +663,7 @@ class CredentialDialog(QDialog):
         
         # Deutsch: Hinweis zur Speicherung der Zugangsdaten.
         self.disclaimer_label = QLabel(
-            "<i>Die Zugangsdaten werden für die Dauer dieser Programmsitzung sicher im Arbeitsspeicher gehalten und beim Beenden der Anwendung automatisch gelöscht.</i>"
+            _("<i>Die Zugangsdaten werden für die Dauer dieser Programmsitzung sicher im Arbeitsspeicher gehalten und beim Beenden der Anwendung automatisch gelöscht.</i>")
         )
         self.disclaimer_label.setWordWrap(True)
         self.layout.addWidget(self.disclaimer_label)
@@ -666,9 +671,9 @@ class CredentialDialog(QDialog):
         # English: OK and Cancel buttons
         # Deutsch: OK- und Abbrechen-Buttons
         self.btn_layout = QHBoxLayout()
-        self.ok_button = QPushButton("OK", self)
+        self.ok_button = QPushButton(_("OK"), self)
         self.ok_button.clicked.connect(self.accept)
-        self.cancel_button = QPushButton("Abbrechen", self)
+        self.cancel_button = QPushButton(_("Abbrechen"), self)
         self.cancel_button.clicked.connect(self.reject)
         self.btn_layout.addWidget(self.ok_button)
         self.btn_layout.addWidget(self.cancel_button)
@@ -692,7 +697,7 @@ class GuidanceWindow(QDialog):
     """
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Bedienungsanleitung")
+        self.setWindowTitle(_("Bedienungsanleitung"))
         self.resize(800, 700)
         
         # English: Non-modal, so main window stays interactive.
@@ -715,7 +720,7 @@ class GuidanceWindow(QDialog):
         
         # English: Add a close button.
         # Deutsch: Füge einen Schließen-Button hinzu.
-        self.btn_close = QPushButton("Schließen", self)
+        self.btn_close = QPushButton(_("Schließen"), self)
         self.btn_close.clicked.connect(self.close)
         self.layout.addWidget(self.btn_close)
 
@@ -812,9 +817,9 @@ class MainWindow(QMainWindow):
         pg.setConfigOption('foreground', 'w')
         self.curves = {}
         configs = {
-            'chart_volt': ('volt', 'Spannung', 'V', 'y', 'w'),
-            'chart_amp':  ('amp',  'Strom',    'A', 'c', 'w'),
-            'chart_watt': ('watt', 'Leistung', 'W', 'm', 'w')
+            'chart_volt': ('volt', _('Spannung'), 'V', 'y', 'w'),
+            'chart_amp':  ('amp',  _('Strom'),    'A', 'c', 'w'),
+            'chart_watt': ('watt', _('Leistung'), 'W', 'm', 'w')
         }
         for widget_name, (key, title, unit, col_dut, col_ref) in configs.items():
             if hasattr(self.ui, widget_name):
@@ -823,15 +828,15 @@ class MainWindow(QMainWindow):
                 layout.setContentsMargins(0, 0, 0, 0)
                 plot_widget = pg.PlotWidget()
                 plot_widget.setLabel('left', title, units=unit)
-                plot_widget.setLabel('bottom', 'Messung', units='#')
+                plot_widget.setLabel('bottom', _('Messung'), units='#')
                 plot_widget.showGrid(x=True, y=True)
                 plot_widget.addLegend(offset=(30, 10))
                 
                 pen_ref = pg.mkPen(col_ref, width=1, style=pg.QtCore.Qt.DashLine)
-                self.curves[f"{key}_ref"] = plot_widget.plot(pen=pen_ref, name=f"Soll (Ref)")
+                self.curves[f"{key}_ref"] = plot_widget.plot(pen=pen_ref, name=_("Soll (Ref)"))
                 
                 pen_dut = pg.mkPen(col_dut, width=2)
-                self.curves[f"{key}_dut"] = plot_widget.plot(pen=pen_dut, name=f"Ist (DUT)")
+                self.curves[f"{key}_dut"] = plot_widget.plot(pen=pen_dut, name=_("Ist (DUT)"))
                 
                 layout.addWidget(plot_widget)
 
@@ -999,7 +1004,7 @@ class MainWindow(QMainWindow):
         """
         ui_path = os.path.join(os.path.dirname(__file__), "setup_general.ui")
         if not os.path.exists(ui_path):
-            return QMessageBox.warning(self, "Fehler", "Datei setup_general.ui nicht gefunden!")
+            return QMessageBox.warning(self, _("Fehler"), _("Datei setup_general.ui nicht gefunden!"))
             
         ui_file = QFile(ui_path)
         ui_file.open(QFile.ReadOnly)
@@ -1011,7 +1016,7 @@ class MainWindow(QMainWindow):
             
             def open_directory_browser():
                 start_dir = dialog.edit_report_dir.text()
-                folder = QFileDialog.getExistingDirectory(dialog, "Report Ordner auswählen", start_dir)
+                folder = QFileDialog.getExistingDirectory(dialog, _("Report Ordner auswählen"), start_dir)
                 if folder:
                     dialog.edit_report_dir.setText(folder)
 
@@ -1045,7 +1050,7 @@ class MainWindow(QMainWindow):
                 self.cm.config['TOLERANCE abs%']['power_limit'] = dialog.edit_devP.text().strip().replace(',', '.')
             
             with open(self.cm.config_path, 'w') as f: self.cm.config.write(f)
-            self.ui.log_output.appendPlainText("✅ Allgemeines Setup in config.ini gespeichert.")
+            self.ui.log_output.appendPlainText(_("✅ Allgemeines Setup in config.ini gespeichert."))
             dialog.accept()
             
         dialog.btn_save.clicked.connect(save_and_close)
@@ -1059,7 +1064,7 @@ class MainWindow(QMainWindow):
         """
         ui_path = os.path.join(os.path.dirname(__file__), "setup_fluke.ui")
         if not os.path.exists(ui_path):
-            return QMessageBox.warning(self, "Fehler", "Datei setup_fluke.ui nicht gefunden!")
+            return QMessageBox.warning(self, _("Fehler"), _("Datei setup_fluke.ui nicht gefunden!"))
             
         ui_file = QFile(ui_path)
         ui_file.open(QFile.ReadOnly)

@@ -81,17 +81,17 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
 ---
 #### **Vorbereitende Schritte (für beide Varianten identisch):**
 
-*   [ ] **1. Konfiguration für Sprachauswahl (`config_manager.py`)**
-    *   [ ] Sicherstellen, dass beim Erstellen einer neuen `config.ini` in der Sektion `[GENERAL]` der Eintrag `language = auto` hinzugefügt wird.
-    *   [ ] Die Benutzer-Dokumentation (z.B. `anleitung.md`) um einen Hinweis ergänzen, dass die Sprache manuell auf `de`, `en` oder `auto` gesetzt werden kann.
+*   [x] **1. Konfiguration für Sprachauswahl (`config_manager.py`)**
+    *   [x] Sicherstellen, dass beim Erstellen einer neuen `config.ini` in der Sektion `[GENERAL]` der Eintrag `language = auto` hinzugefügt wird.
+    *   [x] Die Benutzer-Dokumentation (z.B. `anleitung.md`) um einen Hinweis ergänzen, dass die Sprache manuell auf `de`, `en` oder `auto` gesetzt werden kann.
 
-*   [ ] **2. Implementierung des Übersetzungs-Backends (`i18n_manager.py`)**
-    *   [ ] Eine neue Datei `i18n_manager.py` erstellen, die die `gettext`-Logik kapselt.
-    *   [ ] Diese Datei soll eine `setup_translation()`-Funktion enthalten, die den `language`-Eintrag auswertet, die korrekte `.mo`-Datei lädt und die Übersetzungsfunktion `_` global verfügbar macht.
+*   [x] **2. Implementierung des Übersetzungs-Backends (`i18n_manager.py`)**
+    *   [x] Eine neue Datei `i18n_manager.py` erstellen, die die `gettext`-Logik kapselt.
+    *   [x] Diese Datei soll eine `setup_translation()`-Funktion enthalten, die den `language`-Eintrag auswertet, die korrekte `.mo`-Datei lädt und die Übersetzungsfunktion `_` global verfügbar macht.
 
 *   [ ] **3. Vorbereitung der Code-Basis (Texte markieren)**
-    *   [ ] Die `setup_translation()`-Funktion ganz am Anfang von `gui_main.py` aufrufen.
-    *   [ ] Alle für den Benutzer sichtbaren Zeichenketten in den `.py`-Dateien mit `_()` markieren.
+    *   [x] Die `setup_translation()`-Funktion ganz am Anfang von `gui_main.py` aufrufen.
+    *   [ ] Alle für den Benutzer sichtbaren Zeichenketten in den `.py`-Dateien mit `_()` markieren. (Teilweise erledigt für Hauptfenster und Dialoge)
 
 ---
 #### **Variante A: Workflow mit Babel (Kommandozeile)**
