@@ -4,107 +4,65 @@ This document provides an overview of the most important changes and innovations
 
 ---
 
-## [v5.3.3] - 2026-02-21
+## [v5.4.0] - 2026-02-22
 
-This update focuses on surgical precision during the calibration process and improved reliability for device preparation.
+This major release significantly expands the capabilities of the Tasmota Precision Calibrator, introducing a full manual workflow alongside major UI and architectural improvements.
 
-### 🌟 Top Features of this Version
-1.  **Selective Calibration:** Targeted updates for V, A, or W via checkboxes.
-2.  **Configurable Tolerance Limits:** Set absolute limits (abs %) in **Setup -> General**.
-3.  **Visual Step Progress:** Real-time feedback for the current measurement step.
-4.  **Robust Device Preparation:** Commands sent individually with URL encoding.
+### 🌟 Top Features
+1.  **Manual Calibration Mode:** Calibrate devices using any external reference meter without serial connection via a new 3-point entry UI.
+2.  **Photo-Method Support:** Optimized workflow for high-precision synchronization using smartphone photos.
+3.  **Strict Field Validation:** Enforced data integrity with 2/3 decimal formatting and visual red-border feedback.
+4.  **Cancellable Entry Mode:** Safe mode for manual input with auto power-off and UI locking.
+5.  **Modeless Guidance:** New interactive help window that doesn't block the main GUI.
+6.  **Internationalization (i18n):** Full support for English/German languages.
+7.  **UI Mode Switching:** Switch between "Home Only" and "Pro/Home" interface layouts.
+8.  **Selective Calibration:** Choose exactly which CAL factors to update via checkboxes.
+9.  **Configurable Tolerance Limits:** Define custom deviation limits in Setup with color-coded recommendations.
+10. **Visual Step Progress:** Real-time feedback via a dynamic progress bar.
 
 ### 🛠️ Technical Improvements
-*   **Deviation Analysis:** Visual indicators (Green/Orange) for recommendations.
-*   **Dynamic UI:** Intelligent visibility control for progress indicators.
-*   **Backlog Stability:** Enhanced reliability during the initialization phase.
+*   **Intelligent Calculation Engine:** Automatically skips incomplete data series.
+*   **Secure Asset System:** Help content stored internally to prevent external manipulation.
+*   **Unified Workflow:** Integrated "Old Report" detection for all calibration starts.
+*   **Robust Communication:** Enhanced RS232 logic and refactored DUT initialization.
 
 ---
 
-## [v5.3.3] - 2026-02-21 (DE)
+## [v5.4.0] - 2026-02-22 (DE)
 
-Dieses Update konzentriert sich auf chirurgische Präzision beim Kalibriervorgang und eine verbesserte Zuverlässigkeit bei der Gerätevorbereitung.
+Dieses große Release erweitert den Funktionsumfang des Tasmota Precision Calibrators massiv und führt einen vollständigen manuellen Workflow sowie bedeutende UI- und Architektur-Verbesserungen ein.
 
-### 🌟 Top-Features dieser Version
-1.  **Selektive Kalibrierung:** Gezielte Auswahl von V, A oder W über Checkboxen.
-2.  **Konfigurierbare Toleranzgrenzen:** Eigene Limits (abs %) in **Setup -> Allgemein** festlegbar.
-3.  **Visueller Messfortschritt:** Echtzeit-Rückmeldung über den Status der aktuellen Stufe.
-4.  **Robuste Gerätevorbereitung:** Befehle werden einzeln mit URL-Kodierung gesendet.
+### 🌟 Top-Features
+1.  **Manueller Kalibriermodus:** Kalibrierung mit beliebigen externen Messgeräten ohne serielle Verbindung über eine neue 3-Punkt-Eingabe.
+2.  **Unterstützung der Foto-Methode:** Optimierter Workflow für höchste Präzision mittels Smartphone-Fotos.
+3.  **Strikte Feld-Validierung:** Sicherstellung der Datenqualität durch Formatvorgaben und visuelles Feedback (roter Rahmen).
+4.  **Abbrechbarer Eingabemodus:** Sicherer Modus für manuelle Eingaben inklusive Auto-Power-Off und UI-Sperren.
+5.  **Nicht-modale Anleitung:** Neues interaktives Hilfefenster, das die Bedienung der GUI nicht blockiert.
+6.  **Internationalisierung (i18n):** Vollständige Unterstützung für Deutsch/Englisch.
+7.  **UI-Modus-Umschaltung:** Wechsel zwischen "Home Only" und "Pro/Home" Layout.
+8.  **Selektive Kalibrierung:** Auswahl der zu aktualisierenden Faktoren über Checkboxen.
+9.  **Konfigurierbare Toleranzgrenzen:** Benutzerdefinierte Limits im Setup mit farblichen Empfehlungen.
+10. **Visueller Messfortschritt:** Echtzeit-Feedback durch einen dynamischen Fortschrittsbalken.
 
 ### 🛠️ Technische Verbesserungen
-*   **Abweichungs-Analyse:** Visuelle Empfehlungen (Grün/Orange) im Ergebnis-Dialog.
-*   **Dynamische UI:** Fortschrittsanzeigen werden nur bei Bedarf eingeblendet.
-*   **Backlog-Stabilität:** Erhöhte Zuverlässigkeit bei der Initialisierung.
+*   **Intelligente Berechnungs-Engine:** Automatisches Überspringen unvollständiger Messreihen.
+*   **Sicheres Asset-System:** Interne Speicherung von Hilfeinhalten zur Manipulationsvermeidung.
+*   **Einheitlicher Workflow:** "Alte Messdaten"-Erkennung für alle Kalibrierungs-Starts.
+*   **Robuste Kommunikation:** Verbesserte RS232-Logik und überarbeitete Dose-Initialisierung.
 
 ---
 
 ## [v5.3.2] - 2026-02-21
 
-This version marks a milestone in user guidance and process reliability for the Tasmota Precision Calibrator. It bundles groundbreaking automations and surgical calibration logic.
+Focus on reliability, user guidance, and credential management.
 
-### 🌟 Top Features of this Version
-1.  **Surgical Calibration (Selective Sending):** Target specific factors (`VoltageCal`, `CurrentCal`, `PowerCal`). You decide which values are sent to the device.
-2.  **Intelligent Tolerance Analysis:** Evaluation of deviations against configurable limits (abs %). A color scheme (Green/Orange) provides immediate certainty whether calibration is technically necessary.
-3.  **Automatic Fluke Scan (Auto-Discovery):** System scans all ports and baud rates (9600-300) to identify your Fluke 45 automatically.
-4.  **Integrated Interactive Help:** Professional HTML guide built directly into the app – including Dark Mode and navigation.
-5.  **Optimized Credential Management:** Session-based RAM storage and UI optimization (admin pre-filled, auto-focus).
-
-### 🛠️ Technical Improvements
-*   **Strict Device ID:** Prevents connection errors via "FLUKE" ID check.
-*   **Data Integrity:** Automatic exclusion of Min/Max values and filtering of zero-value artifacts.
-*   **Central Documentation:** Consolidation of all requirements in the **Pflichtenheft v1.1**.
-
----
-
-## [v5.3.2] - 2026-02-21 (DE)
-
-Diese Version markiert einen Meilenstein in der Benutzerführung und Prozesssicherheit des Tasmota Precision Calibrators. Sie bündelt bahnbrechende Automatisierungen und eine chirurgisch präzise Kalibrierungs-Logik.
-
-### 🌟 Top-Features dieser Version
-1.  **Chirurgische Kalibrierung (Selektives Senden):** Gezielte Auswahl einzelner Faktoren (`VoltageCal`, `CurrentCal`, `PowerCal`). Sie entscheiden, welche Werte an die Dose gesendet werden.
-2.  **Intelligente Toleranz-Analyse:** Bewertung der Abweichungen gegen konfigurierbare Limits (abs %). Farbschema (Grün/Orange) zur Empfehlung der Kalibrierung.
-3.  **Automatischer Fluke-Scan (Auto-Discovery):** Systematischer Scan aller COM-Ports und Baudraten (9600-300) zur automatischen Identifizierung des Fluke 45.
-4.  **Integrierte Interaktive Hilfe:** Professionelles HTML-Handbuch direkt in der Software eingebettet – inklusive Dark Mode und Navigation.
-5.  **Optimiertes Credential-Management:** Sitzungsbasierte Speicherung im RAM und UI-Optimierung (admin vorbefüllt, Auto-Fokus).
-
-### 🛠️ Technische Verbesserungen
-*   **Strenge Geräte-Identifikation:** Verhindert Verbindungsfehler durch Prüfung der Geräte-ID ("FLUKE").
-*   **Datenintegrität:** Automatisches Ausschluss von Min/Max-Werten und Filterung von Nullwert-Artefakten.
-*   **Zentrale Dokumentation:** Zusammenführung aller Anforderungen im Pflichtenheft v1.1.
+### 🌟 Top Features
+*   **Integrated Interactive Manual:** Embedded dark-theme manual with anchor navigation.
+*   **Fluke 45 Auto-Scan:** Automatically identify the multimeter across all ports and baud rates.
+*   **Optimized Credential Management:** Session-based RAM storage for enhanced security.
 
 ---
 
 ## [v5.3.0] - 2026-02-20
 
-This release marks a significant milestone in the development of the AutoCal tool. In addition to expanded visualizations, this update focuses on massive stability, data security, and a significantly improved user experience.
-
-### ✨ New Features
-*   **📑 Detailed Reference Display:** New dedicated area (`frame_tasref`) showing device information and live values of the Tasmota reference plug – analogous to the DUT.
-*   **🚫 UI Input Locking:** Automatic locking of input fields during active measurements to prevent errors.
-*   **🔌 Automatic Power-Off on Abort:** Immediate power-off command upon manual measurement cancellation.
-*   **📄 Auto-Config Creation:** Automatic creation of a default `config.ini` upon program start.
-
-### 🛠️ Robustness & Code Quality
-*   **🧮 Intelligent Mean Calculation:** Validation of CSV headers and fallback mode for small datasets.
-*   **📂 Centralized Path Management:** Configuration management via absolute paths.
-*   **🐞 Stability:** Fixed memory leaks in graphs and improved type safety.
-
----
-
-## [v5.3.0] - 2026-02-20 (DE)
-
-Dieses Release markiert einen bedeutenden Meilenstein in der Entwicklung des AutoCal-Tools. Neben erweiterten Visualisierungen liegt der Fokus dieses Updates auf massiver Stabilität, Datensicherheit und einer deutlich verbesserten Benutzerführung.
-
-### ✨ Neue Features
-*   **📑 Detaillierte Referenz-Anzeige:** Neuer Bereich (`frame_tasref`) mit Geräte-Informationen und Live-Messwerten der Tasmota-Referenzdose.
-*   **🚫 UI-Eingabesperre (Locking):** Automatisches Sperren der Eingabefelder während aktiver Messungen zur Fehlervermeidung.
-*   **🔌 Automatisches Ausschalten bei Abbruch:** Sofortiger Ausschaltbefehl bei manuellem Messabbruch.
-*   **📄 Auto-Konfigurations-Erstellung:** Automatische Erstellung einer Standard-`config.ini` bei Programmstart.
-
-### 🛠️ Robustheit & Code-Qualität
-*   **🧮 Intelligente Mittelwertbildung:** Validierung von CSV-Headern und Fallback-Modus für kleine Datensätze.
-*   **📂 Zentralisiertes Pfad-Management:** Verwaltung der Konfiguration via absoluter Pfade.
-*   **🐞 Stabilität:** Behebung von Speicherlecks in Graphen und Verbesserung der Typsicherheit.
-
----
-*Generated with 99% AI support via Gemini CLI.* 🚀
+Initial release of the v5 series with core PyQt interface and automated calibration logic.

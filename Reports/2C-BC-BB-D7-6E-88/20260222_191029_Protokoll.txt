@@ -1,0 +1,35 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-3
+  Hostname:    NOUS-3-D76E88-3720
+  MAC Address: 2C:BC:BB:D7:6E:88
+
+[REFERENZ]
+  Device Name: Manuelle Eingabe
+  Hostname:    k.A.
+  MAC Address: k.A.
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  MANUAL
+  Datenquelle (CSV): 20260222_191029
+  Report erstellt:    20260222_191029
+
+=====================================================================================
+HINWEIS: Diese Kalibrierung wurde auf Basis manuell eingegebener Referenzwerte durchgeführt.
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Strom:    Ref   1.000A | DUT   1.000A | Err: +0.000A ( +0.00%) -> Cal-Vorschlag: 3246
+  Leistung: Ref   50.67W | DUT   45.33W | Err:  -5.33W (-10.53%) -> Cal-Vorschlag: 10456
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+      PowerCal 9356                       PowerCal 10456 (Mittelwert)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

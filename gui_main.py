@@ -28,7 +28,9 @@ from reference_manager import ReferenceManager
 from data_analyzer import DataAnalyzer
 from credential_manager import CredentialsManager
 from fluke_scan import find_fluke
-from assets_guidance import GUIDANCE_HTML
+from assets_guidance import get_guidance_html
+from assets_manual_info import MANUAL_INFO_HTML
+from man_calib_engine import ManualCalibrationEngine
 
 # ---------------------------------------------------------
 # 1. DER LOG-SPION (Log Spy)
@@ -66,63 +68,31 @@ class OutputStreamProxy(QObject):
 # ---------------------------------------------------------
 # 2. DER MESS-ARBEITER (Hintergrund-Thread)
 # ---------------------------------------------------------
-class MeasurementWorker(QThread):
+class BaseWorker(QThread):
     """
-    # English:
-    # A QThread worker that performs the entire measurement and calibration process in the background,
-    # preventing the GUI from freezing. It communicates with the main window via signals.
-    # Deutsch:
-    # Ein QThread-Worker, der den gesamten Mess- und Kalibrierprozess im Hintergrund ausführt,
-    # um ein Einfrieren der GUI zu verhindern. Er kommuniziert über Signale mit dem Hauptfenster.
+    # English: Base class for background workers, providing common signals and methods.
+    # Deutsch: Basisklasse für Hintergrund-Worker, die gemeinsame Signale und Methoden bereitstellt.
     """
     log_signal = Signal(str)
-    data_signal = Signal(dict)
     finished_signal = Signal(str)
-    apply_request_signal = Signal(str, str, list, str, str) 
-    step_progress_signal = Signal(int) # English: New signal for the progress bar / Deutsch: Signal für den Fortschrittsbalken.
-    
     show_popup_signal = Signal(str)
     hide_popup_signal = Signal()
 
-    def __init__(self, config, params, credentials_manager):
-        """
-        # English: Initializes the worker.
-        # Deutsch: Initialisiert den Worker.
-
-        :param config: The application's configuration object.
-        :param params: A dictionary of parameters for the measurement run.
-        :param credentials_manager: The manager for handling device credentials.
-        """
+    def __init__(self, credentials_manager):
         super().__init__()
-        self.config = config
-        self.params = params
         self.credentials_manager = credentials_manager
         self.is_running = True
 
     def _get_auth(self, ip):
-        """
-        # English: Gets the authentication tuple for a given IP from the credentials manager.
-        # Deutsch: Holt das Authentifizierungs-Tupel für eine gegebene IP aus dem Credential-Manager.
-        """
         creds = self.credentials_manager.get_credentials(ip)
         if creds:
             return (creds['user'], creds['password'])
         return None
 
     def wait_for_power(self, ip, stufe):
-        """
-        # English:
-        # Waits for the target device to be powered on by polling its status.
-        # Shows a popup to the user to prompt them to turn the device on.
-        # Deutsch:
-        # Wartet darauf, dass das Zielgerät eingeschaltet wird, indem es dessen Status abfragt.
-        # Zeigt dem Benutzer ein Popup an, um ihn zum Einschalten des Geräts aufzufordern.
-        """
-        msg = f"STUFE {stufe}:\nWarte auf Leistung...\n\nBitte Ziel-Dose jetzt EINSCHALTEN!"
+        msg = _("STUFE {stufe}:\nWarte auf Leistung...\n\nBitte Ziel-Dose jetzt EINSCHALTEN!").format(stufe=stufe)
         self.log_signal.emit(f"⏳ STUFE {stufe}: Warte auf Leistung...")
-        
         self.show_popup_signal.emit(msg)
-        
         auth = self._get_auth(ip)
         while self.is_running:
             try:
@@ -134,21 +104,30 @@ class MeasurementWorker(QThread):
                     return True
             except Exception as e:
                 self.log_signal.emit(f"Fehler in wait_for_power: {e}")
-                # English: No break here, as it might just be a temporary read error. The loop will retry.
-                # Deutsch: Kein Abbruch hier, da es nur ein temporärer Lesefehler sein könnte. Die Schleife versucht es erneut.
-            time.sleep(1)
-            
+                time.sleep(1)
         self.hide_popup_signal.emit()
         return False 
 
+    def stop(self):
+        self.is_running = False
+
+class MeasurementWorker(BaseWorker):
+    """
+    # English: Worker for the main automated measurement process.
+    # Deutsch: Worker für den automatischen Haupt-Messprozess.
+    """
+    data_signal = Signal(dict)
+    apply_request_signal = Signal(str, str, list, str, str) 
+    step_progress_signal = Signal(int)
+    
+    def __init__(self, config, params, credentials_manager):
+        super().__init__(credentials_manager)
+        self.config = config
+        self.params = params
+
     def run(self):
-        """
-        # English: The main execution method of the thread. Contains the entire measurement logic.
-        # Deutsch: Die Haupt-Ausführungsmethode des Threads. Enthält die gesamte Messlogik.
-        """
         try:
             from calibration_engine import CalibrationEngine
-
             dut_ip = self.params['dut_ip']
             ref_ip = self.params['ref_ip']
             mode = self.params['mode']
@@ -156,27 +135,18 @@ class MeasurementWorker(QThread):
             use_existing = self.params.get('use_existing', False)
             dut_info_str = json.dumps(self.params.get('dut_info'))
             ref_info_str = json.dumps(self.params.get('ref_info'))
-            
             dut_auth = self._get_auth(dut_ip)
             ref_auth = self._get_auth(ref_ip)
 
-            # English: Handle the "Re-Apply" case where existing data is used.
-            # Deutsch: Behandle den "Re-Apply"-Fall, bei dem bestehende Daten verwendet werden.
             if use_existing:
                 self.log_signal.emit(f"🔄 Lese alten Report ({data_ts})...")
                 old_report_path = os.path.join(self.params['device_path'], f"{data_ts}_Protokoll.txt")
-                
                 if not os.path.exists(old_report_path):
                     self.finished_signal.emit(f"❌ Fehler: Der ursprüngliche Report '{old_report_path}' wurde nicht gefunden.")
                     return
-                
-                # English: Signal the main thread to show the apply-dialog. Then the worker's job is done.
-                # Deutsch: Signalisiere dem Haupt-Thread, den Anwenden-Dialog zu zeigen. Dann ist die Arbeit des Workers erledigt.
                 self.apply_request_signal.emit(old_report_path, dut_ip, [], dut_info_str, ref_info_str)
                 return
 
-            # English: Normal workflow with new hardware measurements.
-            # Deutsch: Normaler Ablauf mit neuen Hardware-Messungen.
             ref_manager = ReferenceManager(self.config)
             old_cal = ref_manager.get_current_cal_factors(dut_ip, dut_auth)
             engine = CalibrationEngine(self.params['device_path'])
@@ -193,8 +163,6 @@ class MeasurementWorker(QThread):
             from main import prepare_dut
             prepare_dut(dut_ip, dut_auth)
 
-            # English: For HOME mode, determine the DUT's idle consumption offset.
-            # Deutsch: Im HOME-Modus, bestimme den Offset durch den Eigenverbrauch des DUT.
             if mode == "HOME":
                 self.log_signal.emit("🔌 Schalte Ziel-Dose für Offset-Messung AUS...")
                 try:
@@ -202,113 +170,59 @@ class MeasurementWorker(QThread):
                     time.sleep(2) 
                 except Exception as e:
                     self.log_signal.emit(f"⚠️ Warnung: Automatisches Ausschalten fehlgeschlagen: {e}")
-
                 if not self.is_running: return
-                
-                # English: Wait for 5 seconds to ensure DUT is fully off before measuring offset.
-                # Deutsch: Warte 5 Sekunden, um sicherzustellen, dass die DUT vollständig ausgeschaltet ist, bevor der Offset gemessen wird.
                 self.log_signal.emit("⏳ Warte 5 Sekunden, bis Ziel-Dose vollständig AUS ist...")
                 time.sleep(5)
-                
                 from refhome_offset import ermittle_offset
                 offset_a, offset_w = ermittle_offset(ref_ip, ref_auth)
                 ref_manager.set_home_offset(offset_a, offset_w)
 
-            # English: Adjust requested measurements for min/max exclusion.
-            # Deutsch: Angefragte Messungen für Min/Max-Ausschluss anpassen.
-            num_measurements_base = self.params['measurements']
-            num_measurements_compensated = num_measurements_base + 2
+            num_measurements_compensated = self.params['measurements'] + 2
 
-            # English: Loop through all measurement steps.
-            # Deutsch: Schleife durch alle Messstufen.
             for stufe in range(1, self.params['steps'] + 1):
                 if not self.is_running: break
                 if not self.wait_for_power(dut_ip, stufe): break 
-                
-                # English: Wait for the inrush current to stabilize.
-                # Deutsch: Warte, bis sich der Einschaltstrom stabilisiert hat.
                 time.sleep(7) 
-
                 if not self.is_running: break
 
                 self.log_signal.emit(f"\n▶️ Zeichne Messdaten auf (Stufe {stufe}/{self.params['steps']} | {num_measurements_compensated} Messungen)...")
                 step_data_list = []
                 
-                # English: Inner loop for taking multiple measurements per step.
-                # Deutsch: Innere Schleife für mehrere Messungen pro Stufe.
-                measurement_attempt_count = 0
                 while len(step_data_list) < num_measurements_compensated:
-                    measurement_attempt_count += 1
-                    ref_v, ref_a, ref_w = None, None, None
-                    dut_v, dut_a, dut_w = None, None, None
-                    
+                    if not self.is_running: break
                     try:
                         ref_v, ref_a, ref_w = ref_manager.get_reference_data(ref_auth)
-                        if ref_v is None: 
-                            self.log_signal.emit(f"[WARN] Messversuch {measurement_attempt_count}: Referenzdaten unvollständig. Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
-                            time.sleep(0.5)
-                            continue
-                    except Exception as e:
-                        self.log_signal.emit(f"[WARN] Messversuch {measurement_attempt_count}: REFERENZ LESE-FEHLER: {e}. Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
-                        time.sleep(0.5)
-                        continue
-                    
-                    # English: Check for abort signal before potentially blocking I/O (DUT data).
-                    # Deutsch: Prüfe auf Abbruchsignal vor potenziell blockierendem I/O (DUT-Daten).
-                    if not self.is_running: break 
-                    try:
                         r = httpx.get(f"http://{dut_ip}/cm?cmnd=Status%208", timeout=2, auth=dut_auth)
                         r.raise_for_status()
                         d = r.json()['StatusSNS']['ENERGY']
                         dut_v, dut_a, dut_w = float(d['Voltage']), float(d['Current']), float(d['Power'])
-                    except Exception as e: 
-                        self.log_signal.emit(f"❌ Messversuch {measurement_attempt_count}: Fehler beim Lesen der Zieldose: {e}. Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
+                        
+                        if any(val == 0 for val in [ref_v, ref_a, ref_w, dut_v, dut_a, dut_w] if val is not None):
+                            self.log_signal.emit(f"[WARN] Ungültige Messung (0-Wert). Wiederhole...")
+                            time.sleep(0.5)
+                            continue
+
+                        self.data_signal.emit({'volt_ref': ref_v, 'volt_dut': dut_v, 'amp_ref': ref_a, 'amp_dut': dut_a, 'watt_ref': ref_w, 'watt_dut': dut_w, 'dut_off': (dut_w <= 0) })
+                        step_data_list.append({'Ref_Volt': ref_v, 'Ref_Amp': ref_a, 'Ref_Watt': ref_w, 'Target_Volt': dut_v, 'Target_Amp': dut_a, 'Target_Watt': dut_w})
+                        progress_val = int((len(step_data_list) / num_measurements_compensated) * 100)
+                        self.step_progress_signal.emit(progress_val)
+                        time.sleep(1)
+                    except Exception as e:
+                        self.log_signal.emit(f"❌ Fehler beim Lesen der Messwerte: {e}. Wiederhole...")
                         time.sleep(0.5)
                         continue
-
-                    # English: Check for zero values, which are considered invalid.
-                    # Deutsch: Prüfe auf Nullwerte, die als ungültig gelten.
-                    if any(val == 0 for val in [ref_v, ref_a, ref_w, dut_v, dut_a, dut_w] if val is not None):
-                        self.log_signal.emit(f"[WARN] Messversuch {measurement_attempt_count}: Ungültige Messung (0-Wert). Wiederhole... ({len(step_data_list)}/{num_measurements_compensated})")
-                        time.sleep(0.5)
-                        continue
-                    
-                    # English: If everything is valid, add to list and emit signal.
-                    # Deutsch: Wenn alles gültig ist, zur Liste hinzufügen und Signal senden.
-                    # English: Check for abort signal before emitting and appending valid data.
-                    # Deutsch: Prüfe auf Abbruchsignal vor dem Emittieren und Anhängen gültiger Daten.
-                    if not self.is_running: break
-                    self.data_signal.emit({'volt_ref': ref_v, 'volt_dut': dut_v, 'amp_ref': ref_a, 'amp_dut': dut_a, 'watt_ref': ref_w, 'watt_dut': dut_w, 'dut_off': (dut_w <= 0) })
-                    step_data_list.append({'Ref_Volt': ref_v, 'Ref_Amp': ref_a, 'Ref_Watt': ref_w, 'Target_Volt': dut_v, 'Target_Amp': dut_a, 'Target_Watt': dut_w})
-                    
-                    # English: Emit progress signal for the UI progress bar.
-                    # Deutsch: Sende Fortschritts-Signal für den UI-Fortschrittsbalken.
-                    progress_val = int((len(step_data_list) / num_measurements_compensated) * 100)
-                    self.step_progress_signal.emit(progress_val)
-
-                    # English: Removed logging of individual measurement values as requested by the user.
-                    # Deutsch: Protokollierung der einzelnen Messwerte wurde auf Benutzerwunsch entfernt.
-                    # self.log_signal.emit(f"[{len(step_data_list):>3}/{num_measurements_compensated}] Ref: {ref_w:.2f}W | DUT: {dut_w:.2f}W")
-                    time.sleep(1) # Wait for 1 second between valid measurements (original value)
-
 
                 if step_data_list and self.is_running:
                     df = pd.DataFrame(step_data_list)
-                    # English: Round relevant columns to 3 decimal places.
-                    # Deutsch: Runde relevante Spalten auf 3 Nachkommastellen.
                     for col in ["Ref_Volt", "Ref_Amp", "Ref_Watt", "Target_Volt", "Target_Amp", "Target_Watt"]:
-                        if col in df.columns:
-                            df[col] = df[col].round(3)
-                    
+                        if col in df.columns: df[col] = df[col].round(3)
                     csv_name = f"{data_ts}_Stufe_{stufe}.csv"
                     csv_path = os.path.join(self.params['device_path'], csv_name)
                     df.to_csv(csv_path, index=False)
                     self.log_signal.emit(f"💾 {csv_name} gespeichert.")
-
                     res = engine.calculate_new_calibration(csv_path, old_cal)
                     res['Stufe'] = stufe
                     all_results.append(res)
-                    
                     try:
                         self.log_signal.emit(f"🔌 Schalte Ziel-Dose nach Stufe {stufe} AUS...")
                         self.data_signal.emit({'volt_ref': None, 'volt_dut': 0.0, 'amp_ref': None, 'amp_dut': 0.0, 'watt_ref': None, 'watt_dut': 0.0, 'dut_off': True})
@@ -319,39 +233,45 @@ class MeasurementWorker(QThread):
 
             if all_results and self.is_running:
                 self.data_signal.emit({'volt_ref': None, 'volt_dut': 0.0, 'amp_ref': None, 'amp_dut': 0.0, 'watt_ref': None, 'watt_dut': 0.0, 'dut_off': True})
-                
                 report_file = engine.write_summary(
                     all_results, data_ts, report_ts=data_ts, cal_mode=mode, 
                     old_cal=old_cal, dut_info=self.params.get('dut_info'), ref_info=self.params.get('ref_info')
                 )
                 self.log_signal.emit("\n" + "="*40 + "\nERMITTLUNG DER KALIBRIERWERTE ABGESCHLOSSEN\n" + "="*40)
                 self.apply_request_signal.emit(report_file, dut_ip, all_results, dut_info_str, ref_info_str)
-                return # Job is done, main thread takes over via dialog.
-
-            if not self.is_running:
-                # English: Attempt to power off the DUT automatically on manual abort.
-                # Deutsch: Versuche die Zieldose bei manuellem Abbruch automatisch auszuschalten.
+            elif not self.is_running:
                 try:
                     self.log_signal.emit("🔌 Abbruch erkannt: Schalte Ziel-Dose AUS...")
-                    self.data_signal.emit({'volt_ref': None, 'volt_dut': 0.0, 'amp_ref': None, 'amp_dut': 0.0, 'watt_ref': None, 'watt_dut': 0.0, 'dut_off': True})
                     httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2, auth=dut_auth)
                 except Exception as e:
                     self.log_signal.emit(f"⚠️ Warnung: Zieldose konnte beim Abbruch nicht ausgeschaltet werden: {e}")
-                
                 self.finished_signal.emit("⚠️ Messung wurde vom Benutzer abgebrochen.")
             else:
                 self.finished_signal.emit("ℹ️ Messung beendet, aber es wurden keine Ergebnisse zum Anwenden generiert.")
-
         except Exception as e:
             self.finished_signal.emit(f"❌ Schwerer Fehler im Worker: {str(e)}")
 
-    def stop(self):
-        """
-        # English: Stops the execution of the worker thread.
-        # Deutsch: Stoppt die Ausführung des Worker-Threads.
-        """
-        self.is_running = False
+class ManualSetupWorker(BaseWorker):
+    """
+    # English: Worker to prepare the DUT and wait for power-on in manual mode.
+    # Deutsch: Worker, der die DUT im manuellen Modus vorbereitet und auf das Einschalten wartet.
+    """
+    def __init__(self, dut_ip, dut_auth, credentials_manager):
+        super().__init__(credentials_manager)
+        self.dut_ip = dut_ip
+        self.dut_auth = dut_auth
 
+    def run(self):
+        try:
+            from main import prepare_dut
+            self.log_signal.emit(_("INFO: Bereite Ziel-Dose (DUT) vor..."))
+            prepare_dut(self.dut_ip, self.dut_auth)
+            if self.wait_for_power(self.dut_ip, 1):
+                self.finished_signal.emit("SUCCESS")
+            else:
+                self.finished_signal.emit(_("INFO: Vorbereitung durch Benutzer abgebrochen oder fehlgeschlagen."))
+        except Exception as e:
+            self.finished_signal.emit(_("FEHLER bei der Vorbereitung: {e}").format(e=e))
 
 # ---------------------------------------------------------
 # 3. DAS PROTOKOLL-POPUP (Custom Dialog)
@@ -447,9 +367,10 @@ class CalibrationReportDialog(QDialog):
         self.btn_layout.addWidget(self.btn_close)
         self.layout.addLayout(self.btn_layout)
 
-        # English: Hide regression-related elements in HOME mode.
-        # Deutsch: Regressions-bezogene Elemente im HOME-Modus ausblenden.
-        if self.report_info.get('mode') == "HOME":
+        # English: Hide regression-related elements in HOME or MANUAL mode.
+        # Deutsch: Regressions-bezogene Elemente im HOME- oder MANUAL-Modus ausblenden.
+        cal_mode = self.report_info.get('mode')
+        if cal_mode == "HOME" or cal_mode == "MANUAL":
             self.btn_graph.hide()
             self.check_w_regr.hide()
             self.check_w_mean.setText("PowerCal")
@@ -710,7 +631,7 @@ class GuidanceWindow(QDialog):
         # English: Create a QTextBrowser to render HTML content.
         # Deutsch: Erstelle einen QTextBrowser zum Rendern von HTML-Inhalten.
         self.browser = QTextBrowser(self)
-        self.browser.setHtml(GUIDANCE_HTML)
+        self.browser.setHtml(get_guidance_html(_))
         
         # English: Enable internal link navigation (anchors).
         # Deutsch: Aktiviere die Navigation für interne Links (Anker).
@@ -747,7 +668,9 @@ class MainWindow(QMainWindow):
         self.cm = ConfigManager()
         self.credentials_manager = CredentialsManager()
         self.wait_msgbox = None   
-        self.guidance_window = None # English: Stores the help window instance. / Deutsch: Speichert die Instanz des Hilfefensters.
+        self.guidance_window = None
+        self.manual_worker = None
+        self.is_in_manual_entry_mode = False
         
         # English: Load the UI from the .ui file created with Qt Designer.
         # Deutsch: Lade die Benutzeroberfläche aus der .ui-Datei, die mit dem Qt Designer erstellt wurde.
@@ -848,6 +771,20 @@ class MainWindow(QMainWindow):
                 getattr(self.ui, lcd).setStyleSheet(lcd_style)
                 getattr(self.ui, lcd).setSegmentStyle(pg.QtWidgets.QLCDNumber.Flat)
 
+        self.set_manual_fields_enabled(False)
+
+        # English: Programmatically create and add the manual info button
+        # Deutsch: Programmatisch den Info-Button für die manuelle Anleitung erstellen und hinzufügen
+        if hasattr(self.ui, 'frame_manuell'):
+            # English: Assuming frame_manuell has a layout. If not, one might need to be set.
+            # Deutsch: Annahme, dass frame_manuell ein Layout hat. Ansonsten müsste eines gesetzt werden.
+            if self.ui.frame_manuell.layout():
+                self.ui.btn_man_info = QPushButton(" ℹ️ Anleitung")
+                self.ui.btn_man_info.setToolTip(_("Anleitung zur manuellen Messwerterfassung öffnen"))
+                # English: Add to the top of the layout, with stretch to push other items down.
+                # Deutsch: Oben im Layout hinzufügen, mit einem Stretch, um andere Elemente nach unten zu schieben.
+                self.ui.frame_manuell.layout().insertWidget(0, self.ui.btn_man_info)
+    
     def _set_ui_mode(self, mode):
         """
         # English: Sets the UI mode in config and applies the settings.
@@ -1048,6 +985,14 @@ class MainWindow(QMainWindow):
         # English: Perform initial check. / Deutsch: Initiale Prüfung durchführen.
         self.update_steps_restriction(self.ui.check_ref_home.isChecked())
 
+        # English: Connect MANUAL-mode to its logic handler.
+        # Deutsch: MANUELL-Modus mit seinem Logik-Handler verbinden.
+        if hasattr(self.ui, 'check_ref_manual'):
+            self.ui.check_ref_manual.toggled.connect(self.on_manual_ref_toggled)
+            # English: Perform initial check for manual mode.
+            # Deutsch: Initiale Prüfung für den manuellen Modus durchführen.
+            self.on_manual_ref_toggled(self.ui.check_ref_manual.isChecked())
+
         if hasattr(self.ui, 'frame_fluke'):
             self.ui.check_ref_pro.toggled.connect(self.ui.frame_fluke.setVisible)
             self.ui.frame_fluke.setVisible(self.ui.check_ref_pro.isChecked())
@@ -1084,6 +1029,59 @@ class MainWindow(QMainWindow):
             self.ui.action_ui_mode_home_only.setText(_("Einfacher Modus")) # Translate the action text
         if hasattr(self.ui, 'action_ui_mode_pro_home'):
             self.ui.action_ui_mode_pro_home.setText(_("Professioneller Modus")) # Translate the action text
+
+        if hasattr(self.ui, 'btn_man_ubernehmen'):
+            self.ui.btn_man_ubernehmen.setVisible(False)
+            self.ui.btn_man_ubernehmen.clicked.connect(self.on_manual_apply_clicked)
+
+            all_manual_fields = [
+                'edit_vtas_1', 'edit_vtas_2', 'edit_vtas_3', 'edit_vref_1', 'edit_vref_2', 'edit_vref_3',
+                'edit_atas_1', 'edit_atas_2', 'edit_atas_3', 'edit_aref_1', 'edit_aref_2', 'edit_aref_3',
+                'edit_wtas_1', 'edit_wtas_2', 'edit_wtas_3', 'edit_wref_1', 'edit_wref_2', 'edit_wref_3'
+            ]
+            for field_name in all_manual_fields:
+                if hasattr(self.ui, field_name):
+                    widget = getattr(self.ui, field_name)
+                    
+                    if field_name.startswith('edit_a'):
+                        widget.setToolTip(_("Wert mit drei Nachkommastellen eingeben (z.B. 1.234)"))
+                    else:
+                        widget.setToolTip(_("Wert mit zwei Nachkommastellen eingeben (z.B. 123.45)"))
+
+                    widget.setProperty("original_style", widget.styleSheet())
+                    widget.setProperty("is_invalid", False)
+                    
+                    widget.editingFinished.connect(self._validate_field_format)
+                    widget.editingFinished.connect(self._on_manual_input_changed)
+                else:
+                    print(f"DEBUG: Startup - UI element {field_name} not found for validation connection.")
+            if hasattr(self.ui, 'btn_man_info'):
+                self.ui.btn_man_info.clicked.connect(self.show_manual_info_dialog)
+
+    def show_manual_info_dialog(self):
+        """
+        # English: Shows a modeless dialog with instructions for manual calibration from the asset file.
+        # Deutsch: Zeigt einen nicht-modalen Dialog mit der Anleitung für die manuelle Kalibrierung aus der Asset-Datei an.
+        """
+        dialog_exists = False
+        if hasattr(self, 'manual_info_dialog'):
+            try:
+                if self.manual_info_dialog.isVisible():
+                    dialog_exists = True
+            except RuntimeError:
+                dialog_exists = False
+
+        if not dialog_exists:
+            self.manual_info_dialog = QMessageBox(self)
+            self.manual_info_dialog.setAttribute(Qt.WA_DeleteOnClose)
+            self.manual_info_dialog.setWindowModality(Qt.NonModal)
+            self.manual_info_dialog.setIcon(QMessageBox.Information)
+            self.manual_info_dialog.setWindowTitle(_("Anleitung: Manuelle Messwerterfassung"))
+            self.manual_info_dialog.setTextFormat(Qt.RichText)
+            self.manual_info_dialog.setText(MANUAL_INFO_HTML)
+            self.manual_info_dialog.show()
+        else:
+            self.manual_info_dialog.activateWindow()
 
     def load_values_from_config(self):
         """
@@ -1336,10 +1334,17 @@ class MainWindow(QMainWindow):
         # English: Starts the measurement if not running, or stops it if it is running.
         # Deutsch: Startet die Messung, wenn sie nicht läuft, oder stoppt sie, wenn sie läuft.
         """
-        if hasattr(self, 'worker') and self.worker.isRunning():
-            self.ui.log_output.appendPlainText("⚠️ Sende Abbruch-Signal... Bitte warten.")
+        if hasattr(self, 'worker') and self.worker and self.worker.isRunning():
+            self.ui.log_output.appendPlainText("⚠️ Sende Abbruch-Signal an Haupt-Worker...")
             self.worker.stop()
             self.ui.btn_start.setEnabled(False) 
+        elif hasattr(self, 'manual_worker') and self.manual_worker and self.manual_worker.isRunning():
+            self.ui.log_output.appendPlainText("⚠️ Sende Abbruch-Signal an Vorbereitungs-Worker...")
+            self.manual_worker.stop()
+            self.ui.btn_start.setEnabled(False)
+        elif self.is_in_manual_entry_mode:
+            self.ui.log_output.appendPlainText(_("ℹ️ Manueller Eingabemodus durch Benutzer abgebrochen."))
+            self._cancel_manual_entry_mode()
         else:
             self.start_measurement()
 
@@ -1352,6 +1357,11 @@ class MainWindow(QMainWindow):
         # Bereitet den Messprozess vor und startet ihn. Validiert Eingaben,
         # prüft die Geräteverfügbarkeit und startet den MeasurementWorker-Thread.
         """
+        # English: Check if manual calibration is selected and branch off.
+        # Deutsch: Prüfen, ob manuelle Kalibrierung gewählt ist und abzweigen.
+        if hasattr(self.ui, 'check_ref_manual') and self.ui.check_ref_manual.isChecked():
+            return self.start_manual_calibration()
+
         is_pro = self.ui.check_ref_pro.isChecked()
         is_home = self.ui.check_ref_home.isChecked()
         if not is_pro and not is_home:
@@ -1629,7 +1639,7 @@ class MainWindow(QMainWindow):
         # Deutsch: Zeigt eine Message-Box mit Lizenz- und Autoreninformationen an.
         """
         license_text = (
-            "Tasmota Precision Calibrator v5.3.3\n"
+            "Tasmota Precision Calibrator v5.4.0\n"
             "Erstellt von: Arnulf Greilberger\n\n"
             "----------------------------------------------------------\n"
             "LIZENZ:\n"
@@ -1675,6 +1685,11 @@ class MainWindow(QMainWindow):
         # und deaktiviert das Eingabefeld. Im PRO-Modus wird der Konfigurationswert geladen.
         """
         if hasattr(self.ui, 'spin_steps'):
+            # English: Only change if not in manual mode, which has higher priority.
+            # Deutsch: Nur ändern, wenn nicht im manuellen Modus, der höhere Priorität hat.
+            if hasattr(self.ui, 'check_ref_manual') and self.ui.check_ref_manual.isChecked():
+                return
+
             if is_home:
                 # English: Fixed to 1 step in HOME mode. / Deutsch: Fest auf 1 Stufe im HOME-Modus.
                 self.ui.spin_steps.setValue(1)
@@ -1685,6 +1700,345 @@ class MainWindow(QMainWindow):
                 config_val = self.cm.config.getint('TARGET', 'measurement_steps', fallback=3)
                 self.ui.spin_steps.setValue(config_val)
                 self.ui.spin_steps.setEnabled(True)
+
+    def on_manual_ref_toggled(self, is_manual):
+        """
+        # English: 
+        # Handles the logic when the manual reference checkbox is toggled.
+        # It shows/hides the manual input frame and restricts step/measurement counts.
+        # Deutsch:
+        # Behandelt die Logik, wenn die Checkbox für die manuelle Referenz umgeschaltet wird.
+        # Blendet den manuellen Eingabe-Frame ein/aus und beschränkt die Stufen/Messanzahl.
+        """
+        if hasattr(self.ui, 'frame_manuell'):
+            self.ui.frame_manuell.setVisible(is_manual)
+
+        if hasattr(self.ui, 'spin_steps') and hasattr(self.ui, 'spin_measurements'):
+            if is_manual:
+                self.ui.spin_steps.setValue(1)
+                self.ui.spin_steps.setEnabled(False)
+                self.ui.spin_measurements.setValue(3)
+                self.ui.spin_measurements.setEnabled(False)
+            else:
+                self.ui.spin_steps.setEnabled(True)
+                self.ui.spin_measurements.setEnabled(True)
+                self.load_values_from_config()
+                self.update_steps_restriction(self.ui.check_ref_home.isChecked())
+
+    def start_manual_calibration(self):
+        """
+        # English: 
+        # Starts the manual calibration workflow. It first checks for existing reports for the DUT
+        # and asks the user if they want to re-apply old data or start a new manual entry.
+        # Deutsch:
+        # Startet den manuellen Kalibrier-Workflow. Prüft zuerst auf existierende Reports für die DUT
+        # und fragt den Benutzer, ob alte Daten erneut angewendet oder eine neue manuelle Eingabe gestartet werden soll.
+        """
+        self.ui.log_output.appendPlainText(_("INFO: Starte manuellen Kalibrier-Workflow..."))
+
+        dut_ip = self.ui.edit_dut_ip.text().strip()
+        if not dut_ip:
+            return self.ui.log_output.appendPlainText("FEHLER: Ziel-Dose IP fehlt!")
+
+        dut_info = self.fetch_tasmota_info(dut_ip, is_dut=True)
+        if not dut_info:
+            return self.ui.log_output.appendPlainText("❌ ABBRUCH: Ziel-Dose nicht erreichbar!")
+
+        dut_auth = self.credentials_manager.get_credentials(dut_ip)
+        auth_tuple = (dut_auth['user'], dut_auth['password']) if dut_auth else None
+        mac_param = dut_info.get('mac').replace(":", "-") if dut_info.get('mac') else None
+        device_path = self.cm.setup_device_directory(ip=dut_ip, auth=auth_tuple, mac=mac_param)
+        mac_display = os.path.basename(device_path)
+
+        report_files = glob.glob(os.path.join(device_path, "*_Protokoll.txt"))
+        
+        # --- Logic to ask user about re-using old data ---
+        if report_files:
+            latest_report = max(report_files, key=os.path.getctime)
+            last_session_ts = os.path.basename(latest_report).split('_Protokoll.txt')[0].replace('_ReApply','')
+            
+            try:
+                dt_obj = datetime.strptime(last_session_ts, "%Y%m%d_%H%M%S")
+                display_time = dt_obj.strftime("%d.%m.%Y um %H:%M:%S Uhr")
+            except:
+                display_time = last_session_ts
+
+            msg_box = QMessageBox(self)
+            msg_box.setIcon(QMessageBox.Question)
+            msg_box.setWindowTitle("Alte Messdaten gefunden")
+            msg_box.setText(f"Für diese Tasmota-Dose ({mac_display}) existieren bereits Messdaten vom:\n\n{display_time}\n\nMöchtest du eine komplett neue manuelle Eingabe starten oder die Werte des letzten Reports erneut anwenden?")
+            
+            btn_new = msg_box.addButton("Neue manuelle Eingabe", QMessageBox.AcceptRole)
+            btn_old = msg_box.addButton("Alten Report nutzen", QMessageBox.AcceptRole)
+            btn_cancel = msg_box.addButton("Abbrechen", QMessageBox.RejectRole)
+            
+            msg_box.exec()
+            
+            if msg_box.clickedButton() == btn_cancel:
+                return self.ui.log_output.appendPlainText("⚠️ Vorgang durch Benutzer abgebrochen.")
+            
+            elif msg_box.clickedButton() == btn_old:
+                self.ui.log_output.appendPlainText(f"ℹ️ Überspringe manuelle Eingabe. Nutze alten Report: {os.path.basename(latest_report)}")
+                ref_info = {"name": "Manuelle Eingabe"}
+                self.prompt_apply_calibration(
+                    original_report_path=latest_report,
+                    target_ip=dut_ip,
+                    all_results=[], # Signifies re-apply
+                    dut_info_str=json.dumps(dut_info),
+                    ref_info_str=json.dumps(ref_info)
+                )
+                return
+
+        # --- If no reports or "New manual entry" was chosen ---
+        self.ui.log_output.appendPlainText("ℹ️ Bereite die manuelle Eingabe vor...")
+        self.set_ui_locked(True)
+        self.ui.btn_start.setText(_("⛔ Vorbereitung abbrechen"))
+        self.ui.btn_start.setStyleSheet("background-color: darkred; color: white; font-weight: bold;")
+
+        self.manual_worker = ManualSetupWorker(dut_ip, auth_tuple, self.credentials_manager)
+        self.manual_worker.log_signal.connect(self.ui.log_output.appendPlainText)
+        self.manual_worker.show_popup_signal.connect(self.show_power_popup)
+        self.manual_worker.hide_popup_signal.connect(self.hide_power_popup)
+        self.manual_worker.finished_signal.connect(self.on_manual_setup_finished)
+        self.manual_worker.start()
+
+    def on_manual_setup_finished(self, message):
+        """
+        # English: Called when the ManualSetupWorker is finished. Enables fields on success.
+        # Deutsch: Wird aufgerufen, wenn der ManualSetupWorker fertig ist. Aktiviert bei Erfolg die Felder.
+        """
+        self.hide_power_popup()
+
+        if "SUCCESS" in message:
+            self.ui.log_output.appendPlainText(_("HINWEIS: Bitte geben Sie die 3 Messwert-Paare in die Felder ein."))
+            self.set_manual_fields_enabled(True)
+            self.is_in_manual_entry_mode = True
+            self.ui.btn_start.setText(_("⛔ Manuellen Modus abbrechen"))
+            self.ui.btn_start.setStyleSheet("background-color: darkred; color: white; font-weight: bold;")
+            self.ui.btn_start.setEnabled(True)
+        else:
+            self.set_ui_locked(False)
+            self.ui.log_output.appendPlainText(message)
+            self.ui.btn_start.setText(_("Kalibrierung Starten"))
+            self.ui.btn_start.setStyleSheet("")
+            self.ui.btn_start.setEnabled(True)
+        
+        self.manual_worker = None
+
+    def _cancel_manual_entry_mode(self):
+        """
+        # English: Clears and disables all manual input fields, powers off the DUT, and resets the UI state.
+        # Deutsch: Leert und deaktiviert alle manuellen Eingabefelder, schaltet die DUT aus und setzt den UI-Zustand zurück.
+        """
+        if not self.is_in_manual_entry_mode:
+            return
+
+        self.ui.log_output.appendPlainText("INFO: Manueller Eingabemodus wird zurückgesetzt.")
+
+        # --- Power off DUT ---
+        dut_ip = self.ui.edit_dut_ip.text().strip()
+        if dut_ip:
+            try:
+                self.ui.log_output.appendPlainText(_("🔌 Sende AUS-Befehl an die Ziel-Dose (DUT)..."))
+                creds = self.credentials_manager.get_credentials(dut_ip)
+                auth = (creds['user'], creds['password']) if creds else None
+                httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2, auth=auth)
+                self.ui.log_output.appendPlainText(_("✅ AUS-Befehl gesendet."))
+            except Exception as e:
+                self.ui.log_output.appendPlainText(_("⚠️ Warnung: AUS-Befehl konnte nicht gesendet werden: {e}").format(e=e))
+
+        self.is_in_manual_entry_mode = False
+        self.set_manual_fields_enabled(False)
+        self.set_ui_locked(False)
+
+        all_field_keys = [
+            'vtas_1', 'vtas_2', 'vtas_3', 'vref_1', 'vref_2', 'vref_3',
+            'atas_1', 'atas_2', 'atas_3', 'aref_1', 'aref_2', 'aref_3',
+            'wtas_1', 'wtas_2', 'wtas_3', 'wref_1', 'wref_2', 'wref_3'
+        ]
+        for key in all_field_keys:
+            widget_name = f'edit_{key}'
+            if hasattr(self.ui, widget_name):
+                widget = getattr(self.ui, widget_name)
+                widget.setStyleSheet(widget.property("original_style"))
+                widget.clear()
+        
+        self.ui.btn_start.setText(_("Kalibrierung Starten"))
+        self.ui.btn_start.setStyleSheet("")
+        self.ui.btn_start.setEnabled(True)
+        
+        if hasattr(self.ui, 'btn_man_ubernehmen'):
+            self.ui.btn_man_ubernehmen.setVisible(False)
+
+    def on_manual_apply_clicked(self):
+        """
+        # English:
+        # Handles the click of the 'Apply' button in the manual calibration frame.
+        # It reads the values, triggers processing, and powers off the DUT.
+        # Deutsch:
+        # Behandelt den Klick des 'Übernehmen'-Buttons im manuellen Kalibrier-Frame.
+        # Liest die Werte aus, stößt die Verarbeitung an und schaltet die Zieldose ab.
+        """
+        # English: Disable fields immediately to prevent further editing.
+        # Deutsch: Felder sofort deaktivieren, um weitere Bearbeitung zu verhindern.
+        self.set_manual_fields_enabled(False)
+        self.ui.log_output.appendPlainText(_("INFO: Manuelle Messwerte werden übernommen..."))
+
+        # 1. Read all 18 fields into a dictionary
+        all_field_keys = [
+            'vtas_1', 'vtas_2', 'vtas_3', 'vref_1', 'vref_2', 'vref_3',
+            'atas_1', 'atas_2', 'atas_3', 'aref_1', 'aref_2', 'aref_3',
+            'wtas_1', 'wtas_2', 'wtas_3', 'wref_1', 'wref_2', 'wref_3'
+        ]
+        data_dict = {}
+        for key in all_field_keys:
+            widget_name = f'edit_{key}'
+            if hasattr(self.ui, widget_name):
+                data_dict[key] = getattr(self.ui, widget_name).text().strip().replace(',', '.')
+
+        # 2. Get device path
+        dut_ip = self.ui.edit_dut_ip.text().strip()
+        if not dut_ip:
+            self.ui.log_output.appendPlainText(_("FEHLER: Keine IP-Adresse für die Zieldose angegeben."))
+            self.set_manual_fields_enabled(True) # Re-enable fields on error
+            return
+
+        dut_auth = None
+        creds = self.credentials_manager.get_credentials(dut_ip)
+        if creds:
+            dut_auth = (creds['user'], creds['password'])
+            
+        mac_addr = self.fetch_tasmota_info(dut_ip, is_dut=True).get('mac', None)
+        mac_param = mac_addr.replace(":", "-") if mac_addr else None
+        device_path = self.cm.setup_device_directory(ip=dut_ip, auth=dut_auth, mac=mac_param)
+
+        # 3. Process data using ManualCalibrationEngine
+        man_cal_engine = ManualCalibrationEngine()
+        csv_path, session_ts = man_cal_engine.process_manual_data(data_dict, device_path)
+
+        if not csv_path:
+            self.ui.log_output.appendPlainText(_("FEHLER: Manuelle Daten konnten nicht verarbeitet oder gespeichert werden."))
+            self.set_manual_fields_enabled(True) # Re-enable fields on error
+            return
+
+        # 4. Run analysis using the main CalibrationEngine
+        try:
+            from calibration_engine import CalibrationEngine
+            ref_manager = ReferenceManager(self.cm.config)
+            old_cal = ref_manager.get_current_cal_factors(dut_ip, dut_auth)
+            
+            engine = CalibrationEngine(device_path)
+            step_result = engine.calculate_new_calibration(csv_path, old_cal)
+            
+            if step_result is None:
+                self.ui.log_output.appendPlainText(_("FEHLER: Analyse der manuellen Daten fehlgeschlagen. CSV möglicherweise leer oder fehlerhaft."))
+                self.set_manual_fields_enabled(True)
+                return
+
+            step_result['Stufe'] = 1
+            all_results = [step_result]
+            
+            dut_info = self.fetch_tasmota_info(dut_ip, is_dut=True)
+            ref_info = {"name": "Manuelle Eingabe"}
+            current_mode = "MANUAL"
+
+            # 5. FIRST, write the summary to create the report file
+            report_file_path = engine.write_summary(
+                all_results, session_ts, report_ts=session_ts, cal_mode=current_mode, 
+                old_cal=old_cal, dut_info=dut_info, ref_info=ref_info
+            )
+
+            # Power off the DUT immediately
+            self.ui.log_output.appendPlainText(_("🔌 Schalte Ziel-Dose (DUT) aus..."))
+            httpx.get(f"http://{dut_ip}/cm?cmnd=Power%20OFF", timeout=2, auth=dut_auth)
+            self.ui.log_output.appendPlainText(_("✅ Ziel-Dose wurde abgeschaltet."))
+
+            # 6. THEN, trigger the dialog with the REAL report path
+            self.prompt_apply_calibration(
+                original_report_path=report_file_path,
+                target_ip=dut_ip,
+                all_results=all_results,
+                dut_info_str=json.dumps(dut_info),
+                ref_info_str=json.dumps(ref_info)
+            )
+
+        except Exception as e:
+            self.ui.log_output.appendPlainText(_("FEHLER: Unerwarteter Fehler bei der Analyse der manuellen Daten: {e}").format(e=e))
+            self.set_manual_fields_enabled(True)
+            return
+            
+        for key in all_field_keys:
+            widget_name = f'edit_{key}'
+            if hasattr(self.ui, widget_name):
+                getattr(self.ui, widget_name).clear()
+
+    def _validate_field_format(self):
+        """
+        # English: Validates the format of a manual input field (2 or 3 decimals).
+        # Deutsch: Validiert das Format eines manuellen Eingabefeldes (2 oder 3 Dezimalen).
+        """
+        widget = self.sender()
+        if not widget: return
+
+        text = widget.text().strip().replace(',', '.')
+        field_name = widget.objectName()
+        
+        if field_name.startswith('edit_a'):
+            is_valid_format = bool(re.match(r'^\d+\.\d{3}$', text))
+        else:
+            is_valid_format = bool(re.match(r'^\d+\.\d{2}$', text))
+
+        original_style = widget.property("original_style")
+
+        if not text:
+            widget.setStyleSheet(original_style)
+            widget.setProperty("is_invalid", False)
+        elif is_valid_format:
+            widget.setStyleSheet(original_style)
+            widget.setProperty("is_invalid", False)
+        else:
+            widget.setStyleSheet(original_style + "border: 1px solid red;")
+            widget.setProperty("is_invalid", True)
+
+    def _validate_manual_inputs(self):
+        """
+        # English: Validates content AND format of mandatory power fields.
+        # Deutsch: Validiert Inhalt UND Format der obligatorischen Leistungsfelder.
+        """
+        power_fields = ['edit_wtas_1', 'edit_wtas_2', 'edit_wtas_3', 'edit_wref_1', 'edit_wref_2', 'edit_wref_3']
+        all_mandatory_valid = True
+        for field_name in power_fields:
+            if hasattr(self.ui, field_name):
+                widget = getattr(self.ui, field_name)
+                if not widget.text().strip() or widget.property("is_invalid"):
+                    all_mandatory_valid = False
+                    break
+        return all_mandatory_valid
+
+    def _on_manual_input_changed(self):
+        """
+        # English: Slot called when a manual input field's text changes.
+        # It triggers validation and updates the visibility of the 'Apply' button.
+        # Deutsch: Slot, der bei Textänderung eines manuellen Eingabefeldes aufgerufen wird.
+        # Stößt die Validierung an und aktualisiert die Sichtbarkeit des 'Übernehmen'-Buttons.
+        """
+        is_valid = self._validate_manual_inputs()
+        if hasattr(self.ui, 'btn_man_ubernehmen'):
+            self.ui.btn_man_ubernehmen.setVisible(is_valid)
+
+    def set_manual_fields_enabled(self, enabled: bool):
+        """
+        # English: Enables or disables all 18 manual input fields.
+        # Deutsch: Aktiviert oder deaktiviert alle 18 manuellen Eingabefelder.
+        """
+        all_fields = [
+            'edit_vtas_1', 'edit_vtas_2', 'edit_vtas_3', 'edit_vref_1', 'edit_vref_2', 'edit_vref_3',
+            'edit_atas_1', 'edit_atas_2', 'edit_atas_3', 'edit_aref_1', 'edit_aref_2', 'edit_aref_3',
+            'edit_wtas_1', 'edit_wtas_2', 'edit_wtas_3', 'edit_wref_1', 'edit_wref_2', 'edit_wref_3'
+        ]
+        for field_name in all_fields:
+            if hasattr(self.ui, field_name):
+                getattr(self.ui, field_name).setEnabled(enabled)
 
     def on_online_check_clicked(self):
         """

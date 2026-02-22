@@ -1,0 +1,4 @@
+Ref_Volt,Target_Volt,Ref_Amp,Target_Amp,Ref_Watt,Target_Watt
+4.0,4.0,5.0,4.0,4.0,4.0
+1.0,1.0,5.0,4.0,15.0,4.0
+1.0,1.0,5.0,4.0,55.0,75.0

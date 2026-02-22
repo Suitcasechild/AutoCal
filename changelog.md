@@ -1,12 +1,24 @@
 # Changelog
 
-## v5.4.0-dev (2026-02-22)
+## v5.4.0 (2026-02-22)
 
-### 🌍 Internationalisierung (i18n)
-*   **Vorbereitung:** Die grundlegende Infrastruktur für die Mehrsprachigkeit wurde implementiert (`i18n_manager.py`).
-*   **Konfiguration:** Die `config.ini` unterstützt nun die Einstellung `language = auto` (bzw. `de`, `en`).
-*   **UI-Anpassung:** Erste Texte im Hauptfenster, in Dialogen und Fehlermeldungen wurden für die Übersetzung markiert (`_()`).
-*   **Dokumentation:** Die Anleitung wurde um einen Hinweis zur Spracheinstellung ergänzt.
+### 🚀 Neue Features / New Features
+*   **Manuelle Kalibrierung (Vollständig) / Manual Calibration (Complete):**
+    *   **Workflow:** Vollständiger Workflow inkl. Vorbereitung (ManualSetupWorker), synchronisierter Datenerfassung (Foto-Methode) und automatischer DUT-Abschaltung.
+    *   **UI:** Neuer dedizierter Eingabebereich für 3 Messwert-Paare. Dynamische Steuerung von Feldsperren und Tooltips.
+    *   **Validierung:** Strikte Formatprüfung (2 Stellen für V/W, 3 Stellen für A) mit visuellem Feedback (roter Rahmen) und intelligenter Button-Sperre.
+    *   **Anleitung:** Interaktiver, nicht-modaler Info-Dialog mit Schritt-für-Schritt Anleitung, lädt Inhalte sicher aus internen Assets.
+*   **Verbesserte Benutzeroberfläche / Enhanced UI:**
+    *   **Abbruch-Modus (Variante 1):** Der Haupt-Button wird während der Dateneingabe zu "Manuellen Modus abbrechen", inklusive automatischer DUT-Abschaltung und UI-Reset.
+    *   **UI Locking:** Konsequente Sperrung der Einstellungs-Frames während des aktiven manuellen Workflows zur Vermeidung von Fehlkonfigurationen.
+
+### 🛠️ Verbesserungen & Fixes / Improvements & Bugfixes
+*   **Smart Calculation:** `CalibrationEngine` erkennt unvollständige Messreihen und überspringt V- oder A-Berechnungen automatisch, anstatt fehlerhafte Werte zu produzieren.
+*   **Unified Start:** Integration der "Alte Messdaten"-Erkennung nun auch für den Start der manuellen Kalibrierung.
+*   **Sicherheit (Security):** Umstellung des Hilfesystems auf interne Assets (`assets_manual_info.py`) zur Vermeidung externer Manipulationen.
+*   **Adaptive Mittelwertberechnung:** Intelligenter Wechsel zwischen Min/Max-Ausschluss (bei >4 Werten) und einfachem Mittelwert (bei <=4 Werten).
+
+---
 
 ## v5.3.3 (2026-02-21)
 

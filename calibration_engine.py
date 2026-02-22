@@ -29,89 +29,102 @@ class CalibrationEngine:
     def calculate_new_calibration(self, csv_file, old_cal):
         """
         # English:
-        # Calculates new calibration factor suggestions for a single measurement step (one CSV file).
-        # It compares the mean values of the reference (Soll) and the device-under-test (Ist).
+        # Calculates new calibration factors. It validates each measurement type (V, A, W)
+        # series independently. Power is mandatory. V and A are optional and will be
+        # skipped if their data series is incomplete (contains zeros).
         # Deutsch:
-        # Berechnet neue Kalibrierfaktor-Vorschläge für eine einzelne Messstufe (eine CSV-Datei).
-        # Vergleicht die Mittelwerte der Referenz (Soll) und des Prüflings (Ist).
+        # Berechnet neue Kalibrierfaktoren. Validiert jede Mess-Art (V, A, W)
+        # unabhängig. Leistung ist obligatorisch. V und A sind optional und werden
+        # übersprungen, wenn ihre Datenreihen unvollständig sind (Nullen enthalten).
 
-        :param csv_file: (str) Path to the CSV file containing measurement data for one step.
-                         (str) Pfad zur CSV-Datei mit den Messdaten einer Stufe.
-        :param old_cal: (dict) The existing calibration factors of the device.
-                        (dict) Die bestehenden Kalibrierfaktoren des Geräts.
-        :return: (dict) A dictionary containing all calculated results for this step.
-                 (dict) Ein Dictionary mit allen berechneten Ergebnissen für diese Stufe.
+        :param csv_file: Path to the CSV file with measurement data.
+        :param old_cal: The existing calibration factors of the device.
+        :return: A dictionary with calculated results, or None on failure.
         """
-        # English: Read the measurement data from the CSV file.
-        # Deutsch: Lese die Messdaten aus der CSV-Datei.
         try:
             df = pd.read_csv(csv_file)
         except Exception as e:
-            print(_("❌ Fehler beim Lesen der CSV {csv_file}: {e}").format(csv_file=csv_file, e=e))
+            print(f"❌ Fehler beim Lesen der CSV {csv_file}: {e}")
             return None
 
-        # English: Validate required columns.
-        # Deutsch: Erforderliche Spalten validieren.
         required_cols = ['Ref_Volt', 'Ref_Amp', 'Ref_Watt', 'Target_Volt', 'Target_Amp', 'Target_Watt']
         if not all(col in df.columns for col in required_cols):
-            print(_("❌ Fehler: CSV {csv_file} enthält nicht alle erforderlichen Spalten.").format(csv_file=csv_file))
+            print(f"❌ Fehler: CSV {csv_file} enthält nicht alle erforderlichen Spalten.")
             return None
 
         if len(df) == 0:
-            print(_("⚠️ Warnung: CSV {csv_file} ist leer.").format(csv_file=csv_file))
+            print(f"⚠️ Warnung: CSV {csv_file} ist leer.")
             return None
 
-        # English: Calculate the mean values. If we have at least 3 values, exclude min/max.
-        # Otherwise, take the simple mean of all available values.
-        # Deutsch: Mittelwerte berechnen. Bei mindestens 3 Werten Min/Max ausschließen.
-        # Andernfalls den einfachen Mittelwert aller verfügbaren Werte nehmen.
-        if len(df) >= 3:
-            soll = {
-                "V": df['Ref_Volt'].sort_values().iloc[1:-1].mean(),
-                "A": df['Ref_Amp'].sort_values().iloc[1:-1].mean(),
-                "W": df['Ref_Watt'].sort_values().iloc[1:-1].mean()
-            }
-            ist = {
-                "V": df['Target_Volt'].sort_values().iloc[1:-1].mean(),
-                "A": df['Target_Amp'].sort_values().iloc[1:-1].mean(),
-                "W": df['Target_Watt'].sort_values().iloc[1:-1].mean()
-            }
+        # --- VALIDATION ---
+        # English: Power series is mandatory. Abort if any value is zero.
+        # Deutsch: Leistungs-Reihe ist obligatorisch. Abbruch, wenn ein Wert Null ist.
+        if (df['Ref_Watt'] <= 0).any() or (df['Target_Watt'] <= 0).any():
+            print("❌ FEHLER: Die Leistungs-Messreihe (Watt) ist unvollständig oder enthält Nullwerte. Dies ist ein Pflichtfeld. Berechnung abgebrochen.")
+            return None
+
+        # English: Voltage series is optional. Check if it's complete.
+        # Deutsch: Spannungs-Reihe ist optional. Prüfe, ob sie vollständig ist.
+        is_voltage_valid = (df['Ref_Volt'] > 0).all() and (df['Target_Volt'] > 0).all()
+        if not is_voltage_valid:
+            print("ℹ️ Hinweis: Spannungs-Messreihe (Volt) ist unvollständig. VCal-Berechnung wird übersprungen.")
+
+        # English: Current series is optional. Check if it's complete.
+        # Deutsch: Strom-Reihe ist optional. Prüfe, ob sie vollständig ist.
+        is_current_valid = (df['Ref_Amp'] > 0).all() and (df['Target_Amp'] > 0).all()
+        if not is_current_valid:
+            print("ℹ️ Hinweis: Strom-Messreihe (Ampere) ist unvollständig. ACal-Berechnung wird übersprungen.")
+            
+        # --- CALCULATION OF MEAN VALUES ---
+        # English: Use simple mean for manual calibration (max 3 values).
+        # Deutsch: Einfachen Mittelwert für manuelle Kalibrierung nutzen (max. 3 Werte).
+        soll = { "V": df['Ref_Volt'].mean(), "A": df['Ref_Amp'].mean(), "W": df['Ref_Watt'].mean() }
+        ist = { "V": df['Target_Volt'].mean(), "A": df['Target_Amp'].mean(), "W": df['Target_Watt'].mean() }
+
+        # --- CALCULATION OF NEW CALIBRATION FACTORS ---
+        stufen_cal = {}
+        
+        # English: Calculate VCal only if the voltage series was valid.
+        # Deutsch: VCal nur berechnen, wenn die Spannungs-Reihe gültig war.
+        if is_voltage_valid:
+            stufen_cal['VCal'] = int(old_cal['VCal'] * (soll['V'] / ist['V'])) if ist['V'] > 0 else old_cal['VCal']
         else:
-            print(_("ℹ️ Hinweis: Zu wenige Datenpunkte ({len_df}) in {basename_csv_file} für Min/Max-Ausschluss. Nutze einfachen Mittelwert.").format(len_df=len(df), basename_csv_file=os.path.basename(csv_file)))
-            soll = {
-                "V": df['Ref_Volt'].mean(),
-                "A": df['Ref_Amp'].mean(),
-                "W": df['Ref_Watt'].mean()
-            }
-            ist = {
-                "V": df['Target_Volt'].mean(),
-                "A": df['Target_Amp'].mean(),
-                "W": df['Target_Watt'].mean()
-            }
+            stufen_cal['VCal'] = old_cal['VCal'] # Pass through old value
 
-        # English: Calculate absolute and relative differences.
-        # Deutsch: Berechne die absoluten und relativen Abweichungen.
-        diff_abs = {k: ist[k] - soll[k] for k in soll}
-        diff_rel = {k: (diff_abs[k] / soll[k] * 100) if soll[k] > 0 else 0 for k in soll}
+        # English: Calculate ACal only if the current series was valid.
+        # Deutsch: ACal nur berechnen, wenn die Strom-Reihe gültig war.
+        if is_current_valid:
+            stufen_cal['ACal'] = int(old_cal['ACal'] * (soll['A'] / ist['A'])) if ist['A'] > 0 else old_cal['ACal']
+        else:
+            stufen_cal['ACal'] = old_cal['ACal'] # Pass through old value
 
-        # English: Calculate the suggested calibration factors for this specific step.
-        # Deutsch: Berechne die vorgeschlagenen Kalibrierfaktoren für diese spezifische Stufe.
-        stufen_cal = {
-            "VCal": int(old_cal['VCal'] * (soll['V'] / ist['V'])) if ist['V'] > 0 else old_cal['VCal'],
-            "ACal": int(old_cal['ACal'] * (soll['A'] / ist['A'])) if ist['A'] > 0 else old_cal['ACal'],
-            "WCal": int(old_cal['WCal'] * (soll['W'] / ist['W'])) if ist['W'] > 0 else old_cal['WCal']
+        # English: Power is always calculated as it's mandatory.
+        # Deutsch: Leistung wird immer berechnet, da obligatorisch.
+        stufen_cal['WCal'] = int(old_cal['WCal'] * (soll['W'] / ist['W'])) if ist['W'] > 0 else old_cal['WCal']
+
+        # --- CALCULATE DIFFERENCES FOR REPORTING ---
+        # English: Set diffs to 0 if calculation was skipped, to avoid errors in the report.
+        # Deutsch: Setze Diffs auf 0, wenn die Berechnung übersprungen wurde, um Fehler im Report zu vermeiden.
+        diff_abs = {
+            'V': (ist['V'] - soll['V']) if is_voltage_valid else 0,
+            'A': (ist['A'] - soll['A']) if is_current_valid else 0,
+            'W': ist['W'] - soll['W']
+        }
+        diff_rel = {
+            'V': (diff_abs['V'] / soll['V'] * 100) if is_voltage_valid and soll['V'] > 0 else 0,
+            'A': (diff_abs['A'] / soll['A'] * 100) if is_current_valid and soll['A'] > 0 else 0,
+            'W': (diff_abs['W'] / soll['W'] * 100) if soll['W'] > 0 else 0
         }
 
-        # English: Return a structured dictionary with all results for this step.
-        # Deutsch: Gib ein strukturiertes Dictionary mit allen Ergebnissen dieser Stufe zurück.
+        # English: If a value was not calculated, don't show it in the 'Ist'/'Soll' report part.
+        # Deutsch: Wenn ein Wert nicht berechnet wurde, zeige ihn nicht im 'Ist'/'Soll'-Teil des Reports.
+        if not is_voltage_valid: soll['V'], ist['V'] = 0, 0
+        if not is_current_valid: soll['A'], ist['A'] = 0, 0
+
         return {
-            "Stufe": None,
-            "Soll": soll,
-            "Ist": ist,
-            "Diff_Abs": diff_abs,
-            "Diff_Rel": diff_rel,
-            "Alt_Cal": old_cal,
-            "Stufen_Cal": stufen_cal
+            "Stufe": None, "Soll": soll, "Ist": ist,
+            "Diff_Abs": diff_abs, "Diff_Rel": diff_rel,
+            "Alt_Cal": old_cal, "Stufen_Cal": stufen_cal
         }
 
     def write_summary(self, all_results, data_ts, report_ts=None, cal_mode="Unbekannt", old_cal=None, dut_info=None, ref_info=None):
@@ -197,42 +210,64 @@ class CalibrationEngine:
             f.write(_("  Kalibrier-Modus:  {cal_mode}\n").format(cal_mode=cal_mode))
             f.write(_("  Datenquelle (CSV): {data_ts}\n").format(data_ts=data_ts))
             f.write(_("  Report erstellt:    {actual_report_ts}\n").format(actual_report_ts=actual_report_ts))
+            
+            if cal_mode == "MANUAL":
+                f.write("\n" + "="*85 + "\n")
+                f.write(_("HINWEIS: Diese Kalibrierung wurde auf Basis manuell eingegebener Referenzwerte durchgeführt.") + "\n")
+
             f.write("="*85 + "\n")
 
             f.write("\n" + _("[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)") + "\n")
             for res in all_results:
                 f.write(_("\nSTUFE {stufe}:\n").format(stufe=res['Stufe']))
-                f.write(_("  Spannung: Ref {ref_v:>7.2f}V | DUT {dut_v:>7.2f}V | "
-                        "Err: {err_abs_v:>+6.2f}V ({err_rel_v:>+6.2f}%) -> Cal-Vorschlag: {cal_v}\n").format(
-                            ref_v=res['Soll']['V'], dut_v=res['Ist']['V'], 
-                            err_abs_v=res['Diff_Abs']['V'], err_rel_v=res['Diff_Rel']['V'], cal_v=res['Stufen_Cal']['VCal']))
-                f.write(_("  Strom:    Ref {ref_a:>7.3f}A | DUT {dut_a:>7.3f}A | "
-                        "Err: {err_abs_a:>+6.3f}A ({err_rel_a:>+6.2f}%) -> Cal-Vorschlag: {cal_a}\n").format(
-                            ref_a=res['Soll']['A'], dut_a=res['Ist']['A'], 
-                            err_abs_a=res['Diff_Abs']['A'], err_rel_a=res['Diff_Rel']['A'], cal_a=res['Stufen_Cal']['ACal']))
+                
+                # English: Only show lines if the corresponding values are not zero.
+                # Deutsch: Zeilen nur anzeigen, wenn die zugehörigen Werte nicht Null sind.
+                if res['Soll']['V'] != 0 and res['Ist']['V'] != 0:
+                    f.write(_("  Spannung: Ref {ref_v:>7.2f}V | DUT {dut_v:>7.2f}V | "
+                            "Err: {err_abs_v:>+6.2f}V ({err_rel_v:>+6.2f}%) -> Cal-Vorschlag: {cal_v}\n").format(
+                                ref_v=res['Soll']['V'], dut_v=res['Ist']['V'], 
+                                err_abs_v=res['Diff_Abs']['V'], err_rel_v=res['Diff_Rel']['V'], cal_v=res['Stufen_Cal']['VCal']))
+                
+                if res['Soll']['A'] != 0 and res['Ist']['A'] != 0:
+                    f.write(_("  Strom:    Ref {ref_a:>7.3f}A | DUT {dut_a:>7.3f}A | "
+                            "Err: {err_abs_a:>+6.3f}A ({err_rel_a:>+6.2f}%) -> Cal-Vorschlag: {cal_a}\n").format(
+                                ref_a=res['Soll']['A'], dut_a=res['Ist']['A'], 
+                                err_abs_a=res['Diff_Abs']['A'], err_rel_a=res['Diff_Rel']['A'], cal_a=res['Stufen_Cal']['ACal']))
+
                 f.write(_("  Leistung: Ref {ref_w:>7.2f}W | DUT {dut_w:>7.2f}W | "
                         "Err: {err_abs_w:>+6.2f}W ({err_rel_w:>+6.2f}%) -> Cal-Vorschlag: {cal_w}\n").format(
                             ref_w=res['Soll']['W'], dut_w=res['Ist']['W'], 
                             err_abs_w=res['Diff_Abs']['W'], err_rel_w=res['Diff_Rel']['W'], cal_w=res['Stufen_Cal']['WCal']))
 
-            if reg_data:
+            # English: Suppress regression section for HOME and MANUAL mode as it's not applicable.
+            # Deutsch: Regressions-Abschnitt für HOME- und MANUAL-Modus unterdrücken, da nicht anwendbar.
+            if reg_data and cal_mode == "PRO":
                 f.write("\n" + "="*85 + "\n")
                 f.write(_("[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)") + "\n")
                 f.write(_("Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).") + "\n")
                 p_reg = reg_data['Power']
                 f.write(_("  Leistung (W): Steigung m = {slope:.6f} | Bestimmtheitsmaß R2 = {r_squared:.6f}\n").format(slope=p_reg['slope'], r_squared=p_reg['r_squared']))
 
-                f.write("\n" + "="*85 + "\n")
-                f.write(_("[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE") + "\n\n")
-            
-                oc_v = old_cal.get('VCal', _('????')) if old_cal else _('????')
-                oc_a = old_cal.get('ACal', _('????')) if old_cal else _('????')
-                oc_w = old_cal.get('WCal', _('????')) if old_cal else _('????')
+            f.write("\n" + "="*85 + "\n")
+            f.write(_("[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE") + "\n\n")
+        
+            oc_v = old_cal.get('VCal', _('????')) if old_cal else _('????')
+            oc_a = old_cal.get('ACal', _('????')) if old_cal else _('????')
+            oc_w = old_cal.get('WCal', _('????')) if old_cal else _('????')
 
+            # English: Display suggestions based on available data.
+            # Deutsch: Vorschläge basierend auf verfügbaren Daten anzeigen.
+            if avg_v != old_cal.get('VCal'):
                 f.write(_("    VoltageCal {oc_v:<15}          VoltageCal {avg_v} (Mittelwert der Stufen)\n").format(oc_v=str(oc_v), avg_v=avg_v))
+            if avg_a != old_cal.get('ACal'):
                 f.write(_("    CurrentCal {oc_a:<15}          CurrentCal {avg_a} (Mittelwert der Stufen)\n").format(oc_a=str(oc_a), avg_a=avg_a))
+
+            if cal_mode == "PRO":
                 f.write(_("      PowerCal {oc_w:<15}            PowerCal {pcal_from_regression} (aus Regression, empfohlen)\n").format(oc_w=str(oc_w), pcal_from_regression=pcal_from_regression))
                 f.write(_("                                          └─ Alternative: {pcal_from_avg} (Mittelwert der Stufen)\n").format(pcal_from_avg=pcal_from_avg))
+            else: # HOME or MANUAL
+                f.write(_("      PowerCal {oc_w:<15}            PowerCal {pcal_from_avg} (Mittelwert)\n").format(oc_w=str(oc_w), pcal_from_avg=pcal_from_avg))
 
             f.write("\n" + "="*85 + "\n")
             f.write(_("ENDE DES PROTOKOLLS") + "\n")

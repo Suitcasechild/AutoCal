@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>194</height>
+    <height>147</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
    <property name="geometry">
     <rect>
      <x>22</x>
-     <y>160</y>
+     <y>110</y>
      <width>111</width>
      <height>26</height>
     </rect>
@@ -76,42 +76,13 @@
    <property name="geometry">
     <rect>
      <x>172</x>
-     <y>160</y>
+     <y>110</y>
      <width>111</width>
      <height>26</height>
     </rect>
    </property>
    <property name="text">
     <string>Übernehmen</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btn_search_fluke">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>90</y>
-     <width>191</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Fluke finden</string>
-   </property>
-  </widget>
-  <widget class="QProgressBar" name="progress_scan">
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>120</y>
-     <width>181</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="value">
-    <number>24</number>
-   </property>
-   <property name="textVisible">
-    <bool>true</bool>
    </property>
   </widget>
  </widget>

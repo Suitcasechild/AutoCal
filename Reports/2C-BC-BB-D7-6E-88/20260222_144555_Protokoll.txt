@@ -1,0 +1,44 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-3
+  Hostname:    NOUS-3-D76E88-3720
+  MAC Address: 2C:BC:BB:D7:6E:88
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260222_144555
+  Report erstellt:    20260222_144555
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  229.83V | DUT  229.43V | Err:  -0.40V ( -0.17%) -> Cal-Vorschlag: 1524
+  Strom:    Ref   3.670A | DUT   3.669A | Err: -0.001A ( -0.04%) -> Cal-Vorschlag: 3247
+  Leistung: Ref  843.47W | DUT  841.86W | Err:  -1.61W ( -0.19%) -> Cal-Vorschlag: 9431
+
+STUFE 2:
+  Spannung: Ref  225.98V | DUT  226.07V | Err:  +0.09V ( +0.04%) -> Cal-Vorschlag: 1521
+  Strom:    Ref   8.406A | DUT   8.438A | Err: +0.032A ( +0.38%) -> Cal-Vorschlag: 3233
+  Leistung: Ref 1899.69W | DUT 1908.26W | Err:  +8.57W ( +0.45%) -> Cal-Vorschlag: 9370
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.996711 | Bestimmtheitsmaß R2 = 0.999986
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1522                     VoltageCal 1522 (Mittelwert der Stufen)
+    CurrentCal 3246                     CurrentCal 3240 (Mittelwert der Stufen)
+      PowerCal 9413                       PowerCal 9382 (aus Regression, empfohlen)
+                                          └─ Alternative: 9400 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
