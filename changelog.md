@@ -13,6 +13,7 @@
     *   **UI Locking:** Konsequente Sperrung der Einstellungs-Frames während des aktiven manuellen Workflows zur Vermeidung von Fehlkonfigurationen.
 
 ### 🛠️ Verbesserungen & Fixes / Improvements & Bugfixes
+*   **Dokumentation:** `anleitung.md` wurde als `userguide.md` kopiert, um eine international verständliche Dateibenennung zu gewährleisten.
 *   **Smart Calculation:** `CalibrationEngine` erkennt unvollständige Messreihen und überspringt V- oder A-Berechnungen automatisch, anstatt fehlerhafte Werte zu produzieren.
 *   **Unified Start:** Integration der "Alte Messdaten"-Erkennung nun auch für den Start der manuellen Kalibrierung.
 *   **Sicherheit (Security):** Umstellung des Hilfesystems auf interne Assets (`assets_manual_info.py`) zur Vermeidung externer Manipulationen.
