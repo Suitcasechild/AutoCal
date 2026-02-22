@@ -100,6 +100,34 @@ After the measurement, a dialog displays the detailed protocol:
 *   **Data Analysis:** `pandas` & `numpy`
 
 ---
+
+## 📸 Screenshots
+
+### 01 first measurement
+![01 first measurement](Screenshots/v533/01_first_measurement.png)
+
+### 02 initial report
+![02 initial report](Screenshots/v533/02_initial_report.png)
+
+### 03 report after sent calibration values
+![03 report after sent calibration values](Screenshots/v533/03_report%20after%20sent%20calibration%20values.png)
+
+### 04 validation measurement
+![04 validation measurement](Screenshots/v533/04_validation%20measurement.png)
+
+### 05 validation report
+![05 validation report](Screenshots/v533/05_validation%20report.png)
+
+### YY regression diagramm sample
+![YY regression diagramm sample](Screenshots/v533/YY_regression%20diagramm_sample.png)
+
+### ZZ measurement with external device
+![ZZ measurement with external device](Screenshots/v533/ZZ_measurement%20with%20external%20device.png)
+
+### ZZ report external measurement device
+![ZZ report external measurement device](Screenshots/v533/ZZ_report%20external%20measurement%20device.png)
+
+---
 ---
 
 # Tasmota Precision Calibrator (DE)
@@ -145,3 +173,31 @@ After the measurement, a dialog displays the detailed protocol:
 *   **GUI:** PySide6 (Qt)
 *   **Echtzeit-Diagramme:** pyqtgraph
 *   **Datenverarbeitung:** `pandas` & `numpy`
+
+---
+
+## 📸 Screenshots
+
+### 01 first measurement
+![01 first measurement](Screenshots/v533/01_first_measurement.png)
+
+### 02 initial report
+![02 initial report](Screenshots/v533/02_initial_report.png)
+
+### 03 report after sent calibration values
+![03 report after sent calibration values](Screenshots/v533/03_report%20after%20sent%20calibration%20values.png)
+
+### 04 validation measurement
+![04 validation measurement](Screenshots/v533/04_validation%20measurement.png)
+
+### 05 validation report
+![05 validation report](Screenshots/v533/05_validation%20report.png)
+
+### YY regression diagramm sample
+![YY regression diagramm sample](Screenshots/v533/YY_regression%20diagramm_sample.png)
+
+### ZZ measurement with external device
+![ZZ measurement with external device](Screenshots/v533/ZZ_measurement%20with%20external%20device.png)
+
+### ZZ report external measurement device
+![ZZ report external measurement device](Screenshots/v533/ZZ_report%20external%20measurement%20device.png)

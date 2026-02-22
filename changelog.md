@@ -21,6 +21,9 @@
 *   **Verbesserte Robustheit der DUT-Vorbereitung:**
     *   Die Funktion `prepare_dut` sendet Befehle nun einzeln und mit expliziter URL-Kodierung. Dies stellt sicher, dass alle Einstellungen (Auflösung, Anzeige bei Power-Off) zuverlässig in der Dose ankommen.
     *   **English:** Improved DUT Preparation: Commands are now sent individually with proper URL encoding to ensure reliability.
+*   **Dokumentation & Visualisierung:**
+    *   **README-Update:** Die `README.md` wurde in beiden Sprachversionen (DE/EN) um eine umfangreiche Screenshot-Galerie der aktuellen Version v5.3.3 erweitert. Dies visualisiert den gesamten Prozess von der ersten Messung über die Analyse bis zur Validierung.
+    *   **English:** Documentation & Visualization: Updated `README.md` with a comprehensive screenshot gallery (v5.3.3) for both German and English sections.
 
 ## v5.3.2 (2026-02-21)
 

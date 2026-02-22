@@ -1,0 +1,60 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-3
+  Hostname:    NOUS-3-D76E88-3720
+  MAC Address: 2C:BC:BB:D7:6E:88
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260222_112957
+  Report erstellt:    20260222_112957
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  230.87V | DUT  230.01V | Err:  -0.87V ( -0.38%) -> Cal-Vorschlag: 1527
+  Strom:    Ref   0.290A | DUT   0.272A | Err: -0.018A ( -6.35%) -> Cal-Vorschlag: 3460
+  Leistung: Ref   67.01W | DUT   62.61W | Err:  -4.40W ( -6.57%) -> Cal-Vorschlag: 10074
+
+STUFE 2:
+  Spannung: Ref  228.10V | DUT  227.63V | Err:  -0.47V ( -0.21%) -> Cal-Vorschlag: 1525
+  Strom:    Ref   3.642A | DUT   3.630A | Err: -0.011A ( -0.31%) -> Cal-Vorschlag: 3251
+  Leistung: Ref  830.61W | DUT  827.66W | Err:  -2.95W ( -0.36%) -> Cal-Vorschlag: 9446
+
+STUFE 3:
+  Spannung: Ref  226.83V | DUT  226.53V | Err:  -0.29V ( -0.13%) -> Cal-Vorschlag: 1523
+  Strom:    Ref   5.107A | DUT   5.102A | Err: -0.005A ( -0.09%) -> Cal-Vorschlag: 3244
+  Leistung: Ref 1158.63W | DUT 1157.83W | Err:  -0.81W ( -0.07%) -> Cal-Vorschlag: 9419
+
+STUFE 4:
+  Spannung: Ref  224.42V | DUT  224.43V | Err:  +0.02V ( +0.01%) -> Cal-Vorschlag: 1521
+  Strom:    Ref   8.352A | DUT   8.361A | Err: +0.009A ( +0.10%) -> Cal-Vorschlag: 3237
+  Leistung: Ref 1874.45W | DUT 1879.11W | Err:  +4.66W ( +0.25%) -> Cal-Vorschlag: 9389
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.999057 | Bestimmtheitsmaß R2 = 0.999984
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1522                     VoltageCal 1524 (Mittelwert der Stufen)
+    CurrentCal 3241                     CurrentCal 3298 (Mittelwert der Stufen)
+      PowerCal 9413                       PowerCal 9404 (aus Regression, empfohlen)
+                                          └─ Alternative: 9582 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+[11:32:56] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE
+[11:32:56] CurrentCal: 3241 -> 3298 | [OK]
+[11:32:56] Gesamtstatus: ERFOLGREICH
+=====================================================================================

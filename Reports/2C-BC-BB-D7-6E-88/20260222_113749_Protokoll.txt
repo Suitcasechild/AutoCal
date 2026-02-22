@@ -1,0 +1,47 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-3
+  Hostname:    NOUS-3-D76E88-3720
+  MAC Address: 2C:BC:BB:D7:6E:88
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260222_113749
+  Report erstellt:    20260222_113749
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  227.42V | DUT  226.70V | Err:  -0.72V ( -0.32%) -> Cal-Vorschlag: 1526
+  Strom:    Ref   3.610A | DUT   3.688A | Err: +0.078A ( +2.15%) -> Cal-Vorschlag: 3228
+  Leistung: Ref  821.52W | DUT  822.97W | Err:  +1.45W ( +0.18%) -> Cal-Vorschlag: 9396
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.998227 | Bestimmtheitsmaß R2 = 0.715224
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1522                     VoltageCal 1526 (Mittelwert der Stufen)
+    CurrentCal 3298                     CurrentCal 3228 (Mittelwert der Stufen)
+      PowerCal 9413                       PowerCal 9396 (aus Regression, empfohlen)
+                                          └─ Alternative: 9396 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+[11:39:09] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE
+[11:39:09] CurrentCal: 3298 -> 3228 | [OK]
+[11:39:09] Gesamtstatus: ERFOLGREICH
+=====================================================================================
