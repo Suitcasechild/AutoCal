@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>147</height>
+    <height>210</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>22</x>
-     <y>110</y>
+     <y>170</y>
      <width>110</width>
      <height>26</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>172</x>
-     <y>110</y>
+     <y>170</y>
      <width>110</width>
      <height>26</height>
     </rect>
@@ -73,6 +73,75 @@
    </property>
    <property name="text">
     <string>...</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DialogSetupTasmota_2">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>60</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Toleranz Spannung (abs %):</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DialogSetupTasmota_3">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>90</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Toleranz Strom (abs %):</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DialogSetupTasmota_4">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>120</y>
+     <width>151</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Toleranz Leistung (abs %):</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="edit_devV">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>60</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="edit_devI">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>90</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="edit_devP">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>120</y>
+     <width>41</width>
+     <height>26</height>
+    </rect>
    </property>
   </widget>
  </widget>
