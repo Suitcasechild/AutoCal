@@ -75,7 +75,7 @@ class ReferenceManager:
             # Deutsch: Öffne die serielle Verbindung (klappt i.d.R., solange der USB-Adapter steckt).
             self.ser = serial.Serial(port, baud, timeout=3)
             
-            print(f"--- Initialisiere Fluke 45 auf {port} ---")
+            print(_("--- Initialisiere Fluke 45 auf {port} ---").format(port=port))
             
             # English: Perform a hardware ping to see if a device is actually responding.
             # Deutsch: Führe einen Hardware-Ping durch, um zu sehen, ob ein Gerät tatsächlich antwortet.
@@ -84,15 +84,15 @@ class ReferenceManager:
             test_resp = self.ser.read_all().decode('utf-8', errors='replace').strip()
             
             if not test_resp or "FLUKE" not in test_resp.upper():
-                error_msg = "Keine gültige Antwort vom Fluke."
+                error_msg = _("Keine gültige Antwort vom Fluke.")
                 if test_resp:
-                    error_msg += f" (Empfangen: {repr(test_resp)})"
+                    error_msg += _(" (Empfangen: {test_resp_repr})").format(test_resp_repr=repr(test_resp))
                 else:
-                    error_msg += " (Gerät antwortet nicht)"
+                    error_msg += _(" (Gerät antwortet nicht)")
                 raise Exception(error_msg)
             
-            print(f"Verbindung bestätigt: {test_resp}")
-            print("Setze Modus (VAC Fix-Range + AAC2)...")
+            print(_("Verbindung bestätigt: {test_resp}").format(test_resp=test_resp))
+            print(_("Setze Modus (VAC Fix-Range + AAC2)..."))
             
             # English: Send reset command, set to VAC, fix range to 300V, set secondary to AAC.
             # Deutsch: Sende Reset-Befehl, setze auf VAC, fixiere Bereich auf 300V, setze Sekundäranzeige auf AAC.
@@ -104,14 +104,14 @@ class ReferenceManager:
             time.sleep(1)
             self.ser.write(b"AAC2\r")
             
-            print("Warte 3s auf stabile Messung...")
+            print(_("Warte 3s auf stabile Messung..."))
             time.sleep(3)
             self.ser.reset_input_buffer()
             
-            print(f"[OK] Fluke 45 ({port}) ist online und bereit.")
+            print(_("[OK] Fluke 45 ({port}) ist online und bereit.").format(port=port))
             return True
         except Exception as e:
-            print(f"[FEHLER] Fluke 45 Initialisierung fehlgeschlagen: {e}")
+            print(_("[FEHLER] Fluke 45 Initialisierung fehlgeschlagen: {e}").format(e=e))
             if self.ser and self.ser.is_open:
                 try:
                     self.ser.close()
@@ -165,7 +165,7 @@ class ReferenceManager:
                     return v, a, v * a
             return None, None, None
         except Exception as e:
-            print(f"❌ Fehler beim Lesen der Fluke-Daten: {e}")
+            print(_("❌ Fehler beim Lesen der Fluke-Daten: {e}").format(e=e))
             return None, None, None
 
     def _get_tasmota_ref_data(self, auth=None):
@@ -199,7 +199,7 @@ class ReferenceManager:
         except Exception as e:
             # English: On any error (e.g., timeout), print it and return None.
             # Deutsch: Falls ein Fehler auftritt (z.B. Timeout), gib ihn aus und gib None zurück.
-            print(f"❌ Fehler beim Lesen der Tasmota-Referenz ({ip}): {e}")
+            print(_("❌ Fehler beim Lesen der Tasmota-Referenz ({ip}): {e}").format(ip=ip, e=e))
             return None, None, None
 
     def get_current_cal_factors(self, target_ip, auth=None):
@@ -223,7 +223,7 @@ class ReferenceManager:
                 if val is not None:
                     factors[key] = int(val)
             except Exception as e:
-                print(f"⚠️ Warnung: Konnte '{cmd}' von {target_ip} nicht abrufen. Nutze Standardwert. Fehler: {e}")
+                print(_("⚠️ Warnung: Konnte '{cmd}' von {target_ip} nicht abrufen. Nutze Standardwert. Fehler: {e}").format(cmd=cmd, target_ip=target_ip, e=e))
                 pass
         return factors
 

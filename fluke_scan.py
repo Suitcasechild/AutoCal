@@ -87,16 +87,16 @@ def find_fluke(current_port=None, current_baud=None, progress_callback=None):
 if __name__ == "__main__":
     # English: Test run if script is executed directly.
     # Deutsch: Testlauf, wenn das Skript direkt ausgeführt wird.
-    print("--- FLUKE 45 AUTO-SCAN DEBUG ---")
+    print(_("--- FLUKE 45 AUTO-SCAN DEBUG ---"))
     available_ports = [p.device for p in serial.tools.list_ports.comports()]
-    print(f"Verfügbare Ports: {available_ports}")
+    print(_("Verfügbare Ports: {available_ports}").format(available_ports=available_ports))
     
     def pc(p): 
-        print(f"Fortschritt: {p}%", end="\r")
+        print(_("Fortschritt: {p}%").format(p=p), end="\r")
         
     result = find_fluke(progress_callback=pc)
     if result:
-        print(f"\n[GEFUNDEN] Fluke 45 auf {result['port']} mit {result['baud']} Baud.")
-        print(f"Identifikation: {result['info']}")
+        print(_("\n[GEFUNDEN] Fluke 45 auf {port} mit {baud} Baud.").format(port=result['port'], baud=result['baud']))
+        print(_("Identifikation: {info}").format(info=result['info']))
     else:
-        print("\n[FEHLER] Kein Gerät gefunden. Bitte Kabel und Strom prüfen.")
+        print(_("\n[FEHLER] Kein Gerät gefunden. Bitte Kabel und Strom prüfen."))

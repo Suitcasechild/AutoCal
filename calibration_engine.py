@@ -47,18 +47,18 @@ class CalibrationEngine:
         try:
             df = pd.read_csv(csv_file)
         except Exception as e:
-            print(f"❌ Fehler beim Lesen der CSV {csv_file}: {e}")
+            print(_("❌ Fehler beim Lesen der CSV {csv_file}: {e}").format(csv_file=csv_file, e=e))
             return None
 
         # English: Validate required columns.
         # Deutsch: Erforderliche Spalten validieren.
         required_cols = ['Ref_Volt', 'Ref_Amp', 'Ref_Watt', 'Target_Volt', 'Target_Amp', 'Target_Watt']
         if not all(col in df.columns for col in required_cols):
-            print(f"❌ Fehler: CSV {csv_file} enthält nicht alle erforderlichen Spalten.")
+            print(_("❌ Fehler: CSV {csv_file} enthält nicht alle erforderlichen Spalten.").format(csv_file=csv_file))
             return None
 
         if len(df) == 0:
-            print(f"⚠️ Warnung: CSV {csv_file} ist leer.")
+            print(_("⚠️ Warnung: CSV {csv_file} ist leer.").format(csv_file=csv_file))
             return None
 
         # English: Calculate the mean values. If we have at least 3 values, exclude min/max.
@@ -77,7 +77,7 @@ class CalibrationEngine:
                 "W": df['Target_Watt'].sort_values().iloc[1:-1].mean()
             }
         else:
-            print(f"ℹ️ Hinweis: Zu wenige Datenpunkte ({len(df)}) in {os.path.basename(csv_file)} für Min/Max-Ausschluss. Nutze einfachen Mittelwert.")
+            print(_("ℹ️ Hinweis: Zu wenige Datenpunkte ({len_df}) in {basename_csv_file} für Min/Max-Ausschluss. Nutze einfachen Mittelwert.").format(len_df=len(df), basename_csv_file=os.path.basename(csv_file)))
             soll = {
                 "V": df['Ref_Volt'].mean(),
                 "A": df['Ref_Amp'].mean(),
@@ -170,68 +170,74 @@ class CalibrationEngine:
         path = os.path.join(self.device_path, f"{actual_report_ts}_Protokoll.txt")
 
         with open(path, "w", encoding="utf-8") as f:
-            f.write(f"TASMOTA PRECISION CALIBRATION REPORT\n")
+            f.write(_("TASMOTA PRECISION CALIBRATION REPORT") + "\n")
             f.write("="*85 + "\n")
             
             # --- DEVICE HEADER ---
             # --- GERÄTE-HEADER ---
             if dut_info:
-                f.write("[PRÜFLING (DUT)]\n")
-                f.write(f"  Device Name: {dut_info.get('name', 'k.A.')}\n")
-                f.write(f"  Hostname:    {dut_info.get('host', 'k.A.')}\n")
-                f.write(f"  MAC Address: {dut_info.get('mac', 'k.A.')}\n")
+                f.write(_("[PRÜFLING (DUT)]") + "\n")
+                f.write(_("  Device Name: {name}\n").format(name=dut_info.get('name', _('k.A.'))))
+                f.write(_("  Hostname:    {host}\n").format(host=dut_info.get('host', _('k.A.'))))
+                f.write(_("  MAC Address: {mac}\n").format(mac=dut_info.get('mac', _('k.A.'))))
                 f.write("\n")
 
             if ref_info:
-                f.write("[REFERENZ]\n")
+                f.write(_("[REFERENZ]") + "\n")
                 if cal_mode == "PRO":
-                    f.write("  Device: FLUKE 45 DUAL Mode Calculated Power (P)\n")
+                    f.write(_("  Device: FLUKE 45 DUAL Mode Calculated Power (P)") + "\n")
                 else: # HOME
-                    f.write(f"  Device Name: {ref_info.get('name', 'k.A.')}\n")
-                    f.write(f"  Hostname:    {ref_info.get('host', 'k.A.')}\n")
-                    f.write(f"  MAC Address: {ref_info.get('mac', 'k.A.')}\n")
+                    f.write(_("  Device Name: {name}\n").format(name=ref_info.get('name', _('k.A.'))))
+                    f.write(_("  Hostname:    {host}\n").format(host=ref_info.get('host', _('k.A.'))))
+                    f.write(_("  MAC Address: {mac}\n").format(mac=ref_info.get('mac', _('k.A.'))))
             f.write("="*85 + "\n\n")
             # --- END HEADER ---
 
-            f.write(f"MESSUNGSDETAILS\n")
-            f.write(f"  Kalibrier-Modus:  {cal_mode}\n")
-            f.write(f"  Datenquelle (CSV): {data_ts}\n")
-            f.write(f"  Report erstellt:    {actual_report_ts}\n")
+            f.write(_("MESSUNGSDETAILS") + "\n")
+            f.write(_("  Kalibrier-Modus:  {cal_mode}\n").format(cal_mode=cal_mode))
+            f.write(_("  Datenquelle (CSV): {data_ts}\n").format(data_ts=data_ts))
+            f.write(_("  Report erstellt:    {actual_report_ts}\n").format(actual_report_ts=actual_report_ts))
             f.write("="*85 + "\n")
 
-            f.write("\n[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)\n")
+            f.write("\n" + _("[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)") + "\n")
             for res in all_results:
-                f.write(f"\nSTUFE {res['Stufe']}:\n")
-                f.write(f"  Spannung: Ref {res['Soll']['V']:>7.2f}V | DUT {res['Ist']['V']:>7.2f}V | "
-                        f"Err: {res['Diff_Abs']['V']:>+6.2f}V ({res['Diff_Rel']['V']:>+6.2f}%) -> Cal-Vorschlag: {res['Stufen_Cal']['VCal']}\n")
-                f.write(f"  Strom:    Ref {res['Soll']['A']:>7.3f}A | DUT {res['Ist']['A']:>7.3f}A | "
-                        f"Err: {res['Diff_Abs']['A']:>+6.3f}A ({res['Diff_Rel']['A']:>+6.2f}%) -> Cal-Vorschlag: {res['Stufen_Cal']['ACal']}\n")
-                f.write(f"  Leistung: Ref {res['Soll']['W']:>7.2f}W | DUT {res['Ist']['W']:>7.2f}W | "
-                        f"Err: {res['Diff_Abs']['W']:>+6.2f}W ({res['Diff_Rel']['W']:>+6.2f}%) -> Cal-Vorschlag: {res['Stufen_Cal']['WCal']}\n")
+                f.write(_("\nSTUFE {stufe}:\n").format(stufe=res['Stufe']))
+                f.write(_("  Spannung: Ref {ref_v:>7.2f}V | DUT {dut_v:>7.2f}V | "
+                        "Err: {err_abs_v:>+6.2f}V ({err_rel_v:>+6.2f}%) -> Cal-Vorschlag: {cal_v}\n").format(
+                            ref_v=res['Soll']['V'], dut_v=res['Ist']['V'], 
+                            err_abs_v=res['Diff_Abs']['V'], err_rel_v=res['Diff_Rel']['V'], cal_v=res['Stufen_Cal']['VCal']))
+                f.write(_("  Strom:    Ref {ref_a:>7.3f}A | DUT {dut_a:>7.3f}A | "
+                        "Err: {err_abs_a:>+6.3f}A ({err_rel_a:>+6.2f}%) -> Cal-Vorschlag: {cal_a}\n").format(
+                            ref_a=res['Soll']['A'], dut_a=res['Ist']['A'], 
+                            err_abs_a=res['Diff_Abs']['A'], err_rel_a=res['Diff_Rel']['A'], cal_a=res['Stufen_Cal']['ACal']))
+                f.write(_("  Leistung: Ref {ref_w:>7.2f}W | DUT {dut_w:>7.2f}W | "
+                        "Err: {err_abs_w:>+6.2f}W ({err_rel_w:>+6.2f}%) -> Cal-Vorschlag: {cal_w}\n").format(
+                            ref_w=res['Soll']['W'], dut_w=res['Ist']['W'], 
+                            err_abs_w=res['Diff_Abs']['W'], err_rel_w=res['Diff_Rel']['W'], cal_w=res['Stufen_Cal']['WCal']))
 
             if reg_data:
                 f.write("\n" + "="*85 + "\n")
-                f.write("[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)\n")
-                f.write("Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).\n")
+                f.write(_("[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)") + "\n")
+                f.write(_("Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).") + "\n")
                 p_reg = reg_data['Power']
-                f.write(f"  Leistung (W): Steigung m = {p_reg['slope']:.6f} | Bestimmtheitsmaß R2 = {p_reg['r_squared']:.6f}\n")
+                f.write(_("  Leistung (W): Steigung m = {slope:.6f} | Bestimmtheitsmaß R2 = {r_squared:.6f}\n").format(slope=p_reg['slope'], r_squared=p_reg['r_squared']))
 
                 f.write("\n" + "="*85 + "\n")
-                f.write("[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE\n\n")
+                f.write(_("[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE") + "\n\n")
             
-                oc_v = old_cal.get('VCal', '????') if old_cal else '????'
-                oc_a = old_cal.get('ACal', '????') if old_cal else '????'
-                oc_w = old_cal.get('WCal', '????') if old_cal else '????'
+                oc_v = old_cal.get('VCal', _('????')) if old_cal else _('????')
+                oc_a = old_cal.get('ACal', _('????')) if old_cal else _('????')
+                oc_w = old_cal.get('WCal', _('????')) if old_cal else _('????')
 
-                f.write(f"    VoltageCal {str(oc_v):<15}          VoltageCal {avg_v} (Mittelwert der Stufen)\n")
-                f.write(f"    CurrentCal {str(oc_a):<15}          CurrentCal {avg_a} (Mittelwert der Stufen)\n")
-                f.write(f"      PowerCal {str(oc_w):<15}            PowerCal {pcal_from_regression} (aus Regression, empfohlen)\n")
-                f.write(f"                                          └─ Alternative: {pcal_from_avg} (Mittelwert der Stufen)\n")
+                f.write(_("    VoltageCal {oc_v:<15}          VoltageCal {avg_v} (Mittelwert der Stufen)\n").format(oc_v=str(oc_v), avg_v=avg_v))
+                f.write(_("    CurrentCal {oc_a:<15}          CurrentCal {avg_a} (Mittelwert der Stufen)\n").format(oc_a=str(oc_a), avg_a=avg_a))
+                f.write(_("      PowerCal {oc_w:<15}            PowerCal {pcal_from_regression} (aus Regression, empfohlen)\n").format(oc_w=str(oc_w), pcal_from_regression=pcal_from_regression))
+                f.write(_("                                          └─ Alternative: {pcal_from_avg} (Mittelwert der Stufen)\n").format(pcal_from_avg=pcal_from_avg))
 
             f.write("\n" + "="*85 + "\n")
-            f.write("ENDE DES PROTOKOLLS\n")
+            f.write(_("ENDE DES PROTOKOLLS") + "\n")
         
-        print(f"\n[FERTIG] Detailliertes Protokoll erstellt: {path}")
+        print(_("\n[FERTIG] Detailliertes Protokoll erstellt: {path}").format(path=path))
         return path
 
     def write_reapply_summary(self, new_report_path, original_report_path, dut_info, ref_info):
@@ -255,20 +261,20 @@ class CalibrationEngine:
                  (str) Der Pfad zur erstellten Protokolldatei.
         """
         with open(new_report_path, "w", encoding="utf-8") as f:
-            f.write(f"TASMOTA RE-APPLY CALIBRATION REPORT\n")
+            f.write(_("TASMOTA RE-APPLY CALIBRATION REPORT") + "\n")
             f.write("="*85 + "\n")
             
             if dut_info:
-                f.write("[PRÜFLING (DUT)]\n")
-                f.write(f"  Device Name: {dut_info.get('name', 'k.A.')}\n")
-                f.write(f"  Hostname:    {dut_info.get('host', 'k.A.')}\n")
-                f.write(f"  MAC Address: {dut_info.get('mac', 'k.A.')}\n")
+                f.write(_("[PRÜFLING (DUT)]") + "\n")
+                f.write(_("  Device Name: {name}\n").format(name=dut_info.get('name', _('k.A.'))))
+                f.write(_("  Hostname:    {host}\n").format(host=dut_info.get('host', _('k.A.'))))
+                f.write(_("  MAC Address: {mac}\n").format(mac=dut_info.get('mac', _('k.A.'))))
                 f.write("\n")
 
-            f.write("[KALIBRIERUNGSQUELLE]\n")
-            f.write(f"  Die angewendeten Kalibrierwerte wurden aus dem folgenden, bestehenden Report entnommen:\n")
-            f.write(f"  -> {os.path.basename(original_report_path)}\n")
+            f.write(_("[KALIBRIERUNGSQUELLE]") + "\n")
+            f.write(_("  Die angewendeten Kalibrierwerte wurden aus dem folgenden, bestehenden Report entnommen:\n") + "\n")
+            f.write(_("  -> {original_report_path_basename}\n").format(original_report_path_basename=os.path.basename(original_report_path)))
             f.write("="*85 + "\n")
         
-        print(f"\n[FERTIG] Gekürztes Re-Apply Protokoll erstellt: {new_report_path}")
+        print(_("\n[FERTIG] Gekürztes Re-Apply Protokoll erstellt: {new_report_path}").format(new_report_path=new_report_path))
         return new_report_path

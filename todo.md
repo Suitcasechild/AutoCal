@@ -89,9 +89,9 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     *   [x] Eine neue Datei `i18n_manager.py` erstellen, die die `gettext`-Logik kapselt.
     *   [x] Diese Datei soll eine `setup_translation()`-Funktion enthalten, die den `language`-Eintrag auswertet, die korrekte `.mo`-Datei lädt und die Übersetzungsfunktion `_` global verfügbar macht.
 
-*   [ ] **3. Vorbereitung der Code-Basis (Texte markieren)**
+*   [x] **3. Vorbereitung der Code-Basis (Texte markieren)**
     *   [x] Die `setup_translation()`-Funktion ganz am Anfang von `gui_main.py` aufrufen.
-    *   [ ] Alle für den Benutzer sichtbaren Zeichenketten in den `.py`-Dateien mit `_()` markieren. (Teilweise erledigt für Hauptfenster und Dialoge)
+    *   [x] Alle für den Benutzer sichtbaren Zeichenketten in den `.py`-Dateien mit `_()` markieren.
 
 ---
 #### **Variante A: Workflow mit Babel (Kommandozeile)**

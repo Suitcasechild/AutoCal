@@ -42,5 +42,5 @@ class CredentialsManager:
         # Deutsch: Löscht alle gespeicherten Zugangsdaten aus dem Speicher.
         """
         self._credentials.clear()
-        print("INFO: All temporary credentials have been cleared.")
+        print(_("INFO: All temporary credentials have been cleared."))
 

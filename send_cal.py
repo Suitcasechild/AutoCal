@@ -41,7 +41,7 @@ def get_current_factors(ip, auth=None):
     except Exception as e:
         # English: Print an error if reading the factors fails.
         # Deutsch: Gib einen Fehler aus, wenn das Lesen der Faktoren fehlschlägt.
-        print(f"Fehler beim Lesen der Faktoren: {e}")
+        print(_("Fehler beim Lesen der Faktoren: {e}").format(e=e))
         return None
 
 def apply_calibration(ip, new_v=None, new_a=None, new_w=None, auth=None):
@@ -60,10 +60,10 @@ def apply_calibration(ip, new_v=None, new_a=None, new_w=None, auth=None):
     :param auth: (tuple, optional) HTTP Auth tuple.
     :return: (str or None) Formatted report string or None on error.
     """
-    print("\n--- STATUS VOR DER ÜBERTRAGUNG ---")
+    print(_("\n--- STATUS VOR DER ÜBERTRAGUNG ---"))
     as_found = get_current_factors(ip, auth=auth)
     if not as_found:
-        print("Fehler: Konnte bestehende Faktoren nicht lesen.")
+        print(_("Fehler: Konnte bestehende Faktoren nicht lesen."))
         return None 
 
     # English: Build the command chain only for provided values.
@@ -74,47 +74,47 @@ def apply_calibration(ip, new_v=None, new_a=None, new_w=None, auth=None):
     if new_w is not None: cmds.append(f"PowerCal {new_w}")
 
     if not cmds:
-        print("Info: Keine Kalibrierwerte zum Senden ausgewählt.")
-        return "Keine Änderungen vorgenommen.\n"
+        print(_("Info: Keine Kalibrierwerte zum Senden ausgewählt."))
+        return _("Keine Änderungen vorgenommen.\n")
 
-    print(f"Sende neue Werte an {ip}...")
+    print(_("Sende neue Werte an {ip}...").format(ip=ip))
     try:
         cmd_chain = "; ".join(cmds)
         httpx.get(f"http://{ip}/cm?cmnd=Backlog%20{cmd_chain}", timeout=5, auth=auth)
         time.sleep(2)
 
-        print("\n--- VERIFIZIERUNG ---")
+        print(_("\n--- VERIFIZIERUNG ---"))
         as_left = get_current_factors(ip, auth=auth)
         if not as_left:
-            print("Fehler: Konnte neue Faktoren nach dem Senden nicht verifizieren.")
+            print(_("Fehler: Konnte neue Faktoren nach dem Senden nicht verifizieren."))
             return None
 
         ts = time.strftime("%H:%M:%S")
         report_lines = ["\n" + "="*85 + "\n"]
-        report_lines.append(f"[{ts}] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE\n")
+        report_lines.append(_("[{ts}] SELEKTIVE ÜBERTRAGUNG DER KALIBRIERWERTE\n").format(ts=ts))
         
         success = True
         if new_v is not None:
             ok = (as_left['VoltageCal'] == new_v)
-            report_lines.append(f"[{ts}] VoltageCal: {as_found['VoltageCal']} -> {new_v} | {'[OK]' if ok else '[FEHLER]'}\n")
+            report_lines.append(_("[{ts}] VoltageCal: {as_found_vcal} -> {new_v} | {status}\n").format(ts=ts, as_found_vcal=as_found['VoltageCal'], new_v=new_v, status='[OK]' if ok else '[FEHLER]'))
             if not ok: success = False
         
         if new_a is not None:
             ok = (as_left['CurrentCal'] == new_a)
-            report_lines.append(f"[{ts}] CurrentCal: {as_found['CurrentCal']} -> {new_a} | {'[OK]' if ok else '[FEHLER]'}\n")
+            report_lines.append(_("[{ts}] CurrentCal: {as_found_acal} -> {new_a} | {status}\n").format(ts=ts, as_found_acal=as_found['CurrentCal'], new_a=new_a, status='[OK]' if ok else '[FEHLER]'))
             if not ok: success = False
 
         if new_w is not None:
             ok = (as_left['PowerCal'] == new_w)
-            report_lines.append(f"[{ts}] PowerCal:   {as_found['PowerCal']} -> {new_w} | {'[OK]' if ok else '[FEHLER]'}\n")
+            report_lines.append(_("[{ts}] PowerCal:   {as_found_wcal} -> {new_w} | {status}\n").format(ts=ts, as_found_wcal=as_found['PowerCal'], new_w=new_w, status='[OK]' if ok else '[FEHLER]'))
             if not ok: success = False
 
-        status_text = "ERFOLGREICH" if success else "TEILWEISE FEHLGESCHLAGEN"
-        report_lines.append(f"[{ts}] Gesamtstatus: {status_text}\n")
+        status_text = _("ERFOLGREICH") if success else _("TEILWEISE FEHLGESCHLAGEN")
+        report_lines.append(_("[{ts}] Gesamtstatus: {status_text}\n").format(ts=ts, status_text=status_text))
         report_lines.append("="*85 + "\n")
         
         return "".join(report_lines)
         
     except Exception as e:
-        print(f"Fehler bei der Übertragung: {e}")
+        print(_("Fehler bei der Übertragung: {e}").format(e=e))
         return None

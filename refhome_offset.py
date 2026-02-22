@@ -36,7 +36,7 @@ def ermittle_offset(ref_ip, auth=None):
 
     while len(strom_werte) < desired_valid_readings:
         if current_attempt >= max_attempts:
-            print(f"  [FEHLER] Konnte nach {max_attempts} Versuchen keinen stabilen Offset ermitteln. Breche ab.")
+            print(_("  [FEHLER] Konnte nach {max_attempts} Versuchen keinen stabilen Offset ermitteln. Breche ab.").format(max_attempts=max_attempts))
             break
         current_attempt += 1
         try:
@@ -50,13 +50,13 @@ def ermittle_offset(ref_ip, auth=None):
             # English: Check for zero values, which are considered invalid for offset.
             # Deutsch: Prüfe auf Nullwerte, die als ungültig für den Offset gelten.
             if a == 0.0 or w == 0.0:
-                print(f"  [WARN] Messversuch {current_attempt}: Ungültige Offset-Messung (0-Wert). Wiederhole... ({len(strom_werte)}/{desired_valid_readings})")
+                print(_("  [WARN] Messversuch {current_attempt}: Ungültige Offset-Messung (0-Wert). Wiederhole... ({current_readings}/{desired_readings})").format(current_attempt=current_attempt, current_readings=len(strom_werte), desired_readings=desired_valid_readings))
             else:
                 strom_werte.append(a)
                 leistung_werte.append(w)
-                print(f"  Messung {len(strom_werte)}/{desired_valid_readings}: {w:.2f}W | {a:.3f}A")
+                print(_("  Messung {current_readings}/{desired_readings}: {w:.2f}W | {a:.3f}A").format(current_readings=len(strom_werte), desired_readings=desired_valid_readings, w=w, a=a))
         except Exception as e:
-            print(f"  [FEHLER] Messversuch {current_attempt}: {e}. Wiederhole...")
+            print(_("  [FEHLER] Messversuch {current_attempt}: {e}. Wiederhole...").format(current_attempt=current_attempt, e=e))
         time.sleep(1) # Wait for 1 second between attempts
         
     # English: Calculate the average of the collected values.
@@ -65,6 +65,6 @@ def ermittle_offset(ref_ip, auth=None):
     avg_w = sum(leistung_werte) / len(leistung_werte) if leistung_werte else 0.0
     
 
-    print(f"[OK] Offset bestimmt: {avg_w:.2f}W / {avg_a:.3f}A")
-    print(f"     Diese Werte werden von allen Referenz-Messungen abgezogen.\n")
+    print(_("[OK] Offset bestimmt: {avg_w:.2f}W / {avg_a:.3f}A").format(avg_w=avg_w, avg_a=avg_a))
+    print(_("     Diese Werte werden von allen Referenz-Messungen abgezogen.\n"))
     return avg_a, avg_w

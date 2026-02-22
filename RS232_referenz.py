@@ -49,7 +49,7 @@ def run_10_measurements_fixed_range():
         # Deutsch: Öffne die serielle Port-Verbindung.
         ser = serial.Serial(PORT, BAUD, timeout=3)
         
-        print("--- Initialisiere Gerät (VAC Fix-Range + AAC2) ---")
+        print(_("--- Initialisiere Gerät (VAC Fix-Range + AAC2) ---"))
         # English: Reset the device to its default state.
         # Deutsch: Setze das Gerät auf seinen Standardzustand zurück.
         ser.write(b"*RST\r")
@@ -62,7 +62,7 @@ def run_10_measurements_fixed_range():
         
         # English: Set a fixed range of 300V (Range 4).
         # Deutsch: Setze einen festen Messbereich von 300V (Range 4).
-        print("Setze Messbereich auf 300V (Fix)...")
+        print(_("Setze Messbereich auf 300V (Fix)..."))
         ser.write(b"RANGE 4\r")
         time.sleep(1)
         
@@ -70,11 +70,11 @@ def run_10_measurements_fixed_range():
         # Deutsch: Setze die sekundäre Anzeige auf Wechselstrom (AAC), was die Dual-Anzeige aktiviert.
         ser.write(b"AAC2\r")
         
-        print("Warte 3s auf stabile Messung...")
+        print(_("Warte 3s auf stabile Messung..."))
         time.sleep(3)
         ser.reset_input_buffer() 
 
-        print(f"{'Nr.':<5} | {'Spannung (V)':<12} | {'Strom (A)':<12}")
+        print(_("{nr:<5} | {voltage:<12} | {current:<12}").format(nr="Nr.", voltage="Spannung (V)", current="Strom (A)"))
         print("-" * 40)
 
         # English: Loop to perform 10 measurements.
@@ -102,7 +102,7 @@ def run_10_measurements_fixed_range():
                 else:
                     # English: Print raw data if parsing fails.
                     # Deutsch: Gib die Rohdaten aus, wenn das Parsen fehlschlägt.
-                    print(f"{i:<5} | Rohdaten: {repr(raw_data)}")
+                    print(_("{i:<5} | Rohdaten: {raw_data_repr}").format(i=i, raw_data_repr=repr(raw_data)))
             
             # English: Clear the input buffer to prevent reading old data in the next loop.
             # Deutsch: Leere den Eingangspuffer, um das Lesen alter Daten in der nächsten Schleife zu verhindern.
@@ -112,10 +112,10 @@ def run_10_measurements_fixed_range():
         # Deutsch: Schließe die serielle Verbindung ordnungsgemäß.
         ser.close()
         print("-" * 40)
-        print("Messreihe beendet.")
+        print(_("Messreihe beendet."))
 
     except Exception as e:
-        print(f"Fehler: {e}")
+        print(_("Fehler: {e}").format(e=e))
 
 # English: This block runs only when the script is executed directly.
 # Deutsch: Dieser Block wird nur ausgeführt, wenn das Skript direkt gestartet wird.
