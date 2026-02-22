@@ -148,7 +148,9 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
 3.  **🖱️ Aktion:** Wählen Sie die **Referenz-Quelle** (Fluke 45 oder Tasmota-Referenz).
     *   *Hintergrund:* Hiermit wird festgelegt, über welchen Kommunikationsweg (RS232 oder HTTP) die Vergleichswerte bezogen werden.
 4.  **⚙️ Aktion:** Stellen Sie die **Messparameter** ein (Stufen & Messungen pro Stufe).
-    *   *Empfehlung:* 1 Stufe mit 30 Messungen bietet ein exzellentes Verhältnis zwischen Zeitaufwand und Präzision.
+    *   **🏠 HOME-Modus:** Die Anzahl der Messstufen ist fest auf **1** eingestellt und deaktiviert. Eine einzige Stufe mit ca. 30 Messungen ist hier der Standard für höchste Präzision.
+    *   **🔬 PRO-Modus:** Hier können Sie mehrere Stufen wählen (z.B. für eine Kennlinien-Aufnahme). 
+    *   *Empfehlung (PRO):* 3 Stufen mit 25 Messungen bieten im Regelfall ein exzellentes Verhältnis zwischen Zeitaufwand und Präzision.
 
 <a name="ch5_2"></a>
 ### 5.2 ▶️ Start der Messsequenz
@@ -179,7 +181,8 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
     *   🟠 **Orange:** Die Abweichung ist zu hoch. Eine Kalibrierung wird dringend empfohlen. Die Checkbox wird automatisch aktiviert.
 3.  **☑️ Aktion:** Passen Sie die Auswahl über die Checkboxen bei Bedarf manuell an.
     *   *Hinweis:* Sie können `VoltageCal`, `CurrentCal` und `PowerCal` einzeln wählen.
-    *   *Wichtig:* Bei der Leistungsmessung müssen Sie sich zwischen **Mean (Mittelwert)** und **Regression** entscheiden. Beides gleichzeitig ist nicht möglich.
+    *   **🏠 HOME-Modus:** Um die Bedienung zu vereinfachen, wird nur die relevante Leistungsoption (**PowerCal**) angezeigt. Die Regressions-Analyse und der Graph sind hier ausgeblendet.
+    *   **🔬 PRO-Modus:** Sie haben die Wahl zwischen **Mean (Mittelwert)** und **Regression**. Über den Button **"📊 REGRESSIONS-GRAPH"** können Sie die Messkurve visuell prüfen. Beides gleichzeitig ist nicht möglich.
 4.  **📤 Aktion:** Klicken Sie auf den Button **"Auswahl Kalibrieren"**.
     *   *Hintergrund:* Nur die markierten Faktoren werden an den Prüfling gesendet. Die Software verifiziert die Übertragung sofort ("As-Left" Prüfung) und dokumentiert das Ergebnis im Log.
 

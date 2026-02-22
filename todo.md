@@ -214,3 +214,16 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
         - [x] Hinweistext auf Deutsch angepasst (Sitzungsspeicherung im RAM).
     - [x] **Prozess-Integration:**
         - [x] Sicherstellen, dass der Haupt-Kalibrierprozess die bereits im Arbeitsspeicher vorhandenen Daten des Prüflings und der Referenzdose nahtlos übernimmt, ohne erneut nachzufragen.
+
+---
+
+### Feature: Vereinfachte HOME-Kalibrierung (Tasmota-Referenz)
+
+- [x] **Einschränkung der Messstufen:**
+    - [x] Implementierung einer Logik in `gui_main.py`, die bei Auswahl von "Tasmota" (HOME-Modus) die Anzahl der Messstufen fest auf **1** setzt.
+    - [x] Das Eingabefeld `spin_steps` muss im HOME-Modus deaktiviert (ausgegraut) werden.
+    - [x] Bei Abwahl des HOME-Modus wird das Feld wieder freigegeben und der vorherige Wert (aus der Konfiguration) wiederhergestellt.
+- [x] **Anpassung des Ergebnis-Dialogs (`CalibrationReportDialog`):**
+    - [x] Übergabe des aktuellen Kalibrierungsmodus ("PRO" oder "HOME") an den Dialog.
+    - [x] Im HOME-Modus wird der Button `📊 REGRESSIONS-GRAPH` ausgeblendet, da er bei nur einer Messstufe nicht relevant ist.
+    - [x] Ausblenden der Checkbox `PowerCal (Regression)` im HOME-Modus, um Verwirrung zu vermeiden.

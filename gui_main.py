@@ -441,6 +441,13 @@ class CalibrationReportDialog(QDialog):
         self.btn_layout.addWidget(self.btn_close)
         self.layout.addLayout(self.btn_layout)
 
+        # English: Hide regression-related elements in HOME mode.
+        # Deutsch: Regressions-bezogene Elemente im HOME-Modus ausblenden.
+        if self.report_info.get('mode') == "HOME":
+            self.btn_graph.hide()
+            self.check_w_regr.hide()
+            self.check_w_mean.setText("PowerCal")
+
     def init_selection_logic(self):
         """
         # English: Calculates deviations and sets checkboxes/labels accordingly.
@@ -938,6 +945,12 @@ class MainWindow(QMainWindow):
         self.ui.btn_start.clicked.connect(self.toggle_measurement)
         self.ui.check_ref_pro.toggled.connect(lambda c: self.ui.check_ref_home.setChecked(False) if c else None)
         self.ui.check_ref_home.toggled.connect(lambda c: self.ui.check_ref_pro.setChecked(False) if c else None)
+        
+        # English: Connect HOME-mode to steps restriction logic.
+        # Deutsch: HOME-Modus mit der Logik zur Stufenbeschränkung verbinden.
+        self.ui.check_ref_home.toggled.connect(self.update_steps_restriction)
+        # English: Perform initial check. / Deutsch: Initiale Prüfung durchführen.
+        self.update_steps_restriction(self.ui.check_ref_home.isChecked())
 
         if hasattr(self.ui, 'frame_fluke'):
             self.ui.check_ref_pro.toggled.connect(self.ui.frame_fluke.setVisible)
@@ -1052,6 +1065,11 @@ class MainWindow(QMainWindow):
         ui_file.open(QFile.ReadOnly)
         dialog = QUiLoader().load(ui_file, self)
         ui_file.close()
+
+        # English: Ensure the progress bar is hidden by default.
+        # Deutsch: Stelle sicher, dass der Fortschrittsbalken standardmäßig ausgeblendet ist.
+        if hasattr(dialog, 'progress_scan'):
+            dialog.progress_scan.setVisible(False)
         
         if hasattr(dialog, 'edit_com_port'):
             dialog.edit_com_port.setText(self.cm.config.get('REFERENCE_PRO', 'com_port', fallback='COM3'))
@@ -1446,6 +1464,22 @@ class MainWindow(QMainWindow):
 
         dut_info = json.loads(dut_info_str) if dut_info_str and dut_info_str != 'null' else {}
         ref_info = json.loads(ref_info_str) if ref_info_str and ref_info_str != 'null' else {}
+        
+        # English: Determine mode for the report dialog.
+        # Deutsch: Bestimme den Modus für den Report-Dialog.
+        current_mode = "PRO"
+        if not is_reapply:
+            current_mode = "HOME" if self.ui.check_ref_home.isChecked() else "PRO"
+        else:
+            # English: For Re-Apply, try to find the mode in the report text.
+            # Deutsch: Bei Re-Apply versuchen, den Modus im Report-Text zu finden.
+            try:
+                with open(original_report_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    if "Kalibrier-Modus:  HOME" in content:
+                        current_mode = "HOME"
+            except:
+                pass
 
         if is_reapply:
             self.ui.log_output.appendPlainText("-> Kalibrierung auf Basis eines alten Reports (Re-Apply).")
@@ -1475,7 +1509,8 @@ class MainWindow(QMainWindow):
             'device_path': device_path,
             'session_ts': session_ts,
             'dut_info': dut_info,
-            'ref_info': ref_info
+            'ref_info': ref_info,
+            'mode': current_mode
         }
 
         dialog = CalibrationReportDialog(self, target_ip, final_values, old_factors, is_reapply, report_info, self.credentials_manager, self.cm.config)
@@ -1524,6 +1559,27 @@ class MainWindow(QMainWindow):
         self.guidance_window.show()
         self.guidance_window.raise_()
         self.guidance_window.activateWindow()
+
+    def update_steps_restriction(self, is_home):
+        """
+        # English: 
+        # Restricts the number of measurement steps to 1 in HOME mode (Tasmota reference)
+        # and disables the input field. In PRO mode, restores the config value and enables it.
+        # Deutsch:
+        # Begrenzt im HOME-Modus (Tasmota-Referenz) die Anzahl der Messstufen fest auf 1 
+        # und deaktiviert das Eingabefeld. Im PRO-Modus wird der Konfigurationswert geladen.
+        """
+        if hasattr(self.ui, 'spin_steps'):
+            if is_home:
+                # English: Fixed to 1 step in HOME mode. / Deutsch: Fest auf 1 Stufe im HOME-Modus.
+                self.ui.spin_steps.setValue(1)
+                self.ui.spin_steps.setEnabled(False)
+            else:
+                # English: Restore value from config and enable in PRO/other mode.
+                # Deutsch: Wert aus Config wiederherstellen und im PRO/anderen Modus freigeben.
+                config_val = self.cm.config.getint('TARGET', 'measurement_steps', fallback=3)
+                self.ui.spin_steps.setValue(config_val)
+                self.ui.spin_steps.setEnabled(True)
 
     def on_online_check_clicked(self):
         """

@@ -164,7 +164,8 @@ class ReferenceManager:
                     a = float(parts[1].strip())
                     return v, a, v * a
             return None, None, None
-        except:
+        except Exception as e:
+            print(f"❌ Fehler beim Lesen der Fluke-Daten: {e}")
             return None, None, None
 
     def _get_tasmota_ref_data(self, auth=None):
@@ -196,8 +197,9 @@ class ReferenceManager:
             
             return v, a, w
         except Exception as e:
-            # English: On any error (e.g., timeout), return None.
-            # Deutsch: Falls ein Fehler auftritt (z.B. Timeout), gib None zurück.
+            # English: On any error (e.g., timeout), print it and return None.
+            # Deutsch: Falls ein Fehler auftritt (z.B. Timeout), gib ihn aus und gib None zurück.
+            print(f"❌ Fehler beim Lesen der Tasmota-Referenz ({ip}): {e}")
             return None, None, None
 
     def get_current_cal_factors(self, target_ip, auth=None):
@@ -220,7 +222,9 @@ class ReferenceManager:
                 val = r.json().get(cmd)
                 if val is not None:
                     factors[key] = int(val)
-            except: pass
+            except Exception as e:
+                print(f"⚠️ Warnung: Konnte '{cmd}' von {target_ip} nicht abrufen. Nutze Standardwert. Fehler: {e}")
+                pass
         return factors
 
     def close(self):

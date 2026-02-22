@@ -136,6 +136,12 @@ if __name__ == "__main__":
     rm = ReferenceManager(cm.config)
     target_ip = cm.config['TARGET']['ip_address']
     
+    print("="*50)
+    print("=== ACHTUNG: VERALTETE CLI-VERSION ===")
+    print("Dieses Skript wird nicht aktiv gewartet und unterstützt\nKEINE passwortgeschützten Tasmota-Geräte.")
+    print("Für den vollen Funktionsumfang bitte die GUI starten.")
+    print("="*50 + "\n")
+    
     print("=== TASMOTA PRECISION CALIBRATOR v4.0 (CLI) ===")
     print("1: Professionell (Fluke 45 via RS232)")
     print("2: Heimanwender (Referenz-Dose via HTTP)")
@@ -239,23 +245,60 @@ if __name__ == "__main__":
             all_results.append(res)
 
     # --- FINAL REPORT ---
+    pcal_from_regression = None
+    pcal_from_avg = None
+    avg_v = None
+    avg_a = None
+
     if all_results:
         report_file = engine.write_summary(all_results, data_ts, report_ts=report_ts, cal_mode=cal_method_text, old_cal=old_cal)
         print("\n" + "="*40)
         print("ERMITTLUNG DER KALIBRIERWERTE ABGESCHLOSSEN")
         print("="*40)
 
-    # --- APPLY CALIBRATION ---
-    confirm = input("\nSollen die neuen Kalibrierwerte jetzt an die Ziel-Dose übertragen werden? (j/n): ").lower()
-    if confirm == 'j':
-        print("\nStarte Übertragung...")
-        from send_cal import apply_calibration
-        # Note: This CLI version does not yet support authentication for applying calibration.
-        # It relies on the now-outdated signature of apply_calibration.
-        # This will fail if the device requires authentication.
-        apply_calibration(target_ip, all_results, report_file)
+        # --- Calculate final values for applying ---
+        avg_v = int(sum(r['Stufen_Cal']['VCal'] for r in all_results) / len(all_results))
+        avg_a = int(sum(r['Stufen_Cal']['ACal'] for r in all_results) / len(all_results))
+        pcal_from_avg = int(sum(r['Stufen_Cal']['WCal'] for r in all_results) / len(all_results))
+        
+        reg_data = DataAnalyzer.calculate_regression(device_path, data_ts)
+        if reg_data and old_cal:
+            p_reg = reg_data['Power']
+            pcal_from_regression = int(old_cal.get('WCal', 12500) * p_reg['slope'])
+
+    # --- APPLY CALIBRATION (INTERACTIVE) ---
+    if avg_v is not None: # Check if any results were produced
+        print("\nWelche Werte sollen angewendet werden?")
+        apply_v = input(f"  - Spannung (VoltageCal: {avg_v})? [j/n]: ").lower()
+        apply_a = input(f"  - Strom (CurrentCal: {avg_a})? [j/n]: ").lower()
+        
+        new_v = avg_v if apply_v == 'j' else None
+        new_a = avg_a if apply_a == 'j' else None
+        new_w = None
+
+        if pcal_from_regression:
+            print(f"  - Leistung (PowerCal)")
+            print(f"    1: aus Regression ({pcal_from_regression}) [empfohlen]")
+            print(f"    2: aus Mittelwert ({pcal_from_avg})")
+            choice_p = input(f"  Auswahl? [1/2/n]: ").lower()
+            if choice_p == '1':
+                new_w = pcal_from_regression
+            elif choice_p == '2':
+                new_w = pcal_from_avg
+        elif pcal_from_avg: # Fallback if regression failed
+             apply_w = input(f"  - Leistung (PowerCal: {pcal_from_avg})? [j/n]: ").lower()
+             if apply_w == 'j':
+                 new_w = pcal_from_avg
+
+        if new_v is not None or new_a is not None or new_w is not None:
+            print("\nStarte Übertragung...")
+            from send_cal import apply_calibration
+            # Note: This CLI version does not support authentication.
+            apply_calibration(target_ip, new_v=new_v, new_a=new_a, new_w=new_w, auth=None)
+        else:
+            print("\nKeine Werte zur Übertragung ausgewählt.")
     else:
-        print("\nÜbertragung abgebrochen. Die Werte wurden nur im Protokoll gespeichert.")    
+        print("\nKeine Ergebnisse zum Anwenden vorhanden.")
     
     rm.close()
     print("\n--- PROZESS ABGESCHLOSSEN ---")

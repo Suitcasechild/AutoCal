@@ -58,32 +58,29 @@ def find_fluke(current_port=None, current_baud=None, progress_callback=None):
                 # Deutsch: Versuche den seriellen Port mit einem kurzen Timeout zu öffnen.
                 ser = serial.Serial(port, baud, timeout=1.0)
                 
-                # English: Clear buffers to ensure a clean start.
-                # Deutsch: Puffer leeren, um einen sauberen Start zu gewährleisten.
                 ser.reset_input_buffer()
                 ser.reset_output_buffer()
                 
-                # English: Send the identification query.
-                # Deutsch: Sende die Identifikations-Abfrage.
                 ser.write(b"*IDN?\r")
+                time.sleep(1.5) # Wait long enough for slow baud rates
                 
-                # English: Wait long enough for slow baud rates (600/300).
-                # Deutsch: Warte lange genug für langsame Baudraten (600/300).
-                time.sleep(1.5)
-                
-                # English: Read response and check for "FLUKE".
-                # Deutsch: Lese Antwort und prüfe auf "FLUKE".
                 resp = ser.read_all().decode('utf-8', errors='replace').strip()
-                
-                if ser: ser.close()
                 
                 if "FLUKE" in resp.upper():
                     return {"port": port, "baud": str(baud), "info": resp}
-            except:
-                if ser: 
-                    try: ser.close()
-                    except: pass
-                continue
+            except Exception as e:
+                # English: For debugging, you could print the error. In production, we just continue.
+                # Deutsch: Zum Debuggen könnte man den Fehler ausgeben. Im Betrieb wird einfach weitergemacht.
+                # print(f"Info: Scan on {port} at {baud} failed: {e}")
+                pass
+            finally:
+                # English: Ensure the port is always closed, no matter what.
+                # Deutsch: Stelle sicher, dass der Port immer geschlossen wird.
+                if ser and ser.is_open:
+                    try:
+                        ser.close()
+                    except:
+                        pass
                 
     return None
 

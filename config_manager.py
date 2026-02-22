@@ -80,7 +80,7 @@ class ConfigManager:
         
         # English: Ensure the IP has a protocol prefix.
         # Deutsch: Stelle sicher, dass die IP ein Protokoll-Präfix hat.
-        if target_ip and not target_ip.startswith("http"):
+        if target_ip and not target_ip.startswith(("http://", "https://")):
             url = f"http://{target_ip}/cm?cmnd=Status%205"
         else:
             url = f"{target_ip}/cm?cmnd=Status%205"
@@ -111,18 +111,6 @@ class ConfigManager:
         mac = self.get_target_mac(ip=ip, auth=auth, mac=mac)
         device_path = os.path.join(self.root_dir, mac)
         
-        if not os.path.exists(device_path):
-            os.makedirs(device_path)
-            print(f"Verzeichnis erstellt: {device_path}")
-        
-        return device_path
-        
-        # English: Construct the full path.
-        # Deutsch: Konstruiere den vollständigen Pfad.
-        device_path = os.path.join(self.root_dir, mac)
-        
-        # English: If the path does not exist, create it.
-        # Deutsch: Wenn der Pfad nicht existiert, erstelle ihn.
         if not os.path.exists(device_path):
             os.makedirs(device_path)
             print(f"Verzeichnis erstellt: {device_path}")

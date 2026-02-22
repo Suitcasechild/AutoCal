@@ -234,6 +234,12 @@ GUIDANCE_HTML = """
 <div class="action-box"><b>⌨️ Aktion:</b> Geben Sie die <b>IP-Adresse des Prüflings</b> ein und klicken Sie auf <b>"Online Check"</b>.</div>
 <span class="background-info">Hintergrund: Die Software prüft Erreichbarkeit und liest die MAC-Adresse aus. <b>Wichtig:</b> Falls die Dose passwortgeschützt ist, geben Sie hier einmalig die Zugangsdaten ein. Diese werden für die gesamte Sitzung gespeichert.</span>
 
+<div class="action-box"><b>⚙️ Aktion:</b> Stellen Sie die <b>Messparameter</b> ein (Stufen & Messungen pro Stufe).</div>
+<span class="background-info">
+    • <b>🏠 HOME-Modus:</b> Die Anzahl der Messstufen ist fest auf <b>1</b> eingestellt und deaktiviert. Eine einzige Stufe mit ca. 30 Messungen ist hier der Standard für höchste Präzision.<br>
+    • <b>🔬 PRO-Modus:</b> Hier können Sie mehrere Stufen wählen (z.B. für eine Kennlinien-Aufnahme). 3 Stufen mit 25 Messungen bieten im Regelfall ein exzellentes Verhältnis zwischen Zeitaufwand und Präzision.
+</span>
+
 <h3 id="ch5_2">5.2 ▶️ Start der Messsequenz</h3>
 <div class="action-box"><b>🖱️ Aktion:</b> Klicken Sie auf den Button <b>"Kalibrierung Starten"</b>.</div>
 
@@ -250,7 +256,10 @@ GUIDANCE_HTML = """
 <span class="background-info">Hintergrund: Die Software vergleicht die neuen Werte mit den alten. 🟢 Grün bedeutet innerhalb der Toleranz, 🟠 Orange bedeutet Kalibrierung empfohlen.</span>
 
 <div class="action-box"><b>☑️ Aktion:</b> Wählen Sie die gewünschten Faktoren über die Checkboxen aus.</div>
-<span class="background-info">Hinweis: Sie können VoltageCal, CurrentCal und PowerCal (Mean oder Regression) selektiv wählen.</span>
+<span class="background-info">
+    • <b>🏠 HOME-Modus:</b> Nur die relevante Leistungsoption (<b>PowerCal</b>) wird angezeigt. Regressions-Analyse und Graph sind ausgeblendet.<br>
+    • <b>🔬 PRO-Modus:</b> Sie haben die Wahl zwischen Mean (Mittelwert) und Regression. Über den Button <b>"📊 REGRESSIONS-GRAPH"</b> können Sie die Messkurve visuell prüfen.
+</span>
 
 <div class="action-box"><b>📤 Aktion:</b> Klicken Sie auf <b>"Auswahl Kalibrieren"</b>.</div>
 <span class="background-info">Hintergrund: Die ausgewählten Werte werden übertragen und sofort verifiziert.</span>

@@ -11,6 +11,9 @@ def get_current_factors(ip, auth=None):
     """
     # English: Reads the current calibration factors from a Tasmota device.
     # Deutsch: Liest die aktuellen Kalibrierfaktoren von einem Tasmota-Gerät aus.
+    
+    # HINWEIS: Diese Funktion ist redundant zu `get_current_cal_factors` in `reference_manager.py`.
+    # Sollte in Zukunft refaktorisiert werden.
 
     :param ip: (str) The IP address of the Tasmota device.
                (str) Die IP-Adresse des Tasmota-Geräts.
@@ -29,8 +32,11 @@ def get_current_factors(ip, auth=None):
         for cmd in commands:
             r = httpx.get(f"http://{ip}/cm?cmnd={cmd}", timeout=3, auth=auth)
             r.raise_for_status()
-            val = list(r.json().values())[0]
-            factors[cmd] = val
+            # English: Access the value by key, which is more robust.
+            # Deutsch: Greife über den Schlüssel auf den Wert zu, das ist robuster.
+            val = r.json().get(cmd)
+            if val is not None:
+                factors[cmd] = val
         return factors
     except Exception as e:
         # English: Print an error if reading the factors fails.

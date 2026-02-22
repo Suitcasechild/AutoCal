@@ -1,0 +1,41 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: NOUS-3
+  Hostname:    NOUS-3-D76E88-3720
+  MAC Address: 2C:BC:BB:D7:6E:88
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260222_121028
+  Report erstellt:    20260222_121028
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  227.21V | DUT  226.53V | Err:  -0.68V ( -0.30%) -> Cal-Vorschlag: 1526
+  Strom:    Ref   3.615A | DUT   3.607A | Err: -0.008A ( -0.22%) -> Cal-Vorschlag: 3235
+  Leistung: Ref  822.10W | DUT  821.57W | Err:  -0.53W ( -0.06%) -> Cal-Vorschlag: 9419
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 1.000789 | Bestimmtheitsmaß R2 = 0.737554
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1522                     VoltageCal 1526 (Mittelwert der Stufen)
+    CurrentCal 3228                     CurrentCal 3235 (Mittelwert der Stufen)
+      PowerCal 9413                       PowerCal 9420 (aus Regression, empfohlen)
+                                          └─ Alternative: 9419 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

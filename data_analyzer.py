@@ -56,6 +56,11 @@ class DataAnalyzer:
         # Deutsch: Füge alle DataFrames zu einem einzigen zusammen.
         full_df = pd.concat(df_list, ignore_index=True)
 
+        # English: If DataFrame is empty after concatenation, abort.
+        # Deutsch: Wenn der DataFrame nach dem Zusammenfügen leer ist, abbrechen.
+        if full_df.empty:
+            return None
+
         results = {}
         
         # --- ONLY CALCULATE FOR POWER ---
@@ -74,10 +79,15 @@ class DataAnalyzer:
         m, _, _, _ = np.linalg.lstsq(x_reshaped, y, rcond=None)
         slope = float(m[0])
         
-        # English: Calculate the coefficient of determination (R^2) for quality control.
-        # Deutsch: Berechne das Bestimmtheitsmaß (R^2) zur Qualitätskontrolle.
-        correlation_matrix = np.corrcoef(x, y)
-        r_squared = correlation_matrix[0, 1]**2
+        # English: Calculate R^2 only if there is more than one point to avoid NaN.
+        # Deutsch: R^2 nur berechnen, wenn mehr als ein Punkt vorhanden ist, um NaN zu vermeiden.
+        r_squared = 1.0
+        if len(x) > 1:
+            correlation_matrix = np.corrcoef(x, y)
+            # English: Ensure we don't get NaN if variance is zero.
+            # Deutsch: Sicherstellen, dass wir bei Varianz Null kein NaN bekommen.
+            if not np.isnan(correlation_matrix[0, 1]):
+                r_squared = correlation_matrix[0, 1]**2
         
         results['Power'] = {
             'slope': slope,

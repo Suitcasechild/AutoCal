@@ -24,6 +24,10 @@
 *   **Dokumentation & Visualisierung:**
     *   **README-Update:** Die `README.md` wurde in beiden Sprachversionen (DE/EN) um eine umfangreiche Screenshot-Galerie der aktuellen Version v5.3.3 erweitert. Dies visualisiert den gesamten Prozess von der ersten Messung über die Analyse bis zur Validierung.
     *   **English:** Documentation & Visualization: Updated `README.md` with a comprehensive screenshot gallery (v5.3.3) for both German and English sections.
+*   **Vereinfachte HOME-Kalibrierung (Tasmota-Referenz):**
+    *   **Einschränkung der Messstufen:** Bei Auswahl der Tasmota-Referenz (HOME-Modus) wird die Anzahl der Messstufen nun fest auf **1** gesetzt und das Eingabefeld deaktiviert. Dies vereinfacht den Workflow für Heimanwender erheblich. Bei Rückkehr zum PRO-Modus wird die vorherige Einstellung automatisch wiederhergestellt.
+    *   **Anpassung Ergebnis-Dialog:** Im HOME-Modus werden irrelevante Optionen wie der Regressions-Graph und die Auswahl der Regression-Kalibrierung ausgeblendet. Die einzige Leistungsoption wird einfach als "PowerCal" angezeigt.
+    *   **English:** Simplified HOME Calibration: In HOME mode (Tasmota reference), measurement steps are now fixed to 1 and the input field is disabled. Irrelevant UI elements like the regression graph and regression checkbox are hidden in the results dialog.
 
 ## v5.3.2 (2026-02-21)
 

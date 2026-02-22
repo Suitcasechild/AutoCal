@@ -31,9 +31,13 @@ def ermittle_offset(ref_ip, auth=None):
     # English: Aim for 5 valid readings to get a stable average.
     # Deutsch: Ziel sind 5 gültige Messungen für einen stabilen Mittelwert.
     desired_valid_readings = 5
+    max_attempts = 30 # English: To prevent an infinite loop. / Deutsch: Um eine Endlosschleife zu verhindern.
     current_attempt = 0
 
     while len(strom_werte) < desired_valid_readings:
+        if current_attempt >= max_attempts:
+            print(f"  [FEHLER] Konnte nach {max_attempts} Versuchen keinen stabilen Offset ermitteln. Breche ab.")
+            break
         current_attempt += 1
         try:
             # English: Request sensor/energy data from the reference device.
