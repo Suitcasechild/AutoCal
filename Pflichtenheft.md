@@ -23,7 +23,7 @@ Die Anwendung bietet eine klare Menüführung zur administrativen Steuerung und 
 
 ### 2.3 Menü: Hilfe
 *   **Anleitung:** Öffnet die **integrierte, interaktive HTML-Bedienungsanleitung** mit Inhaltsverzeichnis und detaillierten Anweisungen.
-*   **Lizenz & Info:** Anzeige von Version (v5.4.0), Autor und rechtlichen Hinweisen.
+*   **Lizenz & Info:** Anzeige von Version (v5.4.1), Autor und rechtlichen Hinweisen.
 
 ## 3. Funktionale Anforderungen (Implementierung)
 

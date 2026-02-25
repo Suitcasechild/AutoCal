@@ -1,6 +1,6 @@
 # Changelog
 
-## v5.4.0 (2026-02-22)
+## v5.4.1 (2026-02-22)
 
 ### 🚀 Neue Features / New Features
 *   **Manuelle Kalibrierung (Vollständig) / Manual Calibration (Complete):**
@@ -13,6 +13,16 @@
     *   **UI Locking:** Konsequente Sperrung der Einstellungs-Frames während des aktiven manuellen Workflows zur Vermeidung von Fehlkonfigurationen.
 
 ### 🛠️ Verbesserungen & Fixes / Improvements & Bugfixes
+*   **Fix Kalibrier-Übertragung / Fix Calibration Transmission:**
+    *   **Auth-Support:** Die Funktion `apply_calibration` in `send_cal.py` unterstützt nun korrekt Authentifizierungs-Parameter (`auth`), was Abstürze bei passwortgeschützten Tasmota-Dosen verhindert.
+    *   **URL-Encoding:** Umstellung der Befehlsübertragung auf `params`-Dictionary für eine sicherere URL-Codierung der Tasmota-Backlog-Befehle.
+    *   **GUI-Stabilität:** Ein `try-finally` Block in `gui_main.py` stellt sicher, dass der "Schließen"-Button im Report-Dialog auch bei Übertragungsfehlern immer erscheint, um ein "Einfrieren" der Benutzeroberfläche zu verhindern.
+*   **Fix Manueller Workflow / Fix Manual Workflow:** Korrektur eines Absturzes (`AttributeError`) in der manuellen Kalibrierung, der auftrat, wenn die Zieldose nicht erreichbar war.
+*   **Fix Hilfe-Anleitung / Fix Help Instructions:** Die integrierte Bedienungsanleitung (Hilfe -> Anleitung) wurde vervollständigt und enthält nun alle Punkte aus der `anleitung.md`.
+*   **Fix Sichtbarkeit Regressions-Graph / Fix Regression Graph Visibility:** Der Button für den Regressions-Graphen wird nun im "HOME"- und "MANUAL"-Modus konsistent ausgeblendet, auch bei Re-Apply Aktionen.
+*   **Verbessertes Protokoll / Enhanced Reporting:**
+    *   **Vollständigkeit:** Die Zusammenfassung am Ende des Protokolls zeigt nun immer `VoltageCal` und `CurrentCal` an, auch wenn sich die Werte gegenüber der bestehenden Kalibrierung nicht geändert haben.
+    *   **Fix Regressions-Graph / Fix Regression Graph:** Korrektur eines `TypeError`, der auftrat, wenn der Regressions-Graph geöffnet wurde. Die globale Übersetzungsfunktion `_` wird nun nicht mehr durch interne Platzhalter-Variablen überschrieben.
 *   **Dokumentation:** `anleitung.md` wurde als `userguide.md` kopiert, um eine international verständliche Dateibenennung zu gewährleisten.
 *   **Smart Calculation:** `CalibrationEngine` erkennt unvollständige Messreihen und überspringt V- oder A-Berechnungen automatisch, anstatt fehlerhafte Werte zu produzieren.
 *   **Unified Start:** Integration der "Alte Messdaten"-Erkennung nun auch für den Start der manuellen Kalibrierung.

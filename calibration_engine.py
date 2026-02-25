@@ -256,12 +256,10 @@ class CalibrationEngine:
             oc_a = old_cal.get('ACal', _('????')) if old_cal else _('????')
             oc_w = old_cal.get('WCal', _('????')) if old_cal else _('????')
 
-            # English: Display suggestions based on available data.
-            # Deutsch: Vorschläge basierend auf verfügbaren Daten anzeigen.
-            if avg_v != old_cal.get('VCal'):
-                f.write(_("    VoltageCal {oc_v:<15}          VoltageCal {avg_v} (Mittelwert der Stufen)\n").format(oc_v=str(oc_v), avg_v=avg_v))
-            if avg_a != old_cal.get('ACal'):
-                f.write(_("    CurrentCal {oc_a:<15}          CurrentCal {avg_a} (Mittelwert der Stufen)\n").format(oc_a=str(oc_a), avg_a=avg_a))
+            # English: Display suggestions (always show Voltage/Current for completeness).
+            # Deutsch: Vorschläge anzeigen (Spannung/Strom zur Vollständigkeit immer einblenden).
+            f.write(_("    VoltageCal {oc_v:<15}          VoltageCal {avg_v} (Mittelwert der Stufen)\n").format(oc_v=str(oc_v), avg_v=avg_v))
+            f.write(_("    CurrentCal {oc_a:<15}          CurrentCal {avg_a} (Mittelwert der Stufen)\n").format(oc_a=str(oc_a), avg_a=avg_a))
 
             if cal_mode == "PRO":
                 f.write(_("      PowerCal {oc_w:<15}            PowerCal {pcal_from_regression} (aus Regression, empfohlen)\n").format(oc_w=str(oc_w), pcal_from_regression=pcal_from_regression))

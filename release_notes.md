@@ -4,7 +4,7 @@ This document provides an overview of the most important changes and innovations
 
 ---
 
-## [v5.4.0] - 2026-02-22
+## [v5.4.1] - 2026-02-22
 
 This major release significantly expands the capabilities of the Tasmota Precision Calibrator, introducing a full manual workflow alongside major UI and architectural improvements.
 
@@ -28,7 +28,7 @@ This major release significantly expands the capabilities of the Tasmota Precisi
 
 ---
 
-## [v5.4.0] - 2026-02-22 (DE)
+## [v5.4.1] - 2026-02-22 (DE)
 
 Dieses große Release erweitert den Funktionsumfang des Tasmota Precision Calibrators massiv und führt einen vollständigen manuellen Workflow sowie bedeutende UI- und Architektur-Verbesserungen ein.
 

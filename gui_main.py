@@ -117,7 +117,7 @@ class MeasurementWorker(BaseWorker):
     # Deutsch: Worker für den automatischen Haupt-Messprozess.
     """
     data_signal = Signal(dict)
-    apply_request_signal = Signal(str, str, list, str, str) 
+    apply_request_signal = Signal(str, str, list, str, str, str) 
     step_progress_signal = Signal(int)
     
     def __init__(self, config, params, credentials_manager):
@@ -144,7 +144,7 @@ class MeasurementWorker(BaseWorker):
                 if not os.path.exists(old_report_path):
                     self.finished_signal.emit(f"❌ Fehler: Der ursprüngliche Report '{old_report_path}' wurde nicht gefunden.")
                     return
-                self.apply_request_signal.emit(old_report_path, dut_ip, [], dut_info_str, ref_info_str)
+                self.apply_request_signal.emit(old_report_path, dut_ip, [], dut_info_str, ref_info_str, mode)
                 return
 
             ref_manager = ReferenceManager(self.config)
@@ -234,11 +234,11 @@ class MeasurementWorker(BaseWorker):
             if all_results and self.is_running:
                 self.data_signal.emit({'volt_ref': None, 'volt_dut': 0.0, 'amp_ref': None, 'amp_dut': 0.0, 'watt_ref': None, 'watt_dut': 0.0, 'dut_off': True})
                 report_file = engine.write_summary(
-                    all_results, data_ts, report_ts=data_ts, cal_mode=mode, 
+                    all_results, data_ts, report_ts=data_ts, cal_mode=mode,
                     old_cal=old_cal, dut_info=self.params.get('dut_info'), ref_info=self.params.get('ref_info')
                 )
                 self.log_signal.emit("\n" + "="*40 + "\nERMITTLUNG DER KALIBRIERWERTE ABGESCHLOSSEN\n" + "="*40)
-                self.apply_request_signal.emit(report_file, dut_ip, all_results, dut_info_str, ref_info_str)
+                self.apply_request_signal.emit(report_file, dut_ip, all_results, dut_info_str, ref_info_str, mode)
             elif not self.is_running:
                 try:
                     self.log_signal.emit("🔌 Abbruch erkannt: Schalte Ziel-Dose AUS...")
@@ -444,7 +444,7 @@ class CalibrationReportDialog(QDialog):
         full_df = pd.concat(df_list, ignore_index=True)
         x, y = full_df['Target_Watt'].values, full_df['Ref_Watt'].values
         if len(x) == 0: return
-        m, _, _, _ = np.linalg.lstsq(x[:, np.newaxis], y, rcond=None)
+        m, unused_residuals, unused_rank, unused_s = np.linalg.lstsq(x[:, np.newaxis], y, rcond=None)
         slope = float(m[0])
         graph_dialog = QDialog(self)
         graph_dialog.setWindowTitle(_("Regressions-Analyse (Leistung) | Steigung m = {slope:.5f}").format(slope=slope))
@@ -485,34 +485,37 @@ class CalibrationReportDialog(QDialog):
 
         self.log_callback(_("\n🚀 Starte selektive Übertragung an die Dose..."))
         
-        auth = None
-        creds = self.credentials_manager.get_credentials(self.target_ip)
-        if creds: auth = (creds['user'], creds['password'])
-            
-        as_found_left_string = apply_calibration(self.target_ip, v_val, a_val, w_val, auth=auth)
+        try:
+            auth = None
+            creds = self.credentials_manager.get_credentials(self.target_ip)
+            if creds: auth = (creds['user'], creds['password'])
+                
+            as_found_left_string = apply_calibration(self.target_ip, v_val, a_val, w_val, auth=auth)
 
-        if as_found_left_string:
-            self.log_callback("✅ Übertragung abgeschlossen.")
-            report_to_update = self.report_info['original_path']
-            engine = CalibrationEngine(self.report_info['device_path'])
+            if as_found_left_string:
+                self.log_callback("✅ Übertragung abgeschlossen.")
+                report_to_update = self.report_info['original_path']
+                engine = CalibrationEngine(self.report_info['device_path'])
 
-            if self.is_reapply:
-                new_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-                new_report_path = os.path.join(self.report_info['device_path'], f"{new_ts}_ReApply_Protokoll.txt")
-                engine.write_reapply_summary(new_report_path, self.report_info['original_path'], self.report_info['dut_info'], self.report_info['ref_info'])
-                report_to_update = new_report_path
-            
-            try:
-                with open(report_to_update, "a", encoding="utf-8") as f:
-                    f.write(as_found_left_string)
-                self.current_report_path = report_to_update
-                self.load_report_text()
-            except Exception as e:
-                self.log_callback(f"❌ Fehler beim Aktualisieren des Reports: {e}")
-        else:
-            self.log_callback("❌ Übertragung fehlgeschlagen.")
-        
-        self.btn_close.show()
+                if self.is_reapply:
+                    new_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    new_report_path = os.path.join(self.report_info['device_path'], f"{new_ts}_ReApply_Protokoll.txt")
+                    engine.write_reapply_summary(new_report_path, self.report_info['original_path'], self.report_info['dut_info'], self.report_info['ref_info'])
+                    report_to_update = new_report_path
+                
+                try:
+                    with open(report_to_update, "a", encoding="utf-8") as f:
+                        f.write(as_found_left_string)
+                    self.current_report_path = report_to_update
+                    self.load_report_text()
+                except Exception as e:
+                    self.log_callback(f"❌ Fehler beim Aktualisieren des Reports: {e}")
+            else:
+                self.log_callback("❌ Übertragung fehlgeschlagen.")
+        except Exception as e:
+            self.log_callback(f"❌ Unerwarteter Fehler: {e}")
+        finally:
+            self.btn_close.show()
 
 
 # ---------------------------------------------------------
@@ -1279,7 +1282,7 @@ class MainWindow(QMainWindow):
 
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         default_name = f"Log_{ts}.txt"
-        file_path, _ = QFileDialog.getSaveFileName(self, "Log sichern", default_name, "Textdateien (*.txt)")
+        file_path, filter_used = QFileDialog.getSaveFileName(self, "Log sichern", default_name, "Textdateien (*.txt)")
         
         if file_path:
             try:
@@ -1558,7 +1561,7 @@ class MainWindow(QMainWindow):
             self.ui.log_output.appendPlainText(f"❌ Fehler beim Parsen des Reports: {e}")
         return None, None
 
-    def prompt_apply_calibration(self, original_report_path, target_ip, all_results, dut_info_str, ref_info_str):
+    def prompt_apply_calibration(self, original_report_path, target_ip, all_results, dut_info_str, ref_info_str, mode=None):
         """
         # English:
         # This slot is called when the worker has finished processing. It prepares the final values
@@ -1582,19 +1585,24 @@ class MainWindow(QMainWindow):
         
         # English: Determine mode for the report dialog.
         # Deutsch: Bestimme den Modus für den Report-Dialog.
-        current_mode = "PRO"
-        if not is_reapply:
+        current_mode = mode if mode else "PRO"
+        
+        # English: Try to detect mode from report content (highest priority)
+        # Deutsch: Versuche zuerst den Modus aus dem Berichtsinhalt zu erkennen (höchste Priorität)
+        try:
+            with open(original_report_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                if "Kalibrier-Modus:  HOME" in content:
+                    current_mode = "HOME"
+                elif "Kalibrier-Modus:  MANUAL" in content:
+                    current_mode = "MANUAL"
+        except:
+            pass
+
+        if not is_reapply and not mode and current_mode == "PRO":
+            # English: Fallback for new measurements if no explicit mode was provided
+            # Deutsch: Fallback für neue Messungen, falls kein expliziter Modus übergeben wurde
             current_mode = "HOME" if self.ui.check_ref_home.isChecked() else "PRO"
-        else:
-            # English: For Re-Apply, try to find the mode in the report text.
-            # Deutsch: Bei Re-Apply versuchen, den Modus im Report-Text zu finden.
-            try:
-                with open(original_report_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    if "Kalibrier-Modus:  HOME" in content:
-                        current_mode = "HOME"
-            except:
-                pass
 
         if is_reapply:
             self.ui.log_output.appendPlainText("-> Kalibrierung auf Basis eines alten Reports (Re-Apply).")
@@ -1639,7 +1647,7 @@ class MainWindow(QMainWindow):
         # Deutsch: Zeigt eine Message-Box mit Lizenz- und Autoreninformationen an.
         """
         license_text = (
-            "Tasmota Precision Calibrator v5.4.0\n"
+            "Tasmota Precision Calibrator v5.4.1\n"
             "Erstellt von: Arnulf Greilberger\n\n"
             "----------------------------------------------------------\n"
             "LIZENZ:\n"
@@ -1785,7 +1793,8 @@ class MainWindow(QMainWindow):
                     target_ip=dut_ip,
                     all_results=[], # Signifies re-apply
                     dut_info_str=json.dumps(dut_info),
-                    ref_info_str=json.dumps(ref_info)
+                    ref_info_str=json.dumps(ref_info),
+                    mode="MANUAL"
                 )
                 return
 
@@ -1908,7 +1917,13 @@ class MainWindow(QMainWindow):
         if creds:
             dut_auth = (creds['user'], creds['password'])
             
-        mac_addr = self.fetch_tasmota_info(dut_ip, is_dut=True).get('mac', None)
+        dut_info = self.fetch_tasmota_info(dut_ip, is_dut=True)
+        if not dut_info:
+            self.ui.log_output.appendPlainText(_("FEHLER: Zieldose konnte nicht identifiziert werden."))
+            self.set_manual_fields_enabled(True)
+            return
+
+        mac_addr = dut_info.get('mac', None)
         mac_param = mac_addr.replace(":", "-") if mac_addr else None
         device_path = self.cm.setup_device_directory(ip=dut_ip, auth=dut_auth, mac=mac_param)
 
@@ -1959,7 +1974,8 @@ class MainWindow(QMainWindow):
                 target_ip=dut_ip,
                 all_results=all_results,
                 dut_info_str=json.dumps(dut_info),
-                ref_info_str=json.dumps(ref_info)
+                ref_info_str=json.dumps(ref_info),
+                mode=current_mode
             )
 
         except Exception as e:

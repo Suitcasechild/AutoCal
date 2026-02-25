@@ -76,7 +76,7 @@ class DataAnalyzer:
         
         # English: Perform least-squares regression forced through the origin.
         # Deutsch: Führe die Regression der kleinsten Quadrate mit Nullpunkterzwingung durch.
-        m, _, _, _ = np.linalg.lstsq(x_reshaped, y, rcond=None)
+        m, residuals, rank, s = np.linalg.lstsq(x_reshaped, y, rcond=None)
         slope = float(m[0])
         
         # English: Calculate R^2 only if there is more than one point to avoid NaN.
