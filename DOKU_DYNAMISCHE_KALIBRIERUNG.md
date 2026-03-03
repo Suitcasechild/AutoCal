@@ -1,10 +1,10 @@
-# Dokumentation: Dynamische Power-Kalibrierung (Tasmota Rules)
+# 🚀 Dokumentation: Dynamische Power-Kalibrierung (Tasmota Rules)
 
 Dieses Dokument beschreibt die Funktionsweise, die mathematische Logik und die Sicherheitsmechanismen der dynamischen **Power-Kalibrierung** für Tasmota-Geräte.
 
 ---
 
-## Inhaltsverzeichnis
+## 📋 Inhaltsverzeichnis
 1. [Einführung & Zielsetzung](#1-einführung--zielsetzung)
 2. [Die Problematik der statischen Power-Kalibrierung](#2-die-problematik-der-statischen-power-kalibrierung)
 3. [Funktionsweise der dynamischen Regelung](#3-funktionsweise-der-dynamischen-regelung)
@@ -12,61 +12,98 @@ Dieses Dokument beschreibt die Funktionsweise, die mathematische Logik und die S
     - 3.2 [Warum Strom (A) als Triggerquelle?](#32-warum-strom-a-als-triggerquelle)
     - 3.3 [Hysterese-Logik (Anti-Flackern)](#33-hysterese-logik-anti-flackern)
 4. [Anatomie der Tasmota-Rule (Praxisbeispiel)](#4-anatomie-der-tasmota-rule-praxisbeispiel)
+    - 4.1 [Beispiel-Tabelle (Programmansicht)](#41-beispiel-tabelle-programmansicht)
+    - 4.2 [Der generierte Rule-String](#42-der-generierte-rule-string)
+    - 4.3 [Rule-Modus 5 (Once Mode)](#43-rule-modus-5-once-mode)
 5. [Dauerbetrieb mit SaveData 0](#5-dauerbetrieb-mit-savedata-0)
+    - 5.1 [Warum SaveData 0? (Flash-Schutz)](#51-warum-savedata-0-flash-schutz)
+    - 5.2 [Manuelle Änderungen am Gerät](#52-manuelle-änderungen-am-gerät)
 6. [Auswirkungen auf die Energiemessung (Zählerstände)](#6-auswirkungen-auf-die-energiemessung-zählerstände)
-7. [<span style="color:red">WICHTIG: Zusammenfassung & Sicherheit</span>](#7-wichtig-zusammenfassung--sicherheit)
+7. [WICHTIG: Zusammenfassung & Sicherheit](#7-wichtig-zusammenfassung--sicherheit)
 8. [Workflow und Traceability](#8-workflow-und-traceability)
 
 ---
 
-## 1. Einführung & Zielsetzung
-Die dynamische **Power-Kalibrierung** ist ein Experten-Feature, das die Messgenauigkeit der Wirkleistung (`Power`) über den gesamten Lastbereich hinweg drastisch erhöht, indem der **PowerCal-Wert** in Echtzeit angepasst wird.
+## 1. 💡 Einführung & Zielsetzung
+Die dynamische **Power-Kalibrierung** ist ein Experten-Feature, das die Messgenauigkeit der Wirkleistung (`Power`) über den gesamten Lastbereich hinweg drastisch erhöht. Anstatt einen einzigen, festen Kalibrierwert (`PowerCal`) zu verwenden, nutzt dieses System die internen Rules von Tasmota, um den **PowerCal-Wert** in Echtzeit an den fließenden Strom anzupassen.
 
-## 2. Die Problematik der statischen Power-Kalibrierung
-Ein statischer **PowerCal-Wert** ist immer nur ein Kompromiss. Sensoren arbeiten oft nicht linear, was bei sehr kleinen oder sehr hohen Lasten zu Fehlmessungen führt.
+## 2. ⚠️ Die Problematik der statischen Power-Kalibrierung
+Sensoren zur Leistungsmessung arbeiten oft nicht linear. Ein Gerät, das bei hoher Last (z. B. 2000W) perfekt **Power-kalibriert** ist, weist bei geringen Lasten oft signifikante Abweichungen auf. Ein statischer Wert ist daher immer nur ein Kompromiss.
 
-## 3. Funktionsweise der dynamischen Regelung
+## 3. ⚙️ Funktionsweise der dynamischen Regelung
+
 ### 3.1 Berechnung der Umschaltpunkte (Strom-Schwellen)
-Das System berechnet die Mitte zwischen zwei benachbarten Messpunkten basierend auf dem gemessenen Strom.
+Um fließende Übergänge zwischen den Messstufen zu schaffen, berechnet das System die Mitte zwischen zwei benachbarten Messpunkten.
+*   **Beispiel:** 
+    - Stufe 1 gemessen bei **1.0A**
+    - Stufe 2 gemessen bei **4.0A**
+    - **Umschaltpunkt:** (1.0 + 4.0) / 2 = **2.5A**
 
 ### 3.2 Warum Strom (A) als Triggerquelle?
-Die Strommessung ist linear und stabil. Da die Leistung (`Power`) durch die Rule ständig korrigiert wird, würde sie als Trigger zu instabilen Zuständen ("Springen") führen.
+Die Umschaltung der **Power-Kalibrierung** erfolgt ausschließlich auf Basis der **Strommesswerte (Energy#Current)**.
+*   **Stabilität:** Der Stromwert ist bei den meisten Sensoren über den gesamten Bereich linear und unabhängig von der gerade durchgeführten Leistungskorrektur.
+*   **Kein Zirkelbezug:** Da wir die Leistung (`Power`) gerade erst korrigieren, würde sie als Trigger zu instabilen Zuständen führen.
 
 ### 3.3 Hysterese-Logik (Anti-Flackern)
-Durch eine Überlappung der Bereiche (Standard 0.15A) wird verhindert, dass das System an den Schwellenwerten zwischen zwei **PowerCal-Faktoren** flackert.
+Damit das System an einem Umschaltpunkt nicht ständig zwischen den Werten springt, wird eine **Hysterese** (Standard: 0.15A) angewendet.
+*   **Hochschalten:** Erfolgt exakt am Strom-Umschaltpunkt (z. B. 2.50A).
+*   **Runterschalten:** Erfolgt erst, wenn der Strom den Umschaltpunkt minus der Hysterese unterschreitet (z. B. 2.50A - 0.15A = 2.35A).
 
-## 4. Anatomie der Tasmota-Rule (Praxisbeispiel)
-Ein typischer Befehl im "Once-Mode" (`Rule1 5`) sieht so aus:
-`Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ...`
+## 4. 🔍 Anatomie der Tasmota-Rule (Praxisbeispiel)
 
----
+### 4.1 Beispiel-Tabelle (Programmansicht)
+Angenommen, es wurden drei Messstufen durchgeführt (Hysterese 0.15A):
 
-## 5. Dauerbetrieb mit SaveData 0
-Um den Flash-Speicher der Hardware zu schützen, setzt AutoCal das Gerät permanent auf **`SaveData 0`**. In diesem Modus werden Änderungen nur im **RAM (Arbeitsspeicher)** vorgenommen.
+| Strom (A) [Referenz] | PowerCal [Vorschlag] | Bereich (A) [Gültigkeit] |
+| :--- | :--- | :--- |
+| 0.894 A | **9576** | 0.000 - 2.587 A |
+| 4.280 A | **9413** | 2.437 - 6.623 A |
+| 8.966 A | **9361** | 6.473 - 10.000 A |
 
----
+*   **Schwelle 1 (2.587A):** Mitte zwischen 0.894A und 4.280A.
+*   **Schwelle 2 (6.623A):** Mitte zwischen 4.280A und 8.966A.
 
-## 6. Auswirkungen auf die Energiemessung (Zählerstände)
-Eine oft unterschätzte Folge des Modus `SaveData 0` betrifft die internen Energiezähler der Dose (`Total`, `Today`, `Yesterday`).
+### 4.2 Der generierte Rule-String
+Der resultierende Befehl für Tasmota lautet:
 
-1.  **Speicherort:** Tasmota verwaltet die kumulierten Verbrauchswerte im selben Speicherbereich wie die Systemeinstellungen.
-2.  **Verhalten im Betrieb:** Solange die Dose läuft, werden die Wattstunden (Wh) im RAM ganz normal weitergezählt. Die Anzeige in der Weboberfläche ist korrekt.
-3.  **Verhalten bei Neustart/Stromausfall:** Da `SaveData 0` das automatische "Einbrennen" der Werte in den Flash-Speicher verhindert, gehen alle seit dem letzten Speichervorgang aufgelaufenen Energiedaten bei einem Reboot verloren. Das Gerät springt auf den Stand zurück, der zuletzt bei `SaveData 1` gesichert wurde.
-4.  **Notwendigkeit für Rules:** Ohne diesen Modus würde jede durch die Rule ausgelöste Änderung am **PowerCal-Wert** einen Schreibzyklus im Flash verursachen. Bei häufigen Lastwechseln wäre der Speicher (ca. 100.000 Zyklen) innerhalb kürzester Zeit physisch zerstört.
+`Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON`
 
----
+*   `Energy#Current>X.XXX`: Schaltet bei steigender Last hoch.
+*   `Energy#Current<X.XXX`: Schaltet bei sinkender Last (Hysterese) wieder runter.
 
-## 7. <span style="color:red">WICHTIG: Zusammenfassung & Sicherheit</span>
+### 4.3 Rule-Modus 5 (Once Mode)
+Durch den Befehl `Rule1 5` wird der "Once Mode" aktiviert. Ein Trigger wird nur ausgeführt, wenn sich der Zustand von "Falsch" auf "Wahr" ändert. Dies verhindert redundante Befehle bei jeder sekündlichen Messung.
 
-*   **Der Kompromiss:** Die dynamische **Power-Kalibrierung** bietet höchste Präzision, erfordert aber den Verzicht auf die automatische Dauer-Speicherung von Zählerständen im Gerät.
-*   **Datensicherung:** Für eine lückenlose Verbrauchsstatistik sollten die Daten über externe Systeme (z.B. Home Assistant, MQTT-Broker) geloggt werden.
-*   **Manuelle Änderungen:** Jede manuelle Änderung (WLAN, Timer, Name) erfordert ein temporäres `SaveData 1`, gefolgt von einem anschließenden `SaveData 0`, um den RAM-Inhalt fest in den Flash zu übernehmen.
-*   **Flash-Schutz:** Setzen Sie das Gerät **niemals** auf `SaveData 1`, während eine dynamische Rule aktiv ist, die den **PowerCal-Wert** häufig ändert!
+## 5. 🛡️ Dauerbetrieb mit SaveData 0
 
----
+### 5.1 Warum SaveData 0? (Flash-Schutz)
+Hardware-Speicher (Flash) hat begrenzte Schreibzyklen. Da die Rule den **PowerCal-Wert** bei jedem Lastwechsel ändert, würde der Speicher ohne Schutz schnell zerstört werden.
+*   **AutoCal setzt das Gerät permanent auf `SaveData 0`**.
+*   Änderungen erfolgen nur im **RAM (Arbeitsspeicher)**. Der Flash bleibt geschützt.
 
-## 8. Workflow und Traceability
-Der Prozess wird lückenlos dokumentiert und am Ende jedes Messprotokolls vermerkt, um eine vollständige Revisionssicherheit der **Power-Kalibrierung** zu gewährleisten.
+### 5.2 Manuelle Änderungen am Gerät
+**ACHTUNG:** Im Modus `SaveData 0` gehen manuelle Änderungen (WLAN, Timer, Name) nach einem Neustart verloren!
+1.  Befehl: `SaveData 1` in Konsole eingeben.
+2.  Änderungen durchführen.
+3.  **WICHTIG:** Danach wieder `SaveData 0` eingeben.
+
+## 6. <span style="color:red">⚡ Auswirkungen auf die Energiemessung (Zählerstände)</span>
+Eine Folge des Modus `SaveData 0` betrifft die Energiezähler der Dose (`Total`, `Today`, `Yesterday`).
+
+1.  **Speicherort:** Tasmota verwaltet Zählerstände im selben Bereich wie Systemeinstellungen.
+2.  **Verhalten im Betrieb:** Wh werden im RAM korrekt weitergezählt und angezeigt.
+3.  **Verhalten bei Neustart:** Ohne das "Einbrennen" in den Flash gehen die seit dem letzten Speichervorgang aufgelaufenen Daten verloren.
+4.  **Notwendigkeit:** Ohne `SaveData 0` würde jede Rule-Aktion den Flash-Speicher physisch zerstören.
+
+## 7. <span style="color:red">🛑 WICHTIG: Zusammenfassung & Sicherheit</span>
+
+*   **Der Kompromiss:** Höchste Präzision der **Power-Kalibrierung** erfordert den Verzicht auf automatische Dauer-Speicherung von Zählerständen im Gerät.
+*   **Datensicherung:** Nutzen Sie externe Systeme (Home Assistant, MQTT) für lückenlose Statistiken.
+*   **Manuelle Änderungen:** Erfordern zwingend das manuelle Umschalten auf `SaveData 1` und zurück auf `0`.
+*   **Flash-Schutz:** Setzen Sie das Gerät **niemals** auf `SaveData 1`, solange eine dynamische Rule aktiv ist, die Werte häufig ändert!
+
+## 8. 📝 Workflow und Traceability
+Der gesamte Vorgang wird revisionssicher am Ende des ursprünglichen `Protokoll.txt` angehängt.
 
 ---
 *Dokumentation erstellt am 03. März 2026 für das Projekt AutoCal.*
