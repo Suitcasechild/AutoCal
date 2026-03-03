@@ -146,7 +146,7 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
 *   [x] **Ziel:** Live-Anzeige von Spannung, Strom, Leistung des Prüflings in dedizierten Labels in der GUI.
 *   [x] **Betroffene Datei:** `gui_main.py`
 *   [x] **Aufgabe:**
-    *   [x] Erweitere die `update_live_data`-Methode, um die Labels `lbl_v_dut`, `lbl_a_dut` und `lbl_w_dut` mit den entsprechenden Werten des Prüflings zu aktualisieren.
+    *   [x] Erweitere die `update_live_data`-Methode, um die Labels `lbl_v_dut`, `lbl_a_dut` und `lbl_w_dut` with den entsprechenden Werten des Prüflings zu aktualisieren.
     *   [x] Wende die vorgegebenen Nachkommastellen an: Spannung 2, Strom 3, Leistung 2.
     *   [x] Sorge dafür, dass die Labels "----" anzeigen, wenn keine Messung aktiv ist oder die DUT ausgeschaltet ist.
     *   [x] Erweitere die `reset_lcd_displays`-Methode, um auch diese neuen Labels zurückzusetzen.   
@@ -258,3 +258,37 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     *   Die Konfiguration dauerhaft speichern.
     *   Anschließend `_apply_ui_mode_settings()` aufrufen, um die UI-Änderungen sofort anzuwenden.
 *   [x] **Texte markieren:** Markiere alle neuen sichtbaren Texte mit `_()` für die Übersetzung.
+
+---
+
+### Feature: Dynamische Power-Kalibrierung (Tasmota Rules) - ERLEDIGT
+
+- [x] **1. Menü-Integration & Sichtbarkeit (`gui_main.py`)**
+    - [x] Neuen Menüpunkt hinzufügen: `Tools` -> `Dynamische Power-Kalibrierung`.
+    - [x] Sichtbarkeits-Logik: Menüpunkt nur im Pro-Modus (`pro_home`) sichtbar.
+
+- [x] **2. Neues Fenster: `DynamicCalDialog` (`dynamic_cal.ui`)**
+    - [x] Eingabefeld für IP-Adresse und Online-Check.
+    - [x] Anzeige-Bereich für Geräte-Info (Name, MAC, Version).
+    - [x] **Sicherheit:** Status-Anzeige von `SaveData` und `Rule1`.
+    - [x] **Robustheit:** Warn-Popup bei belegter `Rule1` mit Kopier-Funktion.
+    - [x] Tabelle: Anzeige der Bereiche (Hysterese eingerechnet) und PowerCal-Werte.
+    - [x] Eingabefeld: Hysterese (Standardwert: `0.15A`).
+    - [x] Textbereich: Live-Vorschau des generierten `Rule1`-Befehls inkl. Längen-Check.
+    - [x] Log-Ausgabe für Echtzeit-Feedback.
+
+- [x] **3. Backend-Logik & Zustands-Management**
+    - [x] Abruf von MAC, `SaveData` und Inhalt von `Rule1` (robuster Parser für `Rules`/`Text`).
+    - [x] Suche nach passenden Reports im MAC-Ordner.
+    - [x] Berechnung der Umschaltpunkte und Hysterese-Schwellen.
+    - [x] **Cleanup-Logik:** `SaveData` wird bei Abbruch wiederhergestellt, bleibt bei Erfolg aber auf `0`.
+
+- [x] **4. Übertragung, Dokumentation & Flash-Schutz**
+    - [x] Rule via HTTP-Backlog übertragen.
+    - [x] **Aktivierung:** Befehl `Rule1 5` (Once Mode) zur Vermeidung von Flattern.
+    - [x] **Traceability:** Dokumentation der Rule-Aktivierung in der `Protokoll.txt` des Reports.
+    - [x] **Flash-Schutz:** Automatisches Setzen von `SaveData 0` nach Abschluss.
+
+- [ ] **5. i18n & Dokumentation**
+    - [ ] Übersetzungs-Keys für alle neuen Texte, Warnungen und Log-Meldungen (DE/EN).
+    - [ ] Feature und Flash-Schutz-Thematik in `anleitung.md` / `userguide.md` dokumentieren.

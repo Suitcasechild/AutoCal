@@ -48,8 +48,15 @@ Die Anwendung bietet eine klare Menüführung zur administrativen Steuerung und 
 *   **Visualisierung:** Optionale Anzeige der Regressionsgeraden im Vergleich zum Idealzustand.
 
 ### 3.5 Authentifizierung (Passwortschutz)
-*   **Sitzungs-Persistence:** Speicherung der Zugangsdaten im Arbeitsspeicher für die Dauer der Programmausführung.
+*   **Sitzungs-Persistence:** Speicherung der Zugangsdaten im Arbeitsspeicher für die Dauer der Programmsitzung.
 *   **UI-Komfort:** Voreinstellung des Benutzers "admin" und Fokus-Steuerung im Login-Dialog.
+
+### 3.6 Dynamische Power-Kalibrierung (Experten-Feature)
+*   **Multi-Stufen-Regelung:** Automatische Generierung von Tasmota-Rules zur dynamischen Anpassung des `PowerCal`-Wertes basierend auf der aktuellen Last.
+*   **Strom-basierte Triggerung:** Die Umschaltung erfolgt ausschließlich über den gemessenen Strom (`Energy#Current`), um Zirkelbezüge zur korrigierten Leistung zu vermeiden.
+*   **Hysterese-Management:** Implementierung einer konfigurierbaren Hysterese (Standard 0.15A) zur Vermeidung von Schalt-Flackern an den Schwellenwerten.
+*   **Flash-Speicher-Schutz:** Automatisches Setzen von `SaveData 0` nach der Rule-Aktivierung. Dies stellt sicher, dass PowerCal-Änderungen nur im RAM erfolgen und die Lebensdauer des Flash-Speichers nicht beeinträchtigt wird.
+*   **Revisionssicherheit:** Automatische Archivierung des generierten Rule-Strings und der Parameter im ursprünglichen Kalibrierprotokoll.
 
 ## 4. Output & Berichte
 *   **Automatisierter Report (.txt):** Umfassendes Protokoll inkl. "As-Found/As-Left" Vergleich.
@@ -73,6 +80,7 @@ Die Anwendung bietet eine klare Menüführung zur administrativen Steuerung und 
 *   [x] **Konfigurierbare Toleranzen:** Limits für V, A und P über das Setup einstellbar (`[TOLERANCE abs%]`).
 *   [x] **Visueller Messfortschritt:** Implementierung eines Fortschrittsbalkens (`progress_status`) in der Haupt-GUI, der den Status der aktuellen Messstufe in Echtzeit anzeigt. Der Balken wird nur während einer aktiven Messung eingeblendet und bleibt ansonsten unsichtbar.
 *   [x] **Hochgeschwindigkeits-Kommunikation Fluke:** Umstellung auf eine ereignisgesteuerte Abfrage (`readline`) in Kombination mit einem automatischen Puffer-Reset vor jeder Messung. Dies eliminiert unnötige Wartezeiten, verhindert Fehlmessungen durch Puffer-Überreste und maximiert die zeitliche Synchronität zwischen Referenz und Prüfling.
+*   [x] **Dynamische Power-Kalibrierung (Tasmota Rules):** Implementierung einer intelligenten Laststeuerung mittels Rules. Das System berechnet basierend auf Multi-Stufen-Reports optimale Umschaltpunkte (inkl. Hysterese) und überträgt diese an den Prüfling. Inklusive automatischem Flash-Schutz (`SaveData 0`) und lückenloser Dokumentation im Report.
 
 ### 6.2 Offene Punkte & Geplante Features (Roadmap)
 *   [ ] **Manuelle Kalibrierung:**

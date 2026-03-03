@@ -31,6 +31,7 @@ from fluke_scan import find_fluke
 from assets_guidance import get_guidance_html
 from assets_manual_info import MANUAL_INFO_HTML
 from man_calib_engine import ManualCalibrationEngine
+from dynamic_cal_dialog import DynamicCalDialog
 
 # ---------------------------------------------------------
 # 1. DER LOG-SPION (Log Spy)
@@ -809,6 +810,9 @@ class MainWindow(QMainWindow):
         # Note: check_ref_pro, check_ref_home, check_ref_manual are now exclusive via QButtonGroup
 
         if current_ui_mode == 'home_only':
+            # 0. Hide Tools menu / Werkzeuge-Menü ausblenden
+            if hasattr(self.ui, 'menuWerkzeuge'): self.ui.menuWerkzeuge.menuAction().setVisible(False)
+            
             # 1. Hide Fluke checkbox
             if hasattr(self.ui, 'check_ref_pro'): self.ui.check_ref_pro.setVisible(False)
             
@@ -830,6 +834,9 @@ class MainWindow(QMainWindow):
             if hasattr(self.ui, 'frame_reference_selection'): self.ui.frame_reference_selection.setVisible(True)
 
         elif current_ui_mode == 'pro_home':
+            # 0. Show Tools menu / Werkzeuge-Menü einblenden
+            if hasattr(self.ui, 'menuWerkzeuge'): self.ui.menuWerkzeuge.menuAction().setVisible(True)
+            
             # All elements should be visible and in their default behavior.
             if hasattr(self.ui, 'check_ref_pro'): self.ui.check_ref_pro.setVisible(True)
             if hasattr(self.ui, 'spin_steps'): self.ui.spin_steps.setVisible(True)
@@ -1023,6 +1030,9 @@ class MainWindow(QMainWindow):
 
         if hasattr(self.ui, 'action_guide'):
             self.ui.action_guide.triggered.connect(self.open_guidance)
+
+        if hasattr(self.ui, 'action_dynamic_cal'):
+            self.ui.action_dynamic_cal.triggered.connect(self.open_dynamic_cal_dialog)
         
         # English: Update the menu text for UI mode selection
         # Deutsch: Aktualisiere den Menütext für die UI-Modus-Auswahl
@@ -2209,6 +2219,22 @@ class MainWindow(QMainWindow):
         if hasattr(self.ui, 'lbl_host_ref'): self.ui.lbl_host_ref.setText("Hostname")
         if hasattr(self.ui, 'lbl_mac_ref'): self.ui.lbl_mac_ref.setText("MAC")
         if hasattr(self.ui, 'lbl_version_ref'): self.ui.lbl_version_ref.setText("Version")
+
+    def open_dynamic_cal_dialog(self):
+        """
+        # English: Opens the dialog for dynamic power calibration.
+        # Deutsch: Öffnet den Dialog für die dynamische Power-Kalibrierung.
+        """
+        dialog = DynamicCalDialog(self, self.cm, self.credentials_manager)
+        
+        # English: Pre-fill the IP address if available in the main GUI.
+        # Deutsch: IP-Adresse vorausfüllen, falls in der Haupt-GUI vorhanden.
+        if hasattr(self.ui, 'edit_dut_ip'):
+            ip = self.ui.edit_dut_ip.text().strip()
+            if ip and ip != "0.0.0.0":
+                dialog.ui.edit_ip.setText(ip)
+                
+        dialog.exec()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

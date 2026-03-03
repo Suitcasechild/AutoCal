@@ -1182,8 +1182,15 @@
     <addaction name="separator"/>
     <addaction name="action_show_license"/>
    </widget>
+   <widget class="QMenu" name="menuWerkzeuge">
+    <property name="title">
+     <string>Werkzeuge</string>
+    </property>
+    <addaction name="action_dynamic_cal"/>
+   </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuSetup"/>
+   <addaction name="menuWerkzeuge"/>
    <addaction name="menuHilfe"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -1267,6 +1274,11 @@
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="action_dynamic_cal">
+   <property name="text">
+    <string>Dynamische Power-Kalibrierung</string>
    </property>
   </action>
  </widget>
