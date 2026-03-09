@@ -3,7 +3,7 @@
 This release introduces an integrated help system for dynamic calibration and comprehensive documentation updates regarding flash memory protection.
 
 ## 🌟 Top Features & Improvements (v5.4.2)
-1.  **Dynamic Calibration via Support Points:** Advanced power calibration using multiple measurement steps (support points). The system automatically calculates optimal switching thresholds (including hysteresis) based on the flflowing current (A).
+1.  **Dynamic Calibration via Support Points:** Advanced power calibration using multiple measurement steps (support points). The system automatically calculates optimal switching thresholds (including hysteresis) based on the flowing current (A). The resulting logic is automatically deployed as a Tasmota Rule to the device, enabling real-time calibration adjustments. To protect the flash memory from excessive write cycles during these dynamic updates, the device is automatically set to `SaveData 0` mode after activation.
 2.  **Integrated Dynamic Help:** A new help button directly in the Dynamic Power-Calibration dialog provides instant access to technical documentation.
 3.  **Embedded HTML Assets:** The full technical documentation is now securely embedded as an HTML asset, ensuring integrity and providing a modern Dark-Theme look.
 4.  **Non-Modal Help Window:** The help dialog is non-modal, allowing users to read instructions while interacting with the calibration interface.
@@ -23,7 +23,7 @@ This release introduces an integrated help system for dynamic calibration and co
 Dieses Release führt ein integriertes Hilfesystem für die dynamische Kalibrierung ein und bietet umfassende Dokumentations-Updates zum Thema Flash-Speicherschutz.
 
 ## 🌟 Top-Features & Verbesserungen (v5.4.2)
-1.  **Dynamische Kalibrierung über Stützpunkte:** Fortgeschrittene Leistungskalibrierung unter Nutzung mehrerer Messstufen (Stützpunkte). Das System berechnet basierend auf dem fließenden Strom (A) automatisch optimale Umschaltschwellen inklusive Hysterese, um die Genauigkeit über den gesamten Lastbereich zu maximieren.
+1.  **Dynamische Kalibrierung über Stützpunkte:** Fortgeschrittene Leistungskalibrierung unter Nutzung mehrerer Messstufen (Stützpunkte). Das System berechnet basierend auf dem fließenden Strom (A) automatisch optimale Umschaltschwellen inklusive Hysterese, um die Genauigkeit über den gesamten Lastbereich zu maximieren. Die resultierende Logik wird automatisch als Tasmota-Rule auf das Gerät übertragen, was eine Echtzeit-Anpassung der Kalibrierung ermöglicht. Zum Schutz des Flash-Speichers vor zu vielen Schreibzyklen während dieser dynamischen Updates wird die Dose nach der Aktivierung automatisch in den Modus `SaveData 0` gesetzt.
 2.  **Integrierte dynamische Hilfe:** Ein neuer Hilfe-Button direkt im Dialog für die dynamische Power-Kalibrierung bietet sofortigen Zugriff auf die technische Dokumentation.
 3.  **Eingebettete HTML-Assets:** Die vollständige technische Dokumentation ist nun sicher als HTML-Asset eingebettet, was die Integrität gewährleistet und ein modernes Dark-Theme bietet.
 4.  **Nicht-modales Hilfefenster:** Der Hilfe-Dialog ist nicht-modal, sodass Benutzer die Anleitung lesen können, während sie mit der Kalibrierungsoberfläche interagieren.
