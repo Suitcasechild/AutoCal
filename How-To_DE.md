@@ -32,7 +32,11 @@ Da du keine Referenz hast, erschaffen wir uns eine.
 Du benötigst:
 1.  **Den Prüfling (DUT):** Die Tasmota-Dose, die kalibriert werden soll.
 2.  **Ein einfaches Messgerät:** Ein handelsübliches Energiekosten-Messgerät für die Steckdose.
-3.  **Eine stabile Last:** Ideal ist eine alte Glühbirne (60W/100W) oder ein Heizlüfter/Bügeleisen. **Vermeide** LED-Lampen, PCs oder Fernseher (instabile Schaltnetzteile).
+3.  **Drei stabile Last-Stufen:** Um eine präzise Kennlinie zu berechnen, solltest du die Dose bei unterschiedlichen Lasten messen. Ideal sind:
+    *   **Stufe 1 (Kleinlast):** Glühbirne oder Halogenstrahler (ca. **100W - 200W**).
+    *   **Stufe 2 (Mittellast):** Heizstrahler oder Wasserkocher (ca. **1000W - 1500W**).
+    *   **Stufe 3 (Hochlast):** Heizstrahler auf Maximalstufe (ca. **2000W - 2500W**).
+    *   **Vermeide** LED-Lampen, PCs oder Fernseher (instabile Schaltnetzteile).
 4.  **Smartphone:** Für die Foto-Methode.
 
 ---
