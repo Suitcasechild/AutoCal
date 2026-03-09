@@ -5,7 +5,7 @@
 ### 🚀 Neue Features / New Features
 *   **Integrierte Hilfe (Dynamische Kalibrierung) / Integrated Help (Dynamic Calibration):**
     *   **Direktzugriff:** Neuer Hilfe-Button (`btn_help_dynamic`) direkt im Experten-Dialog für die dynamische Power-Kalibrierung.
-    *   **Asset-Einbettung:** Die vollständige technische Dokumentation (`DOKU_DYNAMISCHE_KALIBRIERUNG.md`) wurde als HTML-Asset fest in den Code integriert (`assets_dynamic_info.py`).
+    *   **Asset-Einbettung:** Die vollständige technische Dokumentation (`anleitung_dynamic_cal.md`) wurde als HTML-Asset fest in den Code integriert (`assets_dynamic_info.py`).
     *   **UI/UX:** Nicht-modales Hilfe-Fenster mit Dark-Theme, interaktivem Inhaltsverzeichnis (Anker-Links) und integrierter Suchfunktion für schnelles Finden von Informationen.
 *   **Dokumentations-Update / Documentation Update:**
     *   **Flash-Schutz (SaveData 0):** Umfassende Information zum Flash-Schutz in `anleitung.md`, `userguide.md` und der integrierten App-Hilfe (`assets_guidance.py`) hinzugefügt.

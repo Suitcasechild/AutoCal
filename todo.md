@@ -296,10 +296,10 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
 
 ### Feature: Hilfe-Button für Dynamische Power-Kalibrierung - ERLEDIGT
 
-**Ziel:** Direkter Zugriff auf die technische Dokumentation (`DOKU_DYNAMISCHE_KALIBRIERUNG.md`) aus dem Experten-Dialog heraus.
+**Ziel:** Direkter Zugriff auf die technische Dokumentation (`anleitung_dynamic_cal.md`) aus dem Experten-Dialog heraus.
 
 *   [x] **1. Vorbereitung: Asset-Generierung (`assets_dynamic_info.py`)**
-    *   [x] Erstellen eines Konvertierungsskripts, das die `DOKU_DYNAMISCHE_KALIBRIERUNG.md` in einen HTML-String umwandelt.
+    *   [x] Erstellen eines Konvertierungsskripts, das die `anleitung_dynamic_cal.md` in einen HTML-String umwandelt.
     *   [x] **Integrität:** Einbettung dieses Strings in eine neue Datei `assets_dynamic_info.py` (analog zu `assets_manual_info.py`).
     *   [x] **Styling:** Inkludieren eines CSS-Stylesheets für konsistente Darstellung (Dark-Mode, Schriftgrößen).
     *   [x] **Anker-Optimierung:** Sicherstellung, dass alle Markdown-Anker (`#abschnitt`) in valide HTML-IDs konvertiert werden für funktionierende Verlinkungen.
