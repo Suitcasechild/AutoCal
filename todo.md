@@ -315,8 +315,24 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     *   [x] **Suchfunktion:** Implementierung eines kleinen Suchfelds (`QLineEdit`) im Hilfe-Dialog zum schnellen Finden von Fachbegriffen.
     *   [x] **Navigation:** Konfiguration des `QTextBrowser`, um lokale Anker-Links korrekt zu verarbeiten.
 
-*   [x] **4. Validierung & Abschluss**
-    *   [x] Testen der Inhaltsverzeichnis-Links im Hilfe-Fenster.
-    *   [x] Sicherstellen, dass der Text fest im Kompilat verankert ist.
-    *   [x] Aktuelle Dokumentation in `changelog.md` ergänzen.
+---
+
+### Feature: Periodische Sicherung aller Daten (Auto-Save via Rule2)
+
+**Gehört zu:** Dynamischer Kalibriermodus (Erweiterung)
+**Ziel:** Minimierung von Datenverlusten (Einstellungen & Zähler) bei Stromausfall, während die dynamische Kalibrierung (`Rule1`) geschützt bleibt.
+
+*   [ ] **1. UI-Erweiterung (`dynamic_cal.ui`)**
+    *   [ ] Hinzufügen einer Checkbox `check_autosave` ("Alle Daten alle 30 Min. sichern").
+    *   [ ] Tooltip hinzufügen, der die Logik (SaveData 1/0 Wechsel via Rule2) erklärt.
+
+*   [ ] **2. Logik-Implementierung (`dynamic_cal_dialog.py`)**
+    *   [ ] **Rule-Generierung:** Funktion erstellen, die den `Rule2`-String gemäß `Featuredynami.md` generiert.
+    *   [ ] **Status-Abfrage:** Beim Laden des Dialogs prüfen, ob `Rule2` bereits belegt ist (Warn-Logik analog zu `Rule1`).
+    *   [ ] **Sende-Logik:** Wenn die Checkbox aktiv ist, beim Klick auf "Senden" zusätzlich `Rule2` übertragen und mit `Rule2 1` aktivieren.
+
+*   [ ] **3. Dokumentation & Validierung**
+    *   [ ] Funktion in der integrierten Hilfe (`anleitung_dynamic_cal.md`) beschreiben.
+    *   [ ] Testen des Zusammenspiels zwischen `Rule1` (PowerCal) und `Rule2` (SaveData-Wechsel).
+    *   [ ] Dokumentation in `changelog.md`.
 
