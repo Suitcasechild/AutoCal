@@ -1,0 +1,53 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260225_161112
+  Report erstellt:    20260225_161112
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  227.48V | DUT  228.01V | Err:  +0.53V ( +0.23%) -> Cal-Vorschlag: 1538
+  Strom:    Ref   4.858A | DUT   4.858A | Err: -0.000A ( -0.01%) -> Cal-Vorschlag: 3253
+  Leistung: Ref 1105.14W | DUT 1107.41W | Err:  +2.28W ( +0.21%) -> Cal-Vorschlag: 9369
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.997934 | Bestimmtheitsmaß R2 = 0.288491
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1538 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 3253 (Mittelwert der Stufen)
+      PowerCal 9389                       PowerCal 9369 (aus Regression, empfohlen)
+                                          └─ Alternative: 9369 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+
+[16:11:59] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+
+[16:11:59] Gesendete Werte:    VoltageCal 1538
+
+[16:11:59] As Found (Vorher):  VCal 1542 | ACal 3253 | WCal 9389
+
+[16:11:59] As Left  (Nachher): VCal 1538 | ACal 3253 | WCal 9389
+
+[16:11:59] Status der Übertragung: ERFOLGREICH
+
+=====================================================================================

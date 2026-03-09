@@ -1,0 +1,51 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device Name: Manuelle Eingabe
+  Hostname:    k.A.
+  MAC Address: k.A.
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  MANUAL
+  Datenquelle (CSV): 20260225_160903
+  Report erstellt:    20260225_160903
+
+=====================================================================================
+HINWEIS: Diese Kalibrierung wurde auf Basis manuell eingegebener Referenzwerte durchgeführt.
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Strom:    Ref   4.074A | DUT   2.222A | Err: -1.852A (-45.45%) -> Cal-Vorschlag: 5963
+  Leistung: Ref    1.11W | DUT    1.11W | Err:  +0.00W ( +0.00%) -> Cal-Vorschlag: 9389
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1542 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 5963 (Mittelwert der Stufen)
+      PowerCal 9389                       PowerCal 9389 (Mittelwert)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+
+[16:09:18] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+
+[16:09:18] Gesendete Werte:    PowerCal 9389
+
+[16:09:18] As Found (Vorher):  VCal 1542 | ACal 3253 | WCal 9389
+
+[16:09:18] As Left  (Nachher): VCal 1542 | ACal 3253 | WCal 9389
+
+[16:09:18] Status der Übertragung: ERFOLGREICH
+
+=====================================================================================

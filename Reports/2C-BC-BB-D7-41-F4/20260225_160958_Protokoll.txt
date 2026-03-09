@@ -1,0 +1,49 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260225_160958
+  Report erstellt:    20260225_160958
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  229.21V | DUT  228.90V | Err:  -0.31V ( -0.14%) -> Cal-Vorschlag: 1544
+  Strom:    Ref   4.882A | DUT   4.876A | Err: -0.006A ( -0.13%) -> Cal-Vorschlag: 3257
+  Leistung: Ref 1116.50W | DUT 1115.10W | Err:  -1.40W ( -0.13%) -> Cal-Vorschlag: 9400
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1544 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 3257 (Mittelwert der Stufen)
+      PowerCal 9389                       PowerCal 9400 (Mittelwert)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+
+[16:10:56] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+
+[16:10:56] Gesendete Werte:    VoltageCal 1544
+
+[16:10:56] As Found (Vorher):  VCal 1542 | ACal 3253 | WCal 9389
+
+[16:10:56] As Left  (Nachher): VCal 1544 | ACal 3253 | WCal 9389
+
+[16:10:56] Status der Übertragung: ERFOLGREICH
+
+=====================================================================================

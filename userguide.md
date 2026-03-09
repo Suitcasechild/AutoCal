@@ -198,6 +198,10 @@ This section serves as exact instructions for the operator. Please follow the st
     *   **Solution:** The device is password-protected. Enter the data in the popup that appears. "admin" is already preset as the default user.
 *   **🔐 Tip on Credentials:** The app saves entered passwords securely in memory until the program is closed. Use the **"Online Check"** before the measurement to store the credentials once. This allows the actual calibration process to run through without interruption by popups.
 *   **🌡️ Tip for Experts:** Let the measurement setup "warm up" for approx. 5 minutes. Electronic components drift slightly until they reach their operating temperature. Calibration in a warm state is more precise.
+*   **🛡️ IMPORTANT: Flash Protection (SaveData 0):** 
+    *   **Background:** To protect the flash memory of the Tasmota device from excessive write cycles, this program sets the device to `SaveData 0` permanently **only when performing dynamic calibration (expert feature)**. During standard calibration (PRO/HOME), the storage behavior remains unaffected.
+    *   **Impact:** When dynamic calibration is active, all calibration values are held only in volatile memory (RAM). While these are not lost upon reboot (as they were sent at the start of measurement), **manual changes** to the device (WiFi data, name, timers) are not permanently saved in this mode.
+    *   **Making Manual Changes:** If you wish to save settings permanently, enter `SaveData 1` in the Tasmota console, make your changes, and then set it back to `SaveData 0` for protection.
 
 ---
 [🏠 Back to Index](#index)

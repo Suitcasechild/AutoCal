@@ -3,10 +3,66 @@ import re
 import httpx
 import glob
 from datetime import datetime
-from PySide6 import QtWidgets, QtCore, QtUiTools
+from PySide6 import QtWidgets, QtCore, QtGui, QtUiTools
+from PySide6.QtGui import QTextCursor
 from i18n_manager import setup_translation
+from assets_dynamic_info import DYNAMIC_CAL_HELP_HTML
 
 _ = setup_translation()
+
+class DynamicHelpDialog(QtWidgets.QDialog):
+    """
+    English: A non-modal dialog to display the dynamic calibration documentation.
+    Deutsch: Ein nicht-modaler Dialog zur Anzeige der Dokumentation für die dynamische Kalibrierung.
+    """
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(_("Hilfe: Dynamische Power-Kalibrierung"))
+        self.setMinimumSize(800, 700)
+        self.setModal(False) # English: Non-modal / Deutsch: Nicht-modal
+        
+        layout = QtWidgets.QVBoxLayout(self)
+        
+        # English: Search bar / Deutsch: Suchleiste
+        search_layout = QtWidgets.QHBoxLayout()
+        self.search_input = QtWidgets.QLineEdit(self)
+        self.search_input.setPlaceholderText(_("Suchen..."))
+        self.search_input.returnPressed.connect(self.search_text)
+        search_layout.addWidget(self.search_input)
+        
+        self.btn_search = QtWidgets.QPushButton(_("Suchen"), self)
+        self.btn_search.clicked.connect(self.search_text)
+        search_layout.addWidget(self.btn_search)
+        
+        layout.addLayout(search_layout)
+        
+        # English: Documentation Browser / Deutsch: Dokumentations-Browser
+        self.browser = QtWidgets.QTextBrowser(self)
+        self.browser.setHtml(DYNAMIC_CAL_HELP_HTML)
+        self.browser.setOpenExternalLinks(True)
+        layout.addWidget(self.browser)
+        
+        # English: Close button / Deutsch: Schließen-Button
+        self.btn_close = QtWidgets.QPushButton(_("Schließen"), self)
+        self.btn_close.clicked.connect(self.hide)
+        layout.addWidget(self.btn_close)
+
+    def search_text(self):
+        """
+        English: Searches for text in the browser and highlights the next occurrence.
+        Deutsch: Sucht nach Text im Browser und hebt das nächste Vorkommen hervor.
+        """
+        from PySide6.QtGui import QTextCursor
+        text = self.search_input.text()
+        if text:
+            found = self.browser.find(text)
+            if not found:
+                # English: Reset cursor to start and try again if not found (wrap around)
+                # Deutsch: Cursor zum Anfang zurücksetzen und erneut versuchen, wenn nichts gefunden wurde (Umbrechen)
+                cursor = self.browser.textCursor()
+                cursor.movePosition(QTextCursor.Start)
+                self.browser.setTextCursor(cursor)
+                self.browser.find(text)
 
 class RuleWarningDialog(QtWidgets.QDialog):
     def __init__(self, current_rule, parent=None):
@@ -91,6 +147,12 @@ class DynamicCalDialog(QtWidgets.QDialog):
         self.ui.btn_search_report.clicked.connect(self.on_search_report)
         self.ui.btn_send_rule.clicked.connect(self.on_send_rule)
         self.ui.btn_close.clicked.connect(self.close)
+        
+        # English: Help button connection / Deutsch: Hilfe-Button Verknüpfung
+        if hasattr(self.ui, 'btn_help_dynamic'):
+            self.ui.btn_help_dynamic.clicked.connect(self.on_show_help)
+        
+        self.help_dialog = None # English: Persistent reference / Deutsch: Persistente Referenz
         
         if hasattr(self.ui, 'spin_hysteresis'):
             self.ui.spin_hysteresis.valueChanged.connect(self.generate_rule)
@@ -341,6 +403,18 @@ class DynamicCalDialog(QtWidgets.QDialog):
             self.log_message(_("Dokumentation im Report hinterlegt."))
         except Exception as e:
             self.log_message(_("Fehler bei Dokumentation: ") + str(e))
+
+    def on_show_help(self):
+        """
+        English: Opens the non-modal help dialog for dynamic calibration.
+        Deutsch: Öffnet den nicht-modalen Hilfe-Dialog für die dynamische Kalibrierung.
+        """
+        if self.help_dialog is None:
+            self.help_dialog = DynamicHelpDialog(self)
+        
+        self.help_dialog.show()
+        self.help_dialog.raise_()
+        self.help_dialog.activateWindow()
 
     def closeEvent(self, event):
         ip = self.ui.edit_ip.text().strip()

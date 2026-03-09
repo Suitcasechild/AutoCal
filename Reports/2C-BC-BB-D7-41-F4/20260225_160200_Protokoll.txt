@@ -1,0 +1,36 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device Name: Manuelle Eingabe
+  Hostname:    k.A.
+  MAC Address: k.A.
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  MANUAL
+  Datenquelle (CSV): 20260225_160200
+  Report erstellt:    20260225_160200
+
+=====================================================================================
+HINWEIS: Diese Kalibrierung wurde auf Basis manuell eingegebener Referenzwerte durchgeführt.
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Leistung: Ref    1.11W | DUT    1.11W | Err:  +0.00W ( +0.00%) -> Cal-Vorschlag: 9389
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 20230                    VoltageCal 20230 (Mittelwert der Stufen)
+    CurrentCal 2500                     CurrentCal 2500 (Mittelwert der Stufen)
+      PowerCal 9389                       PowerCal 9389 (Mittelwert)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

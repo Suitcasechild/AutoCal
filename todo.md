@@ -290,5 +290,33 @@ Dieses Dokument beschreibt die notwendigen Schritte, um die Messsteuerung von ei
     - [x] **Flash-Schutz:** Automatisches Setzen von `SaveData 0` nach Abschluss.
 
 - [ ] **5. i18n & Dokumentation**
-    - [ ] Übersetzungs-Keys für alle neuen Texte, Warnungen und Log-Meldungen (DE/EN).
-    - [ ] Feature und Flash-Schutz-Thematik in `anleitung.md` / `userguide.md` dokumentieren.
+    - [x] Übersetzungs-Keys für alle neuen Texte, Warnungen und Log-Meldungen (DE/EN).
+    - [x] Feature und Flash-Schutz-Thematik in `anleitung.md` / `userguide.md` dokumentieren.
+---
+
+### Feature: Hilfe-Button für Dynamische Power-Kalibrierung - ERLEDIGT
+
+**Ziel:** Direkter Zugriff auf die technische Dokumentation (`DOKU_DYNAMISCHE_KALIBRIERUNG.md`) aus dem Experten-Dialog heraus.
+
+*   [x] **1. Vorbereitung: Asset-Generierung (`assets_dynamic_info.py`)**
+    *   [x] Erstellen eines Konvertierungsskripts, das die `DOKU_DYNAMISCHE_KALIBRIERUNG.md` in einen HTML-String umwandelt.
+    *   [x] **Integrität:** Einbettung dieses Strings in eine neue Datei `assets_dynamic_info.py` (analog zu `assets_manual_info.py`).
+    *   [x] **Styling:** Inkludieren eines CSS-Stylesheets für konsistente Darstellung (Dark-Mode, Schriftgrößen).
+    *   [x] **Anker-Optimierung:** Sicherstellung, dass alle Markdown-Anker (`#abschnitt`) in valide HTML-IDs konvertiert werden für funktionierende Verlinkungen.
+
+*   [x] **2. UI-Anpassung (`dynamic_cal.ui`)**
+    *   [x] Hinzufügen eines Buttons `btn_help_dynamic` im Qt Designer (MANUELL DURCH NUTZER).
+    *   [x] Positionierung neben den Berechnungs-Parametern oder im Header des Fensters.
+
+*   [x] **3. Implementierung der Logik (`dynamic_cal_dialog.py`)**
+    *   [x] Verknüpfung des Buttons mit einer neuen Methode `show_help()`.
+    *   [x] **Klasse `DynamicHelpDialog`:** Erstellung einer Dialog-Klasse, die einen `QTextBrowser` nutzt.
+    *   [x] **Modus:** Fenster als **nicht-modal** (`show()` statt `exec()`) konfigurieren, um paralleles Arbeiten zu ermöglichen.
+    *   [x] **Suchfunktion:** Implementierung eines kleinen Suchfelds (`QLineEdit`) im Hilfe-Dialog zum schnellen Finden von Fachbegriffen.
+    *   [x] **Navigation:** Konfiguration des `QTextBrowser`, um lokale Anker-Links korrekt zu verarbeiten.
+
+*   [x] **4. Validierung & Abschluss**
+    *   [x] Testen der Inhaltsverzeichnis-Links im Hilfe-Fenster.
+    *   [x] Sicherstellen, dass der Text fest im Kompilat verankert ist.
+    *   [x] Aktuelle Dokumentation in `changelog.md` ergänzen.
+

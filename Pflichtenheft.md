@@ -81,10 +81,8 @@ Die Anwendung bietet eine klare Menüführung zur administrativen Steuerung und 
 *   [x] **Visueller Messfortschritt:** Implementierung eines Fortschrittsbalkens (`progress_status`) in der Haupt-GUI, der den Status der aktuellen Messstufe in Echtzeit anzeigt. Der Balken wird nur während einer aktiven Messung eingeblendet und bleibt ansonsten unsichtbar.
 *   [x] **Hochgeschwindigkeits-Kommunikation Fluke:** Umstellung auf eine ereignisgesteuerte Abfrage (`readline`) in Kombination mit einem automatischen Puffer-Reset vor jeder Messung. Dies eliminiert unnötige Wartezeiten, verhindert Fehlmessungen durch Puffer-Überreste und maximiert die zeitliche Synchronität zwischen Referenz und Prüfling.
 *   [x] **Dynamische Power-Kalibrierung (Tasmota Rules):** Implementierung einer intelligenten Laststeuerung mittels Rules. Das System berechnet basierend auf Multi-Stufen-Reports optimale Umschaltpunkte (inkl. Hysterese) und überträgt diese an den Prüfling. Inklusive automatischem Flash-Schutz (`SaveData 0`) und lückenloser Dokumentation im Report.
+*   [x] **Manuelle Kalibrierung (Vollständig):** Implementierung eines geführten Workflows zur manuellen Eingabe von Referenzwerten. Inklusive Foto-Methode zur Synchronisation, dynamischer UI-Validierung, automatischer Lastabschaltung und integrierter interaktiver Hilfe.
 
 ### 6.2 Offene Punkte & Geplante Features (Roadmap)
-*   [ ] **Manuelle Kalibrierung:**
-    *   Implementierung eines Workflows zur manuellen Eingabe von Referenzwerten (für Anwender ohne direkte Schnittstelle).
-    *   Workflow: Last-Steuerung, manuelle Eingabemaske für bis zu 4 Messungen pro Stufe, Generierung spezieller "manuell"-CSVs.
 *   [ ] **Internationalisierung (i18n):**
     *   Vorbereitung der Software für eine automatische oder manuelle Sprachumschaltung (Deutsch/Englisch).

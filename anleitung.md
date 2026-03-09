@@ -198,6 +198,10 @@ Dieser Abschnitt dient als exakte Handlungsanweisung für den Operator. Bitte fo
     *   **Lösung:** Die Dose ist passwortgeschützt. Geben Sie die Daten im erscheinenden Popup ein. Als Standardbenutzer ist "admin" bereits voreingestellt.
 *   **🔐 Tipp zu Zugangsdaten:** Die App speichert eingegebene Passwörter sicher im Arbeitsspeicher, bis das Programm geschlossen wird. Nutzen Sie den **"Online Check"** vor der Messung, um die Zugangsdaten einmalig zu hinterlegen. So läuft der eigentliche Kalibrierprozess ohne Unterbrechung durch Popups durch.
 *   **🌡️ Tipp für Experten:** Lassen Sie die Messanordnung ca. 5 Minuten "warmlaufen". Elektronische Bauteile driften leicht, bis sie ihre Betriebstemperatur erreicht haben. Eine Kalibrierung im warmen Zustand ist präziser.
+*   **🛡️ WICHTIG: Flash-Schutz (SaveData 0):** 
+    *   **Hintergrund:** Um den Flash-Speicher der Tasmota-Dose vor zu vielen Schreibzyklen zu schützen, setzt dieses Programm das Gerät **ausschließlich bei Durchführung der dynamischen Kalibrierung (Experten-Feature)** permanent auf `SaveData 0`. Bei einer standardmäßigen Kalibrierung (PRO/HOME) wird das Speicherverhalten nicht verändert.
+    *   **Auswirkung:** Bei aktiver dynamischer Kalibrierung werden alle Kalibrierwerte nur im flüchtigen Arbeitsspeicher (RAM) gehalten. Bei einem Neustart der Dose gehen diese zwar nicht verloren (da sie beim Start der Messung gesendet wurden), aber **manuelle Änderungen** am Gerät (WLAN-Daten, Name, Timer) werden in diesem Modus nicht dauerhaft gespeichert.
+    *   **Manuelle Änderung vornehmen:** Wenn Sie Einstellungen dauerhaft speichern möchten, geben Sie in der Tasmota-Konsole `SaveData 1` ein, nehmen Sie die Änderung vor, und setzen Sie es danach zum Schutz wieder auf `SaveData 0`.
 
 ---
 [🏠 Zurück zum Index](#index)

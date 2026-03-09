@@ -196,6 +196,13 @@ def get_guidance_html(_):
     <li><b>⚠️ {_("Problem:")}</b> {_("'HTTP 401 Unauthorized' -> Zugangsdaten im Popup eingeben.")}</li>
     <li><b>🔐 {_("Tipp:")}</b> {_("Nutzen Sie den Online-Check vorab, um Zugangsdaten einmalig zu hinterlegen.")}</li>
     <li><b>🌡️ {_("Tipp:")}</b> {_("Anlage 5 Minuten 'warmlaufen' lassen für höchste Präzision.")}</li>
+    <li><b>🛡️ <b>{_("WICHTIG: Flash-Schutz (SaveData 0):")}</b></b>
+        <ul>
+            <li><b>{_("Hintergrund:")}</b> {_("Um den Flash-Speicher der Tasmota-Dose vor zu vielen Schreibzyklen zu schützen, setzt dieses Programm das Gerät ausschließlich bei Durchführung der dynamischen Kalibrierung (Experten-Feature) permanent auf SaveData 0. Bei einer standardmäßigen Kalibrierung (PRO/HOME) wird das Speicherverhalten nicht verändert.")}</li>
+            <li><b>{_("Auswirkung:")}</b> {_("Bei aktiver dynamischer Kalibrierung werden alle Kalibrierwerte nur im flüchtigen Arbeitsspeicher (RAM) gehalten. Bei einem Neustart der Dose gehen diese zwar nicht verloren (da sie beim Start der Messung gesendet wurden), aber manuelle Änderungen am Gerät (WLAN-Daten, Name, Timer) werden in diesem Modus nicht dauerhaft gespeichert.")}</li>
+            <li><b>{_("Manuelle Änderung vornehmen:")}</b> {_("Wenn Sie Einstellungen dauerhaft speichern möchten, geben Sie in der Tasmota-Konsole SaveData 1 ein, nehmen Sie die Änderung vor, und setzen Sie es danach zum Schutz wieder auf SaveData 0.")}</li>
+        </ul>
+    </li>
 </ul>
 
 <div class="footer">

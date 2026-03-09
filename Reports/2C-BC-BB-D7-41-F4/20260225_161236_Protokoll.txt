@@ -1,0 +1,35 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device Name: Referenz
+  Hostname:    tasmota-D5B7BC-6076
+  MAC Address: 2C:BC:BB:D5:B7:BC
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  HOME
+  Datenquelle (CSV): 20260225_161236
+  Report erstellt:    20260225_161236
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  228.34V | DUT  227.90V | Err:  -0.44V ( -0.19%) -> Cal-Vorschlag: 1544
+  Strom:    Ref   4.864A | DUT   4.860A | Err: -0.005A ( -0.09%) -> Cal-Vorschlag: 3256
+  Leistung: Ref 1108.47W | DUT 1107.51W | Err:  -0.96W ( -0.09%) -> Cal-Vorschlag: 9397
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1544 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 3256 (Mittelwert der Stufen)
+      PowerCal 9389                       PowerCal 9397 (Mittelwert)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

@@ -1,0 +1,97 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260303_193337
+  Report erstellt:    20260303_193337
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  229.94V | DUT  230.07V | Err:  +0.13V ( +0.06%) -> Cal-Vorschlag: 1541
+  Strom:    Ref   0.914A | DUT   0.897A | Err: -0.018A ( -1.95%) -> Cal-Vorschlag: 3317
+  Leistung: Ref  210.28W | DUT  206.12W | Err:  -4.15W ( -1.98%) -> Cal-Vorschlag: 9576
+
+STUFE 2:
+  Spannung: Ref  227.64V | DUT  227.77V | Err:  +0.12V ( +0.05%) -> Cal-Vorschlag: 1541
+  Strom:    Ref   4.260A | DUT   4.249A | Err: -0.011A ( -0.26%) -> Cal-Vorschlag: 3261
+  Leistung: Ref  969.86W | DUT  967.13W | Err:  -2.73W ( -0.28%) -> Cal-Vorschlag: 9413
+
+STUFE 3:
+  Spannung: Ref  224.57V | DUT  224.93V | Err:  +0.36V ( +0.16%) -> Cal-Vorschlag: 1539
+  Strom:    Ref   8.987A | DUT   9.001A | Err: +0.014A ( +0.15%) -> Cal-Vorschlag: 3248
+  Leistung: Ref 2018.28W | DUT 2023.70W | Err:  +5.42W ( +0.27%) -> Cal-Vorschlag: 9361
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.998527 | Bestimmtheitsmaß R2 = 0.999986
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1540 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 3275 (Mittelwert der Stufen)
+      PowerCal 9387                       PowerCal 9373 (aus Regression, empfohlen)
+                                          └─ Alternative: 9450 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+
+=====================================================================================
+[DYNAMISCHE KALIBRIERUNG (RULES)] - 2026-03-03 20:09:07
+Hysterese: 0.150 A
+Gesendete Rule:
+Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON
+=====================================================================================
+
+
+=====================================================================================
+[DYNAMISCHE KALIBRIERUNG (RULES)] - 2026-03-03 20:16:57
+Hysterese: 0.150 A
+Gesendete Rule:
+Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON
+=====================================================================================
+
+
+=====================================================================================
+[DYNAMISCHE KALIBRIERUNG (RULES)] - 2026-03-03 20:24:21
+Hysterese: 0.150 A
+Gesendete Rule:
+Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON
+=====================================================================================
+
+
+=====================================================================================
+[DYNAMISCHE KALIBRIERUNG (RULES)] - 2026-03-03 20:26:33
+Hysterese: 0.150 A
+Gesendete Rule:
+Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON
+=====================================================================================
+
+
+=====================================================================================
+[DYNAMISCHE KALIBRIERUNG (RULES)] - 2026-03-03 20:37:15
+Hysterese: 0.150 A
+Gesendete Rule:
+Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON
+=====================================================================================
+
+
+=====================================================================================
+[DYNAMISCHE KALIBRIERUNG (RULES)] - 2026-03-03 20:39:38
+Hysterese: 0.150 A
+Gesendete Rule:
+Rule1 ON Energy#Current>0 DO PowerCal 9576 ENDON ON Energy#Current>2.587 DO PowerCal 9413 ENDON ON Energy#Current>6.623 DO PowerCal 9361 ENDON ON Energy#Current<6.473 DO PowerCal 9413 ENDON ON Energy#Current<2.437 DO PowerCal 9576 ENDON
+=====================================================================================

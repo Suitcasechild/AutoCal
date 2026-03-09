@@ -15,10 +15,20 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>IP-Adresse:</string>
+    <widget class="QSplitter" name="splitter_2">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>IP-Adresse:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_help_dynamic">
+      <property name="text">
+       <string>HILFE</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>

@@ -1,0 +1,49 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260303_204325
+  Report erstellt:    20260303_204325
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  229.08V | DUT  229.03V | Err:  -0.05V ( -0.02%) -> Cal-Vorschlag: 1542
+  Strom:    Ref   0.910A | DUT   0.895A | Err: -0.015A ( -1.68%) -> Cal-Vorschlag: 3308
+  Leistung: Ref  208.48W | DUT  209.10W | Err:  +0.62W ( +0.30%) -> Cal-Vorschlag: 9547
+
+STUFE 2:
+  Spannung: Ref  225.57V | DUT  225.90V | Err:  +0.33V ( +0.14%) -> Cal-Vorschlag: 1539
+  Strom:    Ref   5.708A | DUT   5.717A | Err: +0.009A ( +0.16%) -> Cal-Vorschlag: 3247
+  Leistung: Ref 1287.50W | DUT 1294.51W | Err:  +7.01W ( +0.54%) -> Cal-Vorschlag: 9524
+
+STUFE 3:
+  Spannung: Ref  223.71V | DUT  224.27V | Err:  +0.56V ( +0.25%) -> Cal-Vorschlag: 1538
+  Strom:    Ref   8.957A | DUT   8.990A | Err: +0.033A ( +0.37%) -> Cal-Vorschlag: 3241
+  Leistung: Ref 2003.78W | DUT 2008.82W | Err:  +5.05W ( +0.25%) -> Cal-Vorschlag: 9551
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 0.996637 | Bestimmtheitsmaß R2 = 0.999983
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1539 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 3265 (Mittelwert der Stufen)
+      PowerCal 9576                       PowerCal 9543 (aus Regression, empfohlen)
+                                          └─ Alternative: 9540 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS

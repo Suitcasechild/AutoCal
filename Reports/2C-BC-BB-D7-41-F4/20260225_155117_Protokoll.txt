@@ -1,0 +1,53 @@
+TASMOTA PRECISION CALIBRATION REPORT
+=====================================================================================
+[PRÜFLING (DUT)]
+  Device Name: Tasmota
+  Hostname:    tasmota-D741F4-0500
+  MAC Address: 2C:BC:BB:D7:41:F4
+
+[REFERENZ]
+  Device: FLUKE 45 DUAL Mode Calculated Power (P)
+=====================================================================================
+
+MESSUNGSDETAILS
+  Kalibrier-Modus:  PRO
+  Datenquelle (CSV): 20260225_155117
+  Report erstellt:    20260225_155117
+=====================================================================================
+
+[1] EINZEL-AUSWERTUNG (Mittelwerte & Abweichungen pro Laststufe)
+
+STUFE 1:
+  Spannung: Ref  231.91V | DUT  232.21V | Err:  +0.30V ( +0.13%) -> Cal-Vorschlag: 1539
+  Strom:    Ref   4.940A | DUT   4.921A | Err: -0.018A ( -0.37%) -> Cal-Vorschlag: 3265
+  Leistung: Ref 1145.55W | DUT 1141.84W | Err:  -3.71W ( -0.32%) -> Cal-Vorschlag: 9419
+
+=====================================================================================
+[2] ANALYSE DER AUSGLEICHSGERADE (NUR LEISTUNG)
+Die Regression optimiert die Steigung m über alle Stufen hinweg (Nullpunkt-erzwungen).
+  Leistung (W): Steigung m = 1.003246 | Bestimmtheitsmaß R2 = 0.000755
+
+=====================================================================================
+[3]    BESTEHENDE KALIBRIERWERTE            VORGESCHLAGENE KALIBRIERWERTE
+
+    VoltageCal 1542                     VoltageCal 1539 (Mittelwert der Stufen)
+    CurrentCal 3253                     CurrentCal 3265 (Mittelwert der Stufen)
+      PowerCal 9389                       PowerCal 9419 (aus Regression, empfohlen)
+                                          └─ Alternative: 9419 (Mittelwert der Stufen)
+
+=====================================================================================
+ENDE DES PROTOKOLLS
+
+=====================================================================================
+
+[15:52:01] ÜBERTRAGUNG DER KALIBRIERWERTE ZUR DOSE
+
+[15:52:01] Gesendete Werte:    VoltageCal 1539 | CurrentCal 3265 | PowerCal 9419
+
+[15:52:01] As Found (Vorher):  VCal 1542 | ACal 3253 | WCal 9389
+
+[15:52:01] As Left  (Nachher): VCal 1539 | ACal 3265 | WCal 9419
+
+[15:52:01] Status der Übertragung: ERFOLGREICH
+
+=====================================================================================
