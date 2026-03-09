@@ -32,10 +32,9 @@ Since you have no reference, we will create one.
 You will need:
 1.  **The Device Under Test (DUT):** The Tasmota socket that needs to be calibrated.
 2.  **A simple measuring device:** A commercially available plug-in energy meter.
-3.  **Three stable load stages:** To calculate a precise characteristic curve, you should measure the socket at different loads. Ideal are:
-    *   **Stage 1 (Small load):** Incandescent or halogen bulb (approx. **100W - 200W**).
-    *   **Stage 2 (Medium load):** Fan heater or kettle (approx. **1000W - 1500W**).
-    *   **Stage 3 (High load):** Fan heater at maximum level (approx. **2000W - 2500W**).
+3.  **Loads for Calibration & Testing:** Since the manual calibration in the app is optimized for a single load stage, you should have the following consumers ready:
+    *   **Calibration Load (Ideal):** A fan heater or kettle with approx. **1200W**. This is the optimal operating point for the base calibration.
+    *   **Test Loads (Verification):** An incandescent bulb (approx. **200W**) and a strong load (approx. **2500W**) to check how large the deviations are in the peripheral areas after calibration.
     *   **AVOID** LED lamps, PCs, or TVs (unstable switching power supplies).
 4.  **Smartphone:** For the photo method.
 

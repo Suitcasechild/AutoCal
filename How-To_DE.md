@@ -32,10 +32,9 @@ Da du keine Referenz hast, erschaffen wir uns eine.
 Du benötigst:
 1.  **Den Prüfling (DUT):** Die Tasmota-Dose, die kalibriert werden soll.
 2.  **Ein einfaches Messgerät:** Ein handelsübliches Energiekosten-Messgerät für die Steckdose.
-3.  **Drei stabile Last-Stufen:** Um eine präzise Kennlinie zu berechnen, solltest du die Dose bei unterschiedlichen Lasten messen. Ideal sind:
-    *   **Stufe 1 (Kleinlast):** Glühbirne oder Halogenstrahler (ca. **100W - 200W**).
-    *   **Stufe 2 (Mittellast):** Heizstrahler oder Wasserkocher (ca. **1000W - 1500W**).
-    *   **Stufe 3 (Hochlast):** Heizstrahler auf Maximalstufe (ca. **2000W - 2500W**).
+3.  **Lasten für Kalibrierung & Test:** Da die manuelle Kalibrierung in der App auf eine Laststufe optimiert ist, solltest du folgende Verbraucher bereithalten:
+    *   **Kalibrier-Last (Ideal):** Ein Heizlüfter oder Wasserkocher mit ca. **1200W**. Dies ist der optimale Arbeitspunkt für die Basis-Kalibrierung.
+    *   **Test-Lasten (Verifizierung):** Eine Glühbirne (ca. **200W**) und eine starke Last (ca. **2500W**), um nach der Kalibrierung zu prüfen, wie groß die Abweichungen in den Randbereichen sind.
     *   **Vermeide** LED-Lampen, PCs oder Fernseher (instabile Schaltnetzteile).
 4.  **Smartphone:** Für die Foto-Methode.
 
