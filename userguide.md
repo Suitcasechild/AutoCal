@@ -112,7 +112,7 @@ Here, the Fluke is connected directly behind the DUT with a measurement adapter 
 <a name="ch3_3"></a>
 ### 3.3 ❓ Menu: Help
 *   **📘 Manual:** Opens this document. The window is non-modal, so you can work in the GUI in parallel.
-*   **ℹ️ License & Info:** Shows the current software version (e.g., v5.4.1) and information about the developer.
+*   **ℹ️ License & Info:** Shows the current software version (e.g., v5.4.2) and information about the developer.
 
 ---
 

@@ -142,7 +142,7 @@ if __name__ == "__main__":
     print("Für den vollen Funktionsumfang bitte die GUI starten.")
     print("="*50 + "\n")
     
-    print("=== TASMOTA PRECISION CALIBRATOR v5.4.1 (CLI) ===")
+    print("=== TASMOTA PRECISION CALIBRATOR v5.4.2 (CLI) ===")
     print("1: Professionell (Fluke 45 via RS232)")
     print("2: Heimanwender (Referenz-Dose via HTTP)")
     choice = input("Auswahl: ")

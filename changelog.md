@@ -1,13 +1,20 @@
 # Changelog
 
-## v5.4.1 (2026-03-09) - Dokumentations-Update / Documentation Update
+## v5.4.2 (2026-03-09) - Release Update / Release Update
 
 ### 🚀 Neue Features / New Features
 *   **Integrierte Hilfe (Dynamische Kalibrierung) / Integrated Help (Dynamic Calibration):**
     *   **Direktzugriff:** Neuer Hilfe-Button (`btn_help_dynamic`) direkt im Experten-Dialog für die dynamische Power-Kalibrierung.
     *   **Asset-Einbettung:** Die vollständige technische Dokumentation (`DOKU_DYNAMISCHE_KALIBRIERUNG.md`) wurde als HTML-Asset fest in den Code integriert (`assets_dynamic_info.py`).
     *   **UI/UX:** Nicht-modales Hilfe-Fenster mit Dark-Theme, interaktivem Inhaltsverzeichnis (Anker-Links) und integrierter Suchfunktion für schnelles Finden von Informationen.
-*   **Pflichtenheft-Aktualisierung / Specification Update:** Das Pflichtenheft wurde aktualisiert, um den Abschluss der manuellen Kalibrierung (v5.4.1) korrekt abzubilden. Die "Manuelle Kalibrierung" wurde von den offenen Punkten in die Liste der abgeschlossenen Erweiterungen verschoben.
+*   **Dokumentations-Update / Documentation Update:**
+    *   **Flash-Schutz (SaveData 0):** Umfassende Information zum Flash-Schutz in `anleitung.md`, `userguide.md` und der integrierten App-Hilfe (`assets_guidance.py`) hinzugefügt.
+    *   **Präzisierung:** Klarstellung, dass `SaveData 0` nur bei aktiver dynamischer Kalibrierung aktiviert wird.
+*   **Pflichtenheft-Aktualisierung / Specification Update:** Das Pflichtenheft wurde aktualisiert, um den Abschluss der manuellen Kalibrierung (v5.4.2) korrekt abzubilden.
+
+---
+
+## v5.4.1 (2026-03-09) - Dokumentations-Update / Documentation Update (Obsolete, merged to 5.4.2)
     *   **English:** Updated the project specification to reflect the completion of the manual calibration feature. Moved "Manual Calibration" from open points to completed extensions.
 
 ---

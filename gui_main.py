@@ -1657,7 +1657,7 @@ class MainWindow(QMainWindow):
         # Deutsch: Zeigt eine Message-Box mit Lizenz- und Autoreninformationen an.
         """
         license_text = (
-            "Tasmota Precision Calibrator v5.4.1\n"
+            "Tasmota Precision Calibrator v5.4.2\n"
             "Erstellt von: Arnulf Greilberger\n\n"
             "----------------------------------------------------------\n"
             "LIZENZ:\n"

@@ -4,6 +4,18 @@ This document provides an overview of the most important changes and innovations
 
 ---
 
+## [v5.4.2] - 2026-03-09
+
+Documentation and UI enhancements for dynamic calibration and flash protection.
+
+### 🌟 Top Features
+1.  **Integrated Dynamic Help:** Instant access to documentation within the Expert Dialog.
+2.  **Search & Navigation:** Added search function and anchor navigation to the embedded help.
+3.  **Flash Protection Info:** Detailed guidance on `SaveData 0` usage and implications.
+4.  **Bugfix:** Resolved search-related `AttributeError` in the help dialog.
+
+---
+
 ## [v5.4.1] - 2026-02-22
 
 This major release significantly expands the capabilities of the Tasmota Precision Calibrator, introducing a full manual workflow alongside major UI and architectural improvements.
